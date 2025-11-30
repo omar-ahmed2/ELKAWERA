@@ -45,7 +45,7 @@ export const PostMatchStats: React.FC = () => {
       const baseScore = computeOverall(stats, player.position);
       const newScore = computeOverallWithPerformance(baseScore, matchPerformance.goals, matchPerformance.assists, matchPerformance.matches);
       const newType = getCardType(newScore);
-      
+
       const updatedPlayer = {
         ...player,
         stats,
@@ -56,7 +56,7 @@ export const PostMatchStats: React.FC = () => {
         cardType: newType,
         updatedAt: Date.now()
       };
-      
+
       await savePlayer(updatedPlayer);
       navigate('/dashboard');
     }
@@ -70,11 +70,11 @@ export const PostMatchStats: React.FC = () => {
         <label className="text-sm uppercase font-bold text-gray-300">{label}</label>
         <span className="text-elkawera-accent font-mono font-bold">{stats[statKey]}</span>
       </div>
-      <input 
-        type="range" 
-        min="1" 
-        max="99" 
-        value={stats[statKey]} 
+      <input
+        type="range"
+        min="1"
+        max="99"
+        value={stats[statKey]}
         onChange={(e) => handleStatChange(statKey, parseInt(e.target.value))}
         className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-elkawera-accent"
       />
@@ -88,83 +88,98 @@ export const PostMatchStats: React.FC = () => {
           <ArrowLeft size={20} />
         </button>
         <div>
-           <h1 className="text-3xl font-display font-bold uppercase">Post-Match Analysis</h1>
-           <p className="text-gray-400">Update stats for <span className="text-white font-bold">{player.name}</span></p>
+          <h1 className="text-3xl font-display font-bold uppercase">Post-Match Analysis</h1>
+          <p className="text-gray-400">Update stats for <span className="text-white font-bold">{player.name}</span></p>
         </div>
       </div>
 
       <div className="bg-white/5 p-8 rounded-2xl border border-white/10 mb-8">
         <h3 className="text-xl font-bold mb-6 text-elkawera-accent border-b border-white/10 pb-2">Season Stats</h3>
         <div className="grid grid-cols-3 gap-8">
-            <div>
-              <label className="block text-sm uppercase font-bold text-gray-300 mb-2">Total Goals</label>
-              <input 
-                type="number" 
-                min="0"
-                value={matchPerformance.goals}
-                onChange={(e) => setMatchPerformance(prev => ({ ...prev, goals: parseInt(e.target.value) || 0 }))}
-                className="w-full bg-black/50 border border-white/20 rounded-lg p-4 text-2xl font-bold text-white focus:border-elkawera-accent focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm uppercase font-bold text-gray-300 mb-2">Total Assists</label>
-              <input 
-                type="number" 
-                min="0"
-                value={matchPerformance.assists}
-                onChange={(e) => setMatchPerformance(prev => ({ ...prev, assists: parseInt(e.target.value) || 0 }))}
-                className="w-full bg-black/50 border border-white/20 rounded-lg p-4 text-2xl font-bold text-white focus:border-elkawera-accent focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm uppercase font-bold text-gray-300 mb-2">Matches Played</label>
-              <input 
-                type="number" 
-                min="0"
-                value={matchPerformance.matches}
-                onChange={(e) => setMatchPerformance(prev => ({ ...prev, matches: parseInt(e.target.value) || 0 }))}
-                className="w-full bg-black/50 border border-white/20 rounded-lg p-4 text-2xl font-bold text-white focus:border-elkawera-accent focus:outline-none"
-              />
-            </div>
+          <div>
+            <label className="block text-sm uppercase font-bold text-gray-300 mb-2">Total Goals</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              lang="en"
+              value={matchPerformance.goals}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                setMatchPerformance(prev => ({ ...prev, goals: parseInt(val) || 0 }));
+              }}
+              className="w-full bg-black/50 border border-white/20 rounded-lg p-4 text-2xl font-bold text-white focus:border-elkawera-accent focus:outline-none text-center"
+            />
+          </div>
+          <div>
+            <label className="block text-sm uppercase font-bold text-gray-300 mb-2">Total Assists</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              lang="en"
+              value={matchPerformance.assists}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                setMatchPerformance(prev => ({ ...prev, assists: parseInt(val) || 0 }));
+              }}
+              className="w-full bg-black/50 border border-white/20 rounded-lg p-4 text-2xl font-bold text-white focus:border-elkawera-accent focus:outline-none text-center"
+            />
+          </div>
+          <div>
+            <label className="block text-sm uppercase font-bold text-gray-300 mb-2">Matches Played</label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              lang="en"
+              value={matchPerformance.matches}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                setMatchPerformance(prev => ({ ...prev, matches: parseInt(val) || 0 }));
+              }}
+              className="w-full bg-black/50 border border-white/20 rounded-lg p-4 text-2xl font-bold text-white focus:border-elkawera-accent focus:outline-none text-center"
+            />
+          </div>
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-8 bg-white/5 p-8 rounded-2xl border border-white/10">
-         <div>
-            <h3 className="text-xl font-bold mb-6 text-elkawera-accent border-b border-white/10 pb-2">Offensive & Skill</h3>
-            <Slider label="Pace / Sprint Speed" statKey="pace" />
-            <Slider label="Shooting" statKey="shooting" />
-            <Slider label="Passing" statKey="passing" />
-            <Slider label="Dribbling" statKey="dribbling" />
-            <Slider label="Agility" statKey="agility" />
-         </div>
-         <div>
-            <h3 className="text-xl font-bold mb-6 text-elkawera-accent border-b border-white/10 pb-2">Physical & Defensive</h3>
-            <Slider label="Defending" statKey="defending" />
-            <Slider label="Physical / Strength" statKey="physical" />
-            <Slider label="Stamina" statKey="stamina" />
-            <Slider label="Acceleration" statKey="acceleration" />
-         </div>
+        <div>
+          <h3 className="text-xl font-bold mb-6 text-elkawera-accent border-b border-white/10 pb-2">Offensive & Skill</h3>
+          <Slider label="Pace / Sprint Speed" statKey="pace" />
+          <Slider label="Shooting" statKey="shooting" />
+          <Slider label="Passing" statKey="passing" />
+          <Slider label="Dribbling" statKey="dribbling" />
+          <Slider label="Agility" statKey="agility" />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold mb-6 text-elkawera-accent border-b border-white/10 pb-2">Physical & Defensive</h3>
+          <Slider label="Defending" statKey="defending" />
+          <Slider label="Physical / Strength" statKey="physical" />
+          <Slider label="Stamina" statKey="stamina" />
+          <Slider label="Acceleration" statKey="acceleration" />
+        </div>
       </div>
 
       <div className="mt-8 flex justify-end">
-         <div className="bg-black/30 p-4 rounded-lg mr-4 border border-white/10">
-            <span className="text-gray-400 text-sm uppercase block">Projected Overall</span>
-            <span className="text-3xl font-display font-bold text-white">
-                {computeOverallWithPerformance(
-                  computeOverall(stats, player.position),
-                  matchPerformance.goals,
-                  matchPerformance.assists,
-                  matchPerformance.matches
-                )}
-            </span>
-         </div>
-         <button 
-           onClick={saveStats}
-           className="px-8 py-4 bg-elkawera-accent text-black font-bold uppercase rounded hover:bg-white transition-colors flex items-center gap-2"
-         >
-           <CheckCircle size={20} /> Confirm Updates
-         </button>
+        <div className="bg-black/30 p-4 rounded-lg mr-4 border border-white/10">
+          <span className="text-gray-400 text-sm uppercase block">Projected Overall</span>
+          <span className="text-3xl font-display font-bold text-white">
+            {computeOverallWithPerformance(
+              computeOverall(stats, player.position),
+              matchPerformance.goals,
+              matchPerformance.assists,
+              matchPerformance.matches
+            )}
+          </span>
+        </div>
+        <button
+          onClick={saveStats}
+          className="px-8 py-4 bg-elkawera-accent text-black font-bold uppercase rounded hover:bg-white transition-colors flex items-center gap-2"
+        >
+          <CheckCircle size={20} /> Confirm Updates
+        </button>
       </div>
     </div>
   );

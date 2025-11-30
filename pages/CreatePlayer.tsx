@@ -94,7 +94,7 @@ export const CreatePlayer: React.FC = () => {
         setLoading(false);
       });
     } else {
-        setFormData(prev => ({ ...prev, id: generateId() }));
+      setFormData(prev => ({ ...prev, id: generateId() }));
     }
   }, [editId, requestId, user, navigate]);
 
@@ -140,7 +140,7 @@ export const CreatePlayer: React.FC = () => {
         formData.assists || 0,
         formData.matchesPlayed || 0
       );
-      
+
       // Ensure all required fields are present and valid
       const playerToSave: Player = {
         id: playerId,
@@ -194,16 +194,16 @@ export const CreatePlayer: React.FC = () => {
           ...userAccount,
           playerCardId: playerToSave.id
         };
-        
+
         // Update user account with player card ID
         await updateUser(updatedUser);
-        
+
         // Verify the update was successful
         const verifyUser = await getUserById(request.userId);
         if (!verifyUser || verifyUser.playerCardId !== playerToSave.id) {
           console.warn('User account update may not have persisted, but player card was saved.');
         }
-        
+
         // Update localStorage for the player if they're currently logged in
         // This ensures they see the card immediately without needing to refresh
         const storedUser = localStorage.getItem('elkawera_user');
@@ -217,9 +217,9 @@ export const CreatePlayer: React.FC = () => {
             console.warn('Could not update localStorage:', e);
           }
         }
-        
+
         setSaveSuccess(true);
-        
+
         // Show success message and navigate after a short delay
         setTimeout(() => {
           navigate('/new-players');
@@ -245,9 +245,9 @@ export const CreatePlayer: React.FC = () => {
             }
           }
         }
-        
+
         setSaveSuccess(true);
-        
+
         // Show success message and navigate after a short delay
         setTimeout(() => {
           navigate('/dashboard');
@@ -271,15 +271,15 @@ export const CreatePlayer: React.FC = () => {
   // Live preview update - use manually selected card type
   const baseScore = computeOverall(formData.stats, formData.position);
   const previewPlayer = {
-      ...formData,
-      overallScore: computeOverallWithPerformance(
-        baseScore,
-        formData.goals || 0,
-        formData.assists || 0,
-        formData.matchesPlayed || 0
-      ),
-      // Use the manually selected cardType for preview
-      cardType: formData.cardType,
+    ...formData,
+    overallScore: computeOverallWithPerformance(
+      baseScore,
+      formData.goals || 0,
+      formData.assists || 0,
+      formData.matchesPlayed || 0
+    ),
+    // Use the manually selected cardType for preview
+    cardType: formData.cardType,
   };
 
   // Simplified Download Handler
@@ -317,7 +317,7 @@ export const CreatePlayer: React.FC = () => {
       <div className="grid lg:grid-cols-2 gap-12">
         {/* Form Section */}
         <div className="space-y-8 bg-white/5 p-8 rounded-2xl border border-white/10">
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold text-elkawera-accent border-b border-white/10 pb-2 flex-1">Basic Info</h3>
@@ -327,75 +327,75 @@ export const CreatePlayer: React.FC = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="grid grid-cols-2 gap-4">
-               <div>
-                 <label className="block text-xs uppercase text-gray-400 mb-1">Full Name</label>
-                 <input 
-                   type="text" 
-                   name="name" 
-                   value={formData.name} 
-                   onChange={handleInputChange}
-                   className="w-full bg-black/50 border border-white/20 rounded p-3 focus:border-elkawera-accent focus:outline-none text-white"
-                   placeholder="e.g. Lionel Messi"
-                 />
-               </div>
-               <div>
-                 <label className="block text-xs uppercase text-gray-400 mb-1">Country</label>
-                 <select 
-                   name="country" 
-                   value={formData.country} 
-                   onChange={handleInputChange}
-                   className="w-full bg-black/50 border border-white/20 rounded p-3 bg-black focus:border-elkawera-accent focus:outline-none text-white"
-                 >
-                    {COUNTRIES.map(c => (
-                        <option key={c.code} value={c.code}>{c.name}</option>
-                    ))}
-                 </select>
-               </div>
+              <div>
+                <label className="block text-xs uppercase text-gray-400 mb-1">Full Name</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full bg-black/50 border border-white/20 rounded p-3 focus:border-elkawera-accent focus:outline-none text-white"
+                  placeholder="e.g. Lionel Messi"
+                />
+              </div>
+              <div>
+                <label className="block text-xs uppercase text-gray-400 mb-1">Country</label>
+                <select
+                  name="country"
+                  value={formData.country}
+                  onChange={handleInputChange}
+                  className="w-full bg-black/50 border border-white/20 rounded p-3 bg-black focus:border-elkawera-accent focus:outline-none text-white"
+                >
+                  {COUNTRIES.map(c => (
+                    <option key={c.code} value={c.code}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             <div className="grid grid-cols-4 gap-4">
-               <div>
-                 <label className="block text-xs uppercase text-gray-400 mb-1">Age</label>
-                 <input type="number" name="age" value={formData.age} onChange={handleInputChange} className="w-full bg-black/50 border border-white/20 rounded p-3 text-white" />
-               </div>
-               <div>
-                 <label className="block text-xs uppercase text-gray-400 mb-1">Hgt (cm)</label>
-                 <input type="number" name="height" value={formData.height} onChange={handleInputChange} className="w-full bg-black/50 border border-white/20 rounded p-3 text-white" />
-               </div>
-               <div>
-                 <label className="block text-xs uppercase text-gray-400 mb-1">Wgt (kg)</label>
-                 <input type="number" name="weight" value={formData.weight} onChange={handleInputChange} className="w-full bg-black/50 border border-white/20 rounded p-3 text-white" />
-               </div>
-               <div>
-                 <label className="block text-xs uppercase text-gray-400 mb-1">Pos</label>
-                 <select name="position" value={formData.position} onChange={handleInputChange} className="w-full bg-black/50 border border-white/20 rounded p-3 bg-black text-white">
-                    <optgroup label="Forward">
-                      <option value="ST">ST</option>
-                      <option value="CF">CF</option>
-                      <option value="LW">LW</option>
-                      <option value="RW">RW</option>
-                    </optgroup>
-                    <optgroup label="Midfield">
-                      <option value="CAM">CAM</option>
-                      <option value="CM">CM</option>
-                      <option value="CDM">CDM</option>
-                      <option value="LM">LM</option>
-                      <option value="RM">RM</option>
-                    </optgroup>
-                    <optgroup label="Defense">
-                      <option value="CB">CB</option>
-                      <option value="LB">LB</option>
-                      <option value="RB">RB</option>
-                      <option value="LWB">LWB</option>
-                      <option value="RWB">RWB</option>
-                    </optgroup>
-                    <optgroup label="Goalkeeper">
-                      <option value="GK">GK</option>
-                    </optgroup>
-                 </select>
-               </div>
+              <div>
+                <label className="block text-xs uppercase text-gray-400 mb-1">Age</label>
+                <input type="number" name="age" value={formData.age} onChange={handleInputChange} className="w-full bg-black/50 border border-white/20 rounded p-3 text-white" />
+              </div>
+              <div>
+                <label className="block text-xs uppercase text-gray-400 mb-1">Hgt (cm)</label>
+                <input type="number" name="height" value={formData.height} onChange={handleInputChange} className="w-full bg-black/50 border border-white/20 rounded p-3 text-white" />
+              </div>
+              <div>
+                <label className="block text-xs uppercase text-gray-400 mb-1">Wgt (kg)</label>
+                <input type="number" name="weight" value={formData.weight} onChange={handleInputChange} className="w-full bg-black/50 border border-white/20 rounded p-3 text-white" />
+              </div>
+              <div>
+                <label className="block text-xs uppercase text-gray-400 mb-1">Pos</label>
+                <select name="position" value={formData.position} onChange={handleInputChange} className="w-full bg-black/50 border border-white/20 rounded p-3 bg-black text-white">
+                  <optgroup label="Forward">
+                    <option value="ST">ST</option>
+                    <option value="CF">CF</option>
+                    <option value="LW">LW</option>
+                    <option value="RW">RW</option>
+                  </optgroup>
+                  <optgroup label="Midfield">
+                    <option value="CAM">CAM</option>
+                    <option value="CM">CM</option>
+                    <option value="CDM">CDM</option>
+                    <option value="LM">LM</option>
+                    <option value="RM">RM</option>
+                  </optgroup>
+                  <optgroup label="Defense">
+                    <option value="CB">CB</option>
+                    <option value="LB">LB</option>
+                    <option value="RB">RB</option>
+                    <option value="LWB">LWB</option>
+                    <option value="RWB">RWB</option>
+                  </optgroup>
+                  <optgroup label="Goalkeeper">
+                    <option value="GK">GK</option>
+                  </optgroup>
+                </select>
+              </div>
             </div>
 
             <div className="bg-gradient-to-r from-elkawera-accent/10 to-transparent border border-elkawera-accent/30 rounded-xl p-4 mb-4">
@@ -404,11 +404,10 @@ export const CreatePlayer: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, cardType: 'Silver' }))}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    formData.cardType === 'Silver'
-                      ? 'border-gray-400 bg-gray-900/50 shadow-lg scale-105'
-                      : 'border-white/20 bg-black/30 hover:border-white/40'
-                  }`}
+                  className={`p-4 rounded-lg border-2 transition-all ${formData.cardType === 'Silver'
+                    ? 'border-gray-400 bg-gray-900/50 shadow-lg scale-105'
+                    : 'border-white/20 bg-black/30 hover:border-white/40'
+                    }`}
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-1">🥈</div>
@@ -418,11 +417,10 @@ export const CreatePlayer: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, cardType: 'Gold' }))}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    formData.cardType === 'Gold'
-                      ? 'border-yellow-400 bg-yellow-900/50 shadow-lg scale-105'
-                      : 'border-white/20 bg-black/30 hover:border-white/40'
-                  }`}
+                  className={`p-4 rounded-lg border-2 transition-all ${formData.cardType === 'Gold'
+                    ? 'border-yellow-400 bg-yellow-900/50 shadow-lg scale-105'
+                    : 'border-white/20 bg-black/30 hover:border-white/40'
+                    }`}
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-1">🥇</div>
@@ -432,11 +430,10 @@ export const CreatePlayer: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, cardType: 'Platinum' }))}
-                  className={`p-4 rounded-lg border-2 transition-all ${
-                    formData.cardType === 'Platinum'
-                      ? 'border-cyan-400 bg-cyan-900/50 shadow-lg scale-105'
-                      : 'border-white/20 bg-black/30 hover:border-white/40'
-                  }`}
+                  className={`p-4 rounded-lg border-2 transition-all ${formData.cardType === 'Platinum'
+                    ? 'border-cyan-400 bg-cyan-900/50 shadow-lg scale-105'
+                    : 'border-white/20 bg-black/30 hover:border-white/40'
+                    }`}
                 >
                   <div className="text-center">
                     <div className="text-2xl mb-1">💎</div>
@@ -448,30 +445,30 @@ export const CreatePlayer: React.FC = () => {
 
             <div>
               <label className="block text-xs uppercase text-gray-400 mb-1">Assign Team</label>
-              <select 
-                name="teamId" 
-                value={formData.teamId || ''} 
-                onChange={handleInputChange} 
+              <select
+                name="teamId"
+                value={formData.teamId || ''}
+                onChange={handleInputChange}
                 className="w-full bg-black/50 border border-white/20 rounded p-3 bg-black focus:border-elkawera-accent focus:outline-none text-white"
               >
-                 <option value="">-- No Team --</option>
-                 {teams.map(team => (
-                   <option key={team.id} value={team.id}>{team.name} ({team.shortName})</option>
-                 ))}
+                <option value="">-- No Team --</option>
+                {teams.map(team => (
+                  <option key={team.id} value={team.id}>{team.name} ({team.shortName})</option>
+                ))}
               </select>
               <div className="mt-1 text-right">
-                 <Link to="/teams" className="text-xs text-elkawera-accent hover:underline">+ Create New Team</Link>
+                <Link to="/teams" className="text-xs text-elkawera-accent hover:underline">+ Create New Team</Link>
               </div>
             </div>
 
             <div>
               <label className="block text-xs uppercase text-gray-400 mb-1">Player Image</label>
               <div className="flex items-center gap-4">
-                 <label className="cursor-pointer flex items-center justify-center bg-black/50 border border-white/20 hover:border-elkawera-accent border-dashed rounded h-12 px-4 w-full transition-colors">
-                    <Upload size={16} className="mr-2 text-gray-400" />
-                    <span className="text-sm text-gray-300">Choose File...</span>
-                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                 </label>
+                <label className="cursor-pointer flex items-center justify-center bg-black/50 border border-white/20 hover:border-elkawera-accent border-dashed rounded h-12 px-4 w-full transition-colors">
+                  <Upload size={16} className="mr-2 text-gray-400" />
+                  <span className="text-sm text-gray-300">Choose File...</span>
+                  <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                </label>
               </div>
             </div>
           </div>
@@ -491,15 +488,70 @@ export const CreatePlayer: React.FC = () => {
           )}
 
           {requestId && !saveSuccess && (
-              <div className="p-4 bg-blue-500/10 rounded border border-blue-500/30 text-sm text-blue-300">
-                  ✨ <strong>Card Builder Mode:</strong> Customize all aspects of this player card. The card will be sent to the player once you confirm.
-              </div>
+            <div className="p-4 bg-blue-500/10 rounded border border-blue-500/30 text-sm text-blue-300">
+              ✨ <strong>Card Builder Mode:</strong> Customize all aspects of this player card. The card will be sent to the player once you confirm.
+            </div>
           )}
 
           {!editId && !requestId && (
-              <div className="p-4 bg-elkawera-green/20 rounded border border-elkawera-green/50 text-sm text-gray-300">
-                  ⚠️ Physical stats and goal records can be added after the first match in the "Post-Match Stats" section.
+            <div className="p-4 bg-elkawera-green/20 rounded border border-elkawera-green/50 text-sm text-gray-300">
+              ⚠️ Physical stats and goal records can be added after the first match in the "Post-Match Stats" section.
+            </div>
+          )}
+
+          {/* Season Stats Section - Show for Card Builder and Edit modes */}
+          {(requestId || editId) && (
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold text-elkawera-accent border-b border-white/10 pb-2">Season Stats</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-xs uppercase text-gray-400 mb-2">Goals</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    lang="en"
+                    value={formData.goals || 0}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setFormData(prev => ({ ...prev, goals: parseInt(val) || 0 }));
+                    }}
+                    className="w-full bg-black/50 border border-white/20 rounded p-3 text-white text-center text-lg font-bold focus:border-elkawera-accent focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase text-gray-400 mb-2">Assists</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    lang="en"
+                    value={formData.assists || 0}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setFormData(prev => ({ ...prev, assists: parseInt(val) || 0 }));
+                    }}
+                    className="w-full bg-black/50 border border-white/20 rounded p-3 text-white text-center text-lg font-bold focus:border-elkawera-accent focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs uppercase text-gray-400 mb-2">Matches</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    lang="en"
+                    value={formData.matchesPlayed || 0}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^0-9]/g, '');
+                      setFormData(prev => ({ ...prev, matchesPlayed: parseInt(val) || 0 }));
+                    }}
+                    className="w-full bg-black/50 border border-white/20 rounded p-3 text-white text-center text-lg font-bold focus:border-elkawera-accent focus:outline-none"
+                  />
+                </div>
               </div>
+              <p className="text-xs text-gray-500 italic">These stats contribute to the overall card rating</p>
+            </div>
           )}
 
           {/* Stats Section - Show for Card Builder mode or when editing */}
@@ -511,7 +563,7 @@ export const CreatePlayer: React.FC = () => {
                   <Link to={`/stats?id=${formData.id}`} className="text-xs bg-white/10 px-2 py-1 rounded hover:bg-white/20">Edit in Detail</Link>
                 )}
               </div>
-              
+
               {/* Stats Sliders for Card Builder */}
               {requestId && (
                 <div className="grid md:grid-cols-2 gap-4">
@@ -554,14 +606,13 @@ export const CreatePlayer: React.FC = () => {
             </div>
           )}
 
-          <button 
+          <button
             onClick={handleSave}
             disabled={saving || saveSuccess}
-            className={`w-full py-4 font-bold uppercase rounded transition-all flex items-center justify-center gap-2 ${
-              requestId
-                ? 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)] transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
-                : 'bg-elkawera-accent text-black hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed'
-            }`}
+            className={`w-full py-4 font-bold uppercase rounded transition-all flex items-center justify-center gap-2 ${requestId
+              ? 'bg-green-500 hover:bg-green-400 text-white shadow-[0_0_20px_rgba(34,197,94,0.4)] transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none'
+              : 'bg-elkawera-accent text-black hover:bg-white disabled:opacity-50 disabled:cursor-not-allowed'
+              }`}
           >
             {saving ? (
               <>
@@ -578,7 +629,7 @@ export const CreatePlayer: React.FC = () => {
               </>
             )}
           </button>
-          
+
           {requestId && !saveSuccess && (
             <p className="text-xs text-center text-gray-400 mt-2">
               This will finalize the card and send it to the player's account immediately
@@ -589,44 +640,44 @@ export const CreatePlayer: React.FC = () => {
 
         {/* Preview Section */}
         <div className="flex flex-col items-center justify-start space-y-6">
-           <h3 className="text-lg font-bold uppercase text-gray-500">Live Preview</h3>
-           
-           <div className="relative">
-             <PlayerCard 
-               player={previewPlayer} 
-               uniqueId="preview"
-               isFlipped={isFlipped}
-               onFlip={() => setIsFlipped(!isFlipped)}
-               allowFlipClick={false} 
-             />
-             
-             {/* Flip Control */}
-             <button 
-               onClick={() => setIsFlipped(!isFlipped)}
-               className="absolute top-4 right-4 p-2 bg-black/60 rounded-full hover:bg-black/80 text-white z-50 border border-white/20"
-             >
-                <RotateCcw size={16} />
-             </button>
-           </div>
-           
-           <div className="flex gap-4">
-               <button 
-                 onClick={() => handleDownload('front')}
-                 className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded hover:bg-white/20 transition-colors text-sm"
-               >
-                 <Download size={16} /> Front
-               </button>
-               <button 
-                 onClick={() => handleDownload('back')}
-                 className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded hover:bg-white/20 transition-colors text-sm"
-               >
-                 <Download size={16} /> Back
-               </button>
-           </div>
+          <h3 className="text-lg font-bold uppercase text-gray-500">Live Preview</h3>
 
-           <div className="text-center text-sm text-gray-500 max-w-xs mt-4">
-              Click buttons to download specific card faces.
-           </div>
+          <div className="relative">
+            <PlayerCard
+              player={previewPlayer}
+              uniqueId="preview"
+              isFlipped={isFlipped}
+              onFlip={() => setIsFlipped(!isFlipped)}
+              allowFlipClick={false}
+            />
+
+            {/* Flip Control */}
+            <button
+              onClick={() => setIsFlipped(!isFlipped)}
+              className="absolute top-4 right-4 p-2 bg-black/60 rounded-full hover:bg-black/80 text-white z-50 border border-white/20"
+            >
+              <RotateCcw size={16} />
+            </button>
+          </div>
+
+          <div className="flex gap-4">
+            <button
+              onClick={() => handleDownload('front')}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded hover:bg-white/20 transition-colors text-sm"
+            >
+              <Download size={16} /> Front
+            </button>
+            <button
+              onClick={() => handleDownload('back')}
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 border border-white/20 rounded hover:bg-white/20 transition-colors text-sm"
+            >
+              <Download size={16} /> Back
+            </button>
+          </div>
+
+          <div className="text-center text-sm text-gray-500 max-w-xs mt-4">
+            Click buttons to download specific card faces.
+          </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 
 export type CardType = 'Silver' | 'Gold' | 'Platinum';
 
-export type Position = 
+export type Position =
   | 'GK'
   | 'CB' | 'LB' | 'RB' | 'LWB' | 'RWB'
   | 'CDM' | 'CM' | 'CAM' | 'LM' | 'RM'
@@ -21,6 +21,14 @@ export interface PhysicalStats {
 
 export type UserRole = 'admin' | 'player';
 
+export interface Notification {
+  id: string;
+  type: 'card_rejected' | 'card_deleted';
+  message: string;
+  timestamp: number;
+  read: boolean;
+}
+
 export interface User {
   id: string;
   email: string;
@@ -36,6 +44,7 @@ export interface User {
   strongFoot?: 'Left' | 'Right';
   position?: Position;
   playerCardId?: string; // Link to Player card created by admin
+  notifications?: Notification[]; // New field for notifications
   createdAt: number;
 }
 
@@ -80,6 +89,8 @@ export interface Player {
   matchesPlayed: number;
   createdAt: number;
   updatedAt: number;
+  likes?: number; // New field for like count
+  likedBy?: string[]; // Array of user IDs who liked the card
 }
 
 export const INITIAL_STATS: PhysicalStats = {

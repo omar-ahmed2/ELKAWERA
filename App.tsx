@@ -13,6 +13,7 @@ import { SignIn } from './pages/SignIn';
 import { SignUp } from './pages/SignUp';
 import { Profile } from './pages/Profile';
 import { NewPlayers } from './pages/NewPlayers';
+import { RequestCard } from './pages/RequestCard';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
@@ -25,7 +26,7 @@ const App: React.FC = () => {
             <Route path="/" element={<Landing />} />
             <Route path="/login" element={<SignIn />} />
             <Route path="/signup" element={<SignUp />} />
-            
+
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/create" element={<CreatePlayer />} />
@@ -36,6 +37,7 @@ const App: React.FC = () => {
               <Route path="/compare" element={<Compare />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/new-players" element={<NewPlayers />} />
+              <Route path="/request-card" element={<RequestCard />} />
             </Route>
           </Routes>
         </Layout>

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPendingPlayerRegistrationRequests, getAllPlayerRegistrationRequests, updatePlayerRegistrationRequest, getPlayerRegistrationRequestById } from '../utils/db';
+import { getPendingPlayerRegistrationRequests, getAllPlayerRegistrationRequests, updatePlayerRegistrationRequest, getPlayerRegistrationRequestById, addNotificationToUser } from '../utils/db';
+import { v4 as uuidv4 } from 'uuid';
 import { PlayerRegistrationRequest } from '../types';
 import { User, CheckCircle, XCircle, ArrowRight, Clock } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -52,6 +53,16 @@ export const NewPlayers: React.FC = () => {
           ...request,
           status: 'rejected'
         });
+
+        // Add notification
+        await addNotificationToUser(request.userId, {
+          id: uuidv4(),
+          type: 'card_rejected',
+          message: 'Your player card request was rejected. Please review and submit a new request.',
+          timestamp: Date.now(),
+          read: false
+        });
+
         loadRequests();
       }
     } catch (error) {
@@ -103,13 +114,12 @@ export const NewPlayers: React.FC = () => {
                       <h3 className="text-2xl font-display font-bold text-white uppercase">{request.name}</h3>
                       <p className="text-gray-400 text-sm">{request.email}</p>
                     </div>
-                    <div className={`ml-auto flex items-center gap-2 px-3 py-1 rounded-full border ${
-                      request.status === 'approved' 
-                        ? 'bg-green-500/20 border-green-500/30' 
+                    <div className={`ml-auto flex items-center gap-2 px-3 py-1 rounded-full border ${request.status === 'approved'
+                        ? 'bg-green-500/20 border-green-500/30'
                         : request.status === 'rejected'
-                        ? 'bg-red-500/20 border-red-500/30'
-                        : 'bg-yellow-500/20 border-yellow-500/30'
-                    }`}>
+                          ? 'bg-red-500/20 border-red-500/30'
+                          : 'bg-yellow-500/20 border-yellow-500/30'
+                      }`}>
                       {request.status === 'approved' ? (
                         <CheckCircle size={14} className="text-green-400" />
                       ) : request.status === 'rejected' ? (
@@ -117,13 +127,12 @@ export const NewPlayers: React.FC = () => {
                       ) : (
                         <Clock size={14} className="text-yellow-400" />
                       )}
-                      <span className={`text-xs font-bold uppercase ${
-                        request.status === 'approved' 
-                          ? 'text-green-400' 
+                      <span className={`text-xs font-bold uppercase ${request.status === 'approved'
+                          ? 'text-green-400'
                           : request.status === 'rejected'
-                          ? 'text-red-400'
-                          : 'text-yellow-400'
-                      }`}>
+                            ? 'text-red-400'
+                            : 'text-yellow-400'
+                        }`}>
                         {request.status === 'approved' ? 'Confirmed' : request.status === 'rejected' ? 'Rejected' : 'Pending'}
                       </span>
                     </div>
