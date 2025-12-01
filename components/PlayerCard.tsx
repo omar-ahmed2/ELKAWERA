@@ -345,7 +345,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
 
                 {/* Logo image */}
                 <img
-                  src="/assists/Logo/ELKAWERA.png"
+                  src="public/elkawera.jpg"
                   alt="ELKAWERA"
                   className="relative w-16 h-16 rounded-full object-contain z-10 drop-shadow-md group-hover/logo:scale-105 transition-transform duration-300"
                 />

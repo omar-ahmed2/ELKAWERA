@@ -64,7 +64,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               {/* ELKAWERA Logo */}
               <div className="relative w-10 h-10 rounded-full shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                 <img
-                  src="/assists/Logo/ELKAWERA.png"
+                  src="public/elkawera.jpg"
                   alt="ELKAWERA"
                   className="w-8 h-8 object-contain rounded-full group-hover:scale-110 transition-transform duration-300"
                 />
