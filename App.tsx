@@ -14,6 +14,11 @@ import { SignUp } from './pages/SignUp';
 import { Profile } from './pages/Profile';
 import { NewPlayers } from './pages/NewPlayers';
 import { RequestCard } from './pages/RequestCard';
+import { AdminMatches } from './pages/AdminMatches';
+import { EndMatch } from './pages/EndMatch';
+import { PlayerEvaluationPage } from './pages/PlayerEvaluationPage';
+import { CaptainDashboard } from './pages/CaptainDashboard';
+import { ExternalMatchScheduler } from './pages/ExternalMatchScheduler';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
@@ -38,6 +43,15 @@ const App: React.FC = () => {
               <Route path="/profile" element={<Profile />} />
               <Route path="/new-players" element={<NewPlayers />} />
               <Route path="/request-card" element={<RequestCard />} />
+
+              {/* Admin Match Management Routes */}
+              <Route path="/admin/matches" element={<AdminMatches />} />
+              <Route path="/admin/end-match/:matchId" element={<EndMatch />} />
+              <Route path="/admin/evaluation/:matchId" element={<PlayerEvaluationPage />} />
+
+              {/* Captain Routes */}
+              <Route path="/captain/dashboard" element={<CaptainDashboard />} />
+              <Route path="/captain/schedule-match" element={<ExternalMatchScheduler />} />
             </Route>
           </Routes>
         </Layout>

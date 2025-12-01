@@ -206,6 +206,30 @@ export const Profile: React.FC = () => {
                         <p className="text-[10px] text-gray-600 mt-2 ml-1">* Email cannot be changed.</p>
                      </div>
 
+                     {/* Role Switcher (For Testing/Demo) */}
+                     <div className="pt-4 border-t border-white/10">
+                        <label className="flex items-center gap-2 text-xs uppercase text-elkawera-accent mb-2 font-bold tracking-wider">
+                           <Shield size={14} /> Role (Debug/Test)
+                        </label>
+                        <select
+                           value={user.role}
+                           onChange={(e) => {
+                              if (window.confirm(`Switch role to ${e.target.value}? Page will reload.`)) {
+                                 updateProfile(user.name, undefined, e.target.value as any);
+                                 setTimeout(() => window.location.reload(), 500);
+                              }
+                           }}
+                           className="w-full bg-black/50 border border-elkawera-accent/30 rounded-xl p-3 text-white focus:outline-none focus:border-elkawera-accent"
+                        >
+                           <option value="player">Player</option>
+                           <option value="captain">Captain</option>
+                           <option value="admin">Admin</option>
+                        </select>
+                        <p className="text-[10px] text-gray-500 mt-2 ml-1">
+                           * Use this to switch roles and test different features (Captain Dashboard, Admin Matches, etc.)
+                        </p>
+                     </div>
+
                      {isEditing && (
                         <div className="pt-2 animate-fade-in-up">
                            <button

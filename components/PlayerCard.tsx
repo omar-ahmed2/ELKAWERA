@@ -468,36 +468,71 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
               </div>
             </div>
 
-            {/* Performance & Bio Section */}
-            <div className="grid grid-cols-2 gap-2 mb-1">
-              {/* Goals */}
-              <div className={`p-1.5 rounded-lg ${theme.badgeBg} border border-white/10 text-center flex flex-col justify-center shadow-sm`}>
-                <span className={`text-[8px] font-bold uppercase opacity-70 ${theme.text}`}>Goals</span>
-                <span className={`text-lg font-display font-bold ${theme.text}`}>{player.goals || 0}</span>
+            {/* Performance & Bio Section - Enhanced with All Stats */}
+            <div className="space-y-2">
+              {/* Statistics Header */}
+              <div className={`flex items-center gap-2 ${theme.text} opacity-90`}>
+                <Target size={14} />
+                <h4 className="text-xs font-bold uppercase tracking-wider">Season Statistics</h4>
               </div>
 
-              {/* Assists */}
-              <div className={`p-1.5 rounded-lg ${theme.badgeBg} border border-white/10 text-center flex flex-col justify-center shadow-sm`}>
-                <span className={`text-[8px] font-bold uppercase opacity-70 ${theme.text}`}>Assists</span>
-                <span className={`text-lg font-display font-bold ${theme.text}`}>{player.assists || 0}</span>
+              {/* Main Stats Grid - 3 columns */}
+              <div className="grid grid-cols-3 gap-2">
+                {/* Goals */}
+                <div className={`p-2 rounded-lg ${theme.badgeBg} border border-white/10 text-center flex flex-col justify-center shadow-sm`}>
+                  <span className={`text-[9px] font-bold uppercase opacity-70 ${theme.text}`}>⚽ Goals</span>
+                  <span className={`text-xl font-display font-bold ${theme.text}`}>{player.goals || 0}</span>
+                </div>
+
+                {/* Assists */}
+                <div className={`p-2 rounded-lg ${theme.badgeBg} border border-white/10 text-center flex flex-col justify-center shadow-sm`}>
+                  <span className={`text-[9px] font-bold uppercase opacity-70 ${theme.text}`}>🎯 Assists</span>
+                  <span className={`text-xl font-display font-bold ${theme.text}`}>{player.assists || 0}</span>
+                </div>
+
+                {/* Matches */}
+                <div className={`p-2 rounded-lg ${theme.boxBg} border border-white/20 text-center flex flex-col justify-center shadow-md backdrop-blur-sm`}>
+                  <span className={`text-[9px] font-bold uppercase opacity-80 ${theme.text}`}>📊 Matches</span>
+                  <span className={`text-xl font-display font-bold ${theme.text}`}>{player.matchesPlayed || 0}</span>
+                </div>
               </div>
 
-              {/* Matches */}
-              <div className={`p-1.5 rounded-lg ${theme.boxBg} border border-white/20 text-center flex flex-col justify-center shadow-md backdrop-blur-sm`}>
-                <span className={`text-[8px] font-bold uppercase opacity-80 ${theme.text}`}>Matches</span>
-                <span className={`text-lg font-display font-bold ${theme.text}`}>{player.matchesPlayed || 0}</span>
+              {/* Secondary Stats Grid - 3 columns */}
+              <div className="grid grid-cols-3 gap-2">
+                {/* Defensive Contributions */}
+                <div className={`p-2 rounded-lg ${theme.badgeBg} border border-white/10 text-center flex flex-col justify-center shadow-sm`}>
+                  <span className={`text-[9px] font-bold uppercase opacity-70 ${theme.text}`}>🛡️ Def</span>
+                  <span className={`text-xl font-display font-bold ${theme.text}`}>{player.defensiveContributions || 0}</span>
+                </div>
+
+                {/* Clean Sheets */}
+                <div className={`p-2 rounded-lg ${theme.badgeBg} border border-white/10 text-center flex flex-col justify-center shadow-sm`}>
+                  <span className={`text-[9px] font-bold uppercase opacity-70 ${theme.text}`}>🧤 Clean</span>
+                  <span className={`text-xl font-display font-bold ${theme.text}`}>{player.cleanSheets || 0}</span>
+                </div>
+
+                {/* Penalty Saves */}
+                <div className={`p-2 rounded-lg ${theme.badgeBg} border border-white/10 text-center flex flex-col justify-center shadow-sm`}>
+                  <span className={`text-[9px] font-bold uppercase opacity-70 ${theme.text}`}>🥅 Saves</span>
+                  <span className={`text-xl font-display font-bold ${theme.text}`}>{player.penaltySaves || 0}</span>
+                </div>
               </div>
 
-              {/* Physique */}
-              <div className={`p-1.5 rounded-lg ${theme.boxBg} border border-white/20 flex flex-col justify-center items-center gap-0.5 shadow-md backdrop-blur-sm`}>
+              {/* Physique - Full Width */}
+              <div className={`p-2 rounded-lg ${theme.boxBg} border border-white/20 flex justify-around items-center shadow-md backdrop-blur-sm`}>
                 <div className="flex items-baseline gap-1">
                   <span className={`text-sm font-bold ${theme.text}`}>{player.height}</span>
-                  <span className={`text-[7px] font-bold uppercase opacity-80 ${theme.text}`}>cm</span>
+                  <span className={`text-[8px] font-bold uppercase opacity-80 ${theme.text}`}>cm</span>
                 </div>
-                <div className="w-6 h-px bg-current opacity-20 my-0.5"></div>
+                <div className={`w-px h-6 bg-current opacity-20 ${theme.text}`}></div>
                 <div className="flex items-baseline gap-1">
                   <span className={`text-sm font-bold ${theme.text}`}>{player.weight}</span>
-                  <span className={`text-[7px] font-bold uppercase opacity-80 ${theme.text}`}>kg</span>
+                  <span className={`text-[8px] font-bold uppercase opacity-80 ${theme.text}`}>kg</span>
+                </div>
+                <div className={`w-px h-6 bg-current opacity-20 ${theme.text}`}></div>
+                <div className="flex items-baseline gap-1">
+                  <span className={`text-sm font-bold ${theme.text}`}>{player.age}</span>
+                  <span className={`text-[8px] font-bold uppercase opacity-80 ${theme.text}`}>yrs</span>
                 </div>
               </div>
             </div>
