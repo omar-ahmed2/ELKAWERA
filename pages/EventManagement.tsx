@@ -21,9 +21,9 @@ export const EventManagement: React.FC = () => {
         loadEvent();
     }, [eventId]);
 
-    const loadEvent = async () => {
+    const loadEvent = async (showLoading = true) => {
         if (!eventId) return;
-        setLoading(true);
+        if (showLoading) setLoading(true);
         try {
             const [ev, teamsData] = await Promise.all([
                 getEventById(eventId),
@@ -41,18 +41,27 @@ export const EventManagement: React.FC = () => {
             console.error(error);
             alert('Failed to load data');
         } finally {
-            setLoading(false);
+            if (showLoading) setLoading(false);
         }
     };
 
     const handleStatusUpdate = async (teamId: string, status: 'approved' | 'rejected') => {
         if (!event) return;
+
+        // Optimistic Update
+        const updatedTeams = event.registeredTeams?.map(team =>
+            team.teamId === teamId ? { ...team, status } : team
+        ) || [];
+
+        setEvent({ ...event, registeredTeams: updatedTeams });
+
         try {
             await updateEventRegistrationStatus(event.id, teamId, status);
-            loadEvent(); // Refresh
+            loadEvent(false); // Silent refresh
         } catch (error) {
             console.error('Failed to update status:', error);
             alert('Failed to update status');
+            loadEvent(true); // Revert on error
         }
     };
 

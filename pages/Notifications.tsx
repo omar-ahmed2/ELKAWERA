@@ -65,18 +65,25 @@ export const Notifications: React.FC = () => {
     const handleMatchRequestAction = async (notification: Notification, action: 'confirm') => {
         if (!notification.metadata?.requestId) return;
 
+        // Optimistic UI Update: Mark as read immediately to hide buttons/visualize action
+        setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: true } : n));
+
         try {
             if (action === 'confirm') {
-                if (!user?.id) return;
-                await confirmMatchRequestByOpponent(notification.metadata.requestId, user.id);
+                if (!user?.id) throw new Error("User ID missing");
+                // Pass empty array for lineup as handling it via notification doesn't select players yet. 
+                // Ideally this flow should open a modal to select players, but for now passing empty to fix error/match rapid accept flow.
+                await confirmMatchRequestByOpponent(notification.metadata.requestId, user.id, []);
                 showToast('Match request confirmed! Admin notified.', 'success');
-                // Auto-mark notification as read and delete it (or keep history)
-                await handleMarkAsRead(notification.id);
-                // Optionally refresh to update UI state if we were showing status
+
+                // Ensure backend is synced
+                await markNotificationAsRead(notification.id);
             }
         } catch (error) {
             console.error('Error handling match request:', error);
             showToast('Failed to confirm match request', 'error');
+            // Revert optimistic update on failure (optional, but good practice)
+            setNotifications(prev => prev.map(n => n.id === notification.id ? { ...n, read: false } : n));
         }
     };
 

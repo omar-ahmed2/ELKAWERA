@@ -277,6 +277,7 @@ const EventDetailModal: React.FC<{
     const [captainTeam, setCaptainTeam] = useState<Team | null>(null);
     const [registering, setRegistering] = useState(false);
     const [showParticipants, setShowParticipants] = useState(false);
+    const [optimisticIsRegistered, setOptimisticIsRegistered] = useState(false);
 
     useEffect(() => {
         const fetchTeam = async () => {
@@ -289,12 +290,16 @@ const EventDetailModal: React.FC<{
         fetchTeam();
     }, [user]);
 
-    const isRegistered = captainTeam && event.registeredTeams?.some(t => t.teamId === captainTeam.id);
+    const isRegistered = optimisticIsRegistered || (captainTeam && event.registeredTeams?.some(t => t.teamId === captainTeam.id));
     const isAdmin = user?.role === 'admin';
 
     const handleRegister = async () => {
         if (!captainTeam) return;
+
+        // Optimistic Update
+        setOptimisticIsRegistered(true);
         setRegistering(true);
+
         try {
             await registerTeamForEvent(event.id, {
                 teamId: captainTeam.id,
@@ -302,11 +307,12 @@ const EventDetailModal: React.FC<{
                 captainId: user?.id || '',
                 captainName: user?.name || 'Unknown'
             });
-            alert('Successfully registered for the event!');
+            // alert('Successfully registered for the event!'); // Removed for seamlessness
             onRegister();
         } catch (error) {
             console.error(error);
             alert('Failed to register.');
+            setOptimisticIsRegistered(false); // Revert on error
         } finally {
             setRegistering(false);
         }
