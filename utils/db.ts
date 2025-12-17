@@ -2,7 +2,7 @@ import { User, Player, CardType, Position, Match, MatchStatus, MatchEvent, Playe
 import { v4 as uuidv4 } from 'uuid';
 
 const DB_NAME = 'ElkaweraDB';
-const DB_VERSION = 13; // Bumped for Scout system
+const DB_VERSION = 20; // Bumped for Scout system
 const PLAYER_STORE = 'players';
 const TEAM_STORE = 'teams';
 const USER_STORE = 'users';
@@ -176,6 +176,8 @@ export const openDB = (): Promise<IDBDatabase> => {
             eventStore.createIndex('date', 'date', { unique: false });
             eventStore.createIndex('category', 'category', { unique: false });
           }
+
+
 
           // Scout Profiles Store (v13)
           if (!db.objectStoreNames.contains(SCOUT_PROFILE_STORE)) {
@@ -1497,6 +1499,33 @@ export const saveEvent = async (event: AppEvent): Promise<void> => {
       resolve();
     };
     request.onerror = () => reject('Error saving event');
+  });
+};
+
+export const getEventById = async (eventId: string): Promise<Event | undefined> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([EVENT_STORE], 'readonly');
+    const store = transaction.objectStore(EVENT_STORE);
+    const request = store.get(eventId);
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject('Error fetching event');
+  });
+};
+
+export const updateEvent = async (event: Event): Promise<void> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([EVENT_STORE], 'readwrite');
+    const store = transaction.objectStore(EVENT_STORE);
+    const request = store.put(event);
+
+    request.onsuccess = () => {
+      notifyChanges();
+      resolve();
+    };
+    request.onerror = () => reject('Error updating event');
   });
 };
 

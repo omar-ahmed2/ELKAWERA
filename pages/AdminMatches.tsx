@@ -307,7 +307,7 @@ const MatchCard: React.FC<{ match: Match; teams: Team[]; onUpdate: () => void }>
                     {getStatusBadge()}
                     <span className="text-xs text-gray-500 font-mono">ID: {match.id.slice(0, 8)}</span>
                 </div>
-                {match.status === 'running' && (
+                {(match.status === 'running' || match.status === 'awaiting_confirmation') && (
                     <div className="flex gap-2">
                         <button
                             onClick={handleEndMatch}

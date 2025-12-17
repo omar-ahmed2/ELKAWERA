@@ -186,6 +186,7 @@ export interface Match {
   finishedAt?: number;
   isExternal: boolean; // True if created by captain, false if admin match
   createdBy: string; // User ID of creator (admin or captain)
+  eventId?: string; // Link to the event if this match is part of one
 }
 
 export interface MatchEvent {
@@ -292,7 +293,7 @@ export interface MatchRequest {
 // Events System
 // ============================================
 
-export type EventStatus = 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+export type EventStatus = 'upcoming' | 'open' | 'ongoing' | 'completed' | 'ended' | 'cancelled';
 export type EventCategory = 'tournament' | 'match' | 'training' | 'social' | 'other';
 
 export interface Event {
@@ -319,6 +320,7 @@ export interface Event {
   createdByName: string;
   createdAt: number;
   updatedAt: number;
+  schedulePublished?: boolean;
 }
 
 // ============================================

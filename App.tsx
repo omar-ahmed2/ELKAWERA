@@ -23,6 +23,7 @@ import { CaptainDashboard } from './pages/CaptainDashboard';
 import { ExternalMatchScheduler } from './pages/ExternalMatchScheduler';
 import { Notifications } from './pages/Notifications';
 import { Events } from './pages/Events';
+import { EventManagement } from './pages/EventManagement';
 import { Settings } from './pages/Settings';
 import { CaptainSignUp } from './pages/CaptainSignUp';
 import { PlayerPublicProfile } from './pages/PlayerPublicProfile';
@@ -31,6 +32,7 @@ import { MatchResults } from './pages/MatchResults';
 import { ScoutSignUp } from './pages/ScoutSignUp';
 import { ScoutDashboard } from './pages/ScoutDashboard';
 import { AdminScoutControl } from './pages/AdminScoutControl';
+import { AdminTeamRankings } from './pages/AdminTeamRankings';
 import { AuthProvider } from './context/AuthContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -64,6 +66,7 @@ const App: React.FC = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/notifications" element={<Notifications />} />
                 <Route path="/events" element={<Events />} />
+                <Route path="/events/:eventId/manage" element={<EventManagement />} />
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/new-players" element={<NewPlayers />} />
                 <Route path="/request-card" element={<RequestCard />} />
@@ -83,6 +86,7 @@ const App: React.FC = () => {
 
                 {/* Admin Scout Control */}
                 <Route path="/admin/scouts" element={<AdminScoutControl />} />
+                <Route path="/admin/rankings" element={<AdminTeamRankings />} />
               </Route>
             </Routes>
           </Layout>

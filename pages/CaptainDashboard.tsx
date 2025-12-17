@@ -10,6 +10,7 @@ import {
     getPendingInvitationsForTeam,
     getTeamInvitations,
     updateInvitationStatus,
+    deleteTeamInvitation, // Added
     getCaptainStats,
     subscribeToChanges,
     getPlayerById,
@@ -24,7 +25,7 @@ import {
 } from '../utils/db';
 import { Team, Player, TeamInvitation, CaptainStats, User, MatchRequest, Match } from '../types'; // Added MatchRequest, Match
 import { v4 as uuidv4 } from 'uuid';
-import { Users, PlusCircle, Send, Trophy, TrendingUp, Calendar, UserPlus, CheckCircle, XCircle, Upload, Shield, Award, Star, Edit3, Trash2 } from 'lucide-react';
+import { Users, PlusCircle, Send, Trophy, TrendingUp, Calendar, UserPlus, CheckCircle, XCircle, Upload, Shield, Award, Star, Edit3, Trash2, HelpCircle } from 'lucide-react';
 import { PlayerCard } from '../components/PlayerCard';
 
 export const CaptainDashboard: React.FC = () => {
@@ -295,12 +296,19 @@ export const CaptainDashboard: React.FC = () => {
                                 </div>
                                 <p className="text-3xl font-display font-bold text-elkawera-accent">{myTeam.experiencePoints || 0}</p>
                             </div>
-                            <div className="bg-black/30 rounded-xl p-4 border border-white/10">
+                            <div className="bg-black/30 rounded-xl p-4 border border-white/10 relative group">
                                 <div className="flex items-center gap-2 text-gray-400 mb-2">
                                     <Trophy size={16} />
                                     <span className="text-xs uppercase font-bold">Ranking</span>
+                                    <HelpCircle size={12} className="cursor-help text-gray-500 hover:text-white transition-colors" />
                                 </div>
                                 <p className="text-3xl font-display font-bold text-yellow-400">#{myTeam.ranking || 'Unranked'}</p>
+
+                                {/* Tooltip */}
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-56 bg-black/90 border border-white/20 p-3 rounded text-xs text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-20 shadow-xl">
+                                    <div className="font-bold text-white mb-1">Global Team Ranking</div>
+                                    Calculated based on total Team XP earned from matches, tournament wins, and clean sheets.
+                                </div>
                             </div>
                             <div className="bg-black/30 rounded-xl p-4 border border-white/10">
                                 <div className="flex items-center gap-2 text-gray-400 mb-2">
@@ -318,12 +326,26 @@ export const CaptainDashboard: React.FC = () => {
                             <h3 className="text-2xl font-display font-bold uppercase">Pending Invitations</h3>
                             <div className="grid gap-4">
                                 {pendingInvitations.map(invitation => (
-                                    <div key={invitation.id} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between">
+                                    <div key={invitation.id} className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center justify-between group hover:border-white/20 transition-all">
                                         <div>
                                             <p className="font-bold">{invitation.playerName}</p>
                                             <p className="text-sm text-gray-400">Invited {new Date(invitation.createdAt).toLocaleDateString()}</p>
                                         </div>
-                                        <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold uppercase">Pending</span>
+                                        <div className="flex items-center gap-3">
+                                            <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold uppercase">Pending</span>
+                                            <button
+                                                onClick={async () => {
+                                                    if (confirm(`Are you sure you want to cancel the invitation to ${invitation.playerName}?`)) {
+                                                        await deleteTeamInvitation(invitation.id);
+                                                        loadData();
+                                                    }
+                                                }}
+                                                className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                title="Cancel Invitation"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -496,29 +518,8 @@ export const CaptainDashboard: React.FC = () => {
                     {/* Quick Actions */}
                     <div className="grid md:grid-cols-2 gap-4">
                         <button
-                            onClick={() => {
-                                const teamPlayerCount = players.filter(p => p.teamId === myTeam.id).length;
-                                if (teamPlayerCount < 5) {
-                                    alert('Your team must have at least 5 players to schedule a match.');
-                                    return;
-                                }
-                                if (teamPlayerCount > 7) {
-                                    alert('Your team cannot have more than 7 players to schedule a match.');
-                                    return;
-                                }
-                                navigate('/captain/schedule-match');
-                            }}
-                            className="flex items-center justify-center gap-3 p-6 bg-gradient-to-r from-elkawera-accent/20 to-elkawera-accent/10 border border-elkawera-accent rounded-2xl hover:from-elkawera-accent/30 hover:to-elkawera-accent/20 transition-all group"
-                        >
-                            <Calendar size={24} className="text-elkawera-accent" />
-                            <div className="text-left">
-                                <p className="font-bold text-lg">Schedule External Match</p>
-                                <p className="text-sm text-gray-400">Challenge another team</p>
-                            </div>
-                        </button>
-                        <button
                             onClick={() => navigate('/teams')}
-                            className="flex items-center justify-center gap-3 p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group"
+                            className="flex items-center justify-center gap-3 p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 transition-all group col-span-full"
                         >
                             <Trophy size={24} className="text-yellow-400" />
                             <div className="text-left">

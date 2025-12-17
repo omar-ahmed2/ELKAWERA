@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getAllPlayers, deletePlayerAndNotifyUser, getAllTeams, getPlayerById, getUserById, getAllPlayerRegistrationRequests, clearUserNotifications, deletePlayerRegistrationRequest, subscribeToChanges, getAllUsers, deleteUser, getAllMatchRequests, approveMatchRequest, rejectMatchRequest } from '../utils/db';
 import { Player, Team, User, PlayerRegistrationRequest, MatchRequest } from '../types';
 import { Link, useNavigate } from 'react-router-dom';
-import { Edit2, Trash2, Activity, Download, Search, Filter, PlusCircle, Trophy, Sparkles, User as UserIcon, Clock, Bell, X, Shield, Users, CheckCircle } from 'lucide-react';
+import { Edit2, Trash2, Activity, Download, Search, Filter, PlusCircle, Trophy, Sparkles, User as UserIcon, Clock, Bell, X, Shield, Users, CheckCircle, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { PlayerCard } from '../components/PlayerCard';
 import { ConfirmationDialog } from '../components/ConfirmationDialog';
@@ -340,6 +340,9 @@ export const Dashboard: React.FC = () => {
           <button onClick={handleExportJSON} className="flex items-center gap-2 px-5 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full hover:border-elkawera-accent text-sm font-bold transition-colors text-[var(--text-primary)]">
             <Download size={18} /> {t('dashboard.backup_data')}
           </button>
+          <Link to="/admin/rankings" className="flex items-center gap-2 px-6 py-3 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold rounded-full hover:bg-[var(--text-primary)]/80 transition-all shadow-lg">
+            <TrendingUp size={18} /> Team Rankings
+          </Link>
           <Link to="/match-reporter" className="flex items-center gap-2 px-6 py-3 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold rounded-full hover:bg-[var(--text-primary)]/80 transition-all shadow-lg">
             <Trophy size={18} /> {t('dashboard.match_results')}
           </Link>
@@ -406,8 +409,8 @@ export const Dashboard: React.FC = () => {
                       onClick={() => handleApproveMatch(req)}
                       disabled={!isReady}
                       className={`px-6 py-3 font-bold rounded-lg transition-colors flex items-center gap-2 ${isReady
-                          ? 'bg-elkawera-accent text-black hover:bg-[var(--text-primary)] hover:text-white'
-                          : 'bg-gray-700 text-gray-500 cursor-not-allowed border border-gray-600'
+                        ? 'bg-elkawera-accent text-black hover:bg-[var(--text-primary)] hover:text-white'
+                        : 'bg-gray-700 text-gray-500 cursor-not-allowed border border-gray-600'
                         }`}
                       title={!isReady ? "Wait for opponent captain to approve" : "Approve Match"}
                     >

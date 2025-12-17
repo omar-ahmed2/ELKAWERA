@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getAllEvents, saveEvent, deleteEvent, subscribeToChanges, registerTeamForEvent, getAllTeams, updateEventRegistrationStatus, notifyAllUsers, getUserNotifications } from '../utils/db';
+import { useNavigate } from 'react-router-dom';
+import { getAllEvents, saveEvent, updateEvent, deleteEvent, subscribeToChanges, registerTeamForEvent, getAllTeams, updateEventRegistrationStatus, notifyAllUsers, getUserNotifications } from '../utils/db';
 import { Event, EventStatus, EventCategory, Team } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import {
     Calendar, MapPin, Clock, PlusCircle, Edit3, Trash2,
     XCircle, CheckCircle, Trophy, Users, Star, Info, Bell
 } from 'lucide-react';
+import { EventMatchMaker } from '../components/EventMatchMaker';
 
 export const Events: React.FC = () => {
     const { user } = useAuth();
@@ -15,6 +17,7 @@ export const Events: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [editingEvent, setEditingEvent] = useState<Event | null>(null);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+    const [showMatchMaker, setShowMatchMaker] = useState(false);
     const [toast, setToast] = useState<{ title: string; message: string } | null>(null);
     const lastCheckRef = React.useRef<number>(Date.now());
 
@@ -233,6 +236,7 @@ export const Events: React.FC = () => {
                     onRegister={() => {
                         loadEvents(); // Refresh to show updated registration status
                     }}
+                    onManageMatches={() => setShowMatchMaker(true)}
                 />
             )}
 
@@ -247,6 +251,17 @@ export const Events: React.FC = () => {
                     <button onClick={() => setToast(null)} className="ml-2 hover:bg-black/10 rounded-full p-1"><XCircle size={18} /></button>
                 </div>
             )}
+
+            {/* Match Maker Modal */}
+            {showMatchMaker && selectedEvent && (
+                <EventMatchMaker
+                    event={selectedEvent}
+                    onClose={() => setShowMatchMaker(false)}
+                    onUpdate={() => {
+                        loadEvents();
+                    }}
+                />
+            )}
         </div>
     );
 };
@@ -255,8 +270,10 @@ const EventDetailModal: React.FC<{
     event: Event;
     onClose: () => void;
     onRegister: () => void;
-}> = ({ event, onClose, onRegister }) => {
+    onManageMatches?: () => void;
+}> = ({ event, onClose, onRegister, onManageMatches }) => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [captainTeam, setCaptainTeam] = useState<Team | null>(null);
     const [registering, setRegistering] = useState(false);
     const [showParticipants, setShowParticipants] = useState(false);
@@ -394,13 +411,40 @@ const EventDetailModal: React.FC<{
                         )}
 
                         {isAdmin && (
-                            <div className="flex-1">
+                            <div className="flex-1 space-y-3">
                                 <button
                                     onClick={() => setShowParticipants(!showParticipants)}
                                     className="w-full py-4 bg-white/10 text-white font-bold uppercase rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Users size={20} /> {showParticipants ? 'Hide Participants' : 'View Registered Teams'}
                                 </button>
+
+                                <button
+                                    onClick={() => {
+                                        navigate(`/events/${event.id}/manage`);
+                                    }}
+                                    className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold uppercase rounded-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg"
+                                >
+                                    <Trophy size={20} /> Manage Event & Matches
+                                </button>
+                                {event.status === 'ongoing' && (
+                                    <button
+                                        onClick={async () => {
+                                            if (!confirm('Are you sure you want to mark this event as ended?')) return;
+                                            try {
+                                                await updateEvent({ ...event, status: 'ended' });
+                                                onRegister();
+                                                onClose();
+                                            } catch (error) {
+                                                console.error(error);
+                                                alert('Failed to end event');
+                                            }
+                                        }}
+                                        className="w-full py-4 bg-red-600/80 text-white font-bold uppercase rounded-xl hover:bg-red-600 transition-all flex items-center justify-center gap-2 shadow-lg"
+                                    >
+                                        <CheckCircle size={20} /> Mark as Ended
+                                    </button>
+                                )}
                             </div>
                         )}
                     </div>
@@ -454,7 +498,7 @@ const EventDetailModal: React.FC<{
                     )}
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

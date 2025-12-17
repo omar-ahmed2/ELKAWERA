@@ -41,7 +41,7 @@ export const EndMatch: React.FC = () => {
                     return;
                 }
 
-                if (matchData.status !== 'running') {
+                if (matchData.status !== 'running' && matchData.status !== 'awaiting_confirmation') {
                     alert('This match has already ended');
                     navigate('/admin/matches');
                     return;
