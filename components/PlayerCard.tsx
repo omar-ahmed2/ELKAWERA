@@ -77,6 +77,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
     const getThemeStyles = () => {
         const patternId = `pattern-${player.cardType}-${uniqueId}`;
         const foilId = `foil-${player.cardType}-${uniqueId}`;
+        const noiseId = `noise-${player.cardType}-${uniqueId}`;
 
         // Role-based Color Accents
         let roleAccentText = 'text-white';
@@ -89,75 +90,89 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             default: break;
         }
 
-        // Reuse the existing elegant themes
         switch (player.cardType) {
-            case 'Elite':
+            case 'Platinum':
                 return {
-                    wrapper: 'bg-[#0f0404]',
-                    bg: 'bg-gradient-to-br from-[#1a0505] via-[#450a0a] to-[#000000] bg-[length:300%_300%] animate-gradient-x',
-                    border: 'border-[#fca5a5] border-opacity-60',
-                    borderGlow: 'shadow-[0_0_40px_rgba(220,38,38,0.4),inset_0_0_20px_rgba(220,38,38,0.2)]',
-                    borderInner: 'border-white/20',
-                    text: 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]',
-                    textSecondary: 'text-[#fecaca]',
-                    shadow: 'shadow-[0_0_100px_rgba(220,38,38,0.6),0_30px_90px_rgba(0,0,0,0.9)]',
-                    overlay: 'bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-600/20 via-transparent to-black/80',
-                    badgeBg: 'bg-black/40 backdrop-blur-md',
-                    badgeBorder: 'border-red-500/50',
+                    wrapper: 'bg-[#020617]',
+                    bg: 'bg-gradient-to-br from-[#020617] via-[#0f172a] to-[#010816] bg-[length:400%_400%] animate-gradient-x',
+                    border: 'border-[#38bdf8] border-opacity-80',
+                    borderGlow: 'shadow-[0_0_40px_rgba(14,165,233,0.5),inset_0_0_30px_rgba(14,165,233,0.3)]',
+                    borderInner: 'border-cyan-400/40',
+                    text: 'text-cyan-100 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]',
+                    textSecondary: 'text-cyan-400/80',
+                    shadow: 'shadow-[0_0_100px_rgba(14,165,233,0.4),0_30px_60px_rgba(0,0,0,0.9)]',
+                    overlay: 'bg-[radial-gradient(circle_at_50%_0%,rgba(14,165,233,0.3),transparent_70%)]',
+                    badgeBg: 'bg-black/60 backdrop-blur-xl',
+                    badgeBorder: 'border-cyan-500/50',
                     roleAccentText, roleAccentBg,
                     pattern: (
                         <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
-                            <svg width="100%" height="100%" className="opacity-50 mix-blend-color-dodge">
+                            {/* Obsidian Texture */}
+                            <svg width="100%" height="100%" className="absolute inset-0 opacity-20 mix-blend-overlay">
+                                <filter id={noiseId}>
+                                    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch" />
+                                    <feColorMatrix type="saturate" values="0" />
+                                </filter>
+                                <rect width="100%" height="100%" filter={`url(#${noiseId})`} />
+                            </svg>
+                            {/* Flowing Energy Patterns */}
+                            <div className="absolute inset-0 opacity-40 bg-[length:400%_400%] animate-energy-flow bg-gradient-to-br from-transparent via-cyan-500/10 via-transparent to-transparent"></div>
+                            {/* Neon Circuitry */}
+                            <svg width="100%" height="100%" className="opacity-30 mix-blend-screen">
                                 <defs>
-                                    <pattern id={patternId} width="80" height="80" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                                        <rect x="0" y="0" width="40" height="40" stroke="rgba(254,202,202,0.3)" strokeWidth="0.5" fill="none" />
-                                        <rect x="40" y="40" width="40" height="40" stroke="rgba(254,202,202,0.3)" strokeWidth="0.5" fill="none" />
-                                        <circle cx="40" cy="40" r="2" fill="white" className="animate-pulse" />
-                                        <path d="M0 80 L80 0" stroke="rgba(254,202,202,0.2)" strokeWidth="1" />
+                                    <pattern id={patternId} width="100" height="100" patternUnits="userSpaceOnUse">
+                                        <path d="M0 50 L20 50 L30 40 L70 40 L80 50 L100 50" stroke="#38bdf8" strokeWidth="0.5" fill="none" className="animate-pulse" />
+                                        <circle cx="30" cy="40" r="1.5" fill="#38bdf8" />
+                                        <circle cx="70" cy="40" r="1.5" fill="#38bdf8" />
                                     </pattern>
                                 </defs>
                                 <rect width="100%" height="100%" fill={`url(#${patternId})`} />
                             </svg>
-                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent skew-x-12 pointer-events-none"></div>
-                            <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-red-900/40 to-transparent mix-blend-overlay"></div>
+                            {/* Animated Sheen */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent w-[30%] -skew-x-20 animate-shimmer-fast"></div>
                         </div>
                     )
                 };
 
-            case 'Platinum':
+            case 'Elite':
                 return {
-                    // Reverted to darker/more professional look as requested in previous steps, just in case
-                    wrapper: 'bg-[#020617]',
-                    bg: 'bg-gradient-to-br from-[#0c1e3a] via-[#0ea5e9] to-[#1e3a5f] bg-[length:400%_400%] animate-gradient-x',
-                    border: 'border-[#38bdf8]',
-                    borderGlow: 'shadow-[0_0_30px_rgba(56,189,248,0.8),inset_0_0_30px_rgba(56,189,248,0.3)]',
-                    borderInner: 'border-[#bae6fd]/60',
-                    text: 'text-[#e0f2fe]',
-                    textSecondary: 'text-[#7dd3fc]',
-                    shadow: 'shadow-[0_0_80px_rgba(14,165,233,0.7),0_20px_60px_rgba(0,0,0,0.5)]',
-                    overlay: 'bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-white/50 via-cyan-300/20 to-transparent',
-                    badgeBg: 'bg-[#020617]/95',
-                    badgeBorder: 'border-[#38bdf8]',
+                    wrapper: 'bg-[#0f0404]',
+                    bg: 'bg-gradient-to-br from-[#1a0505] via-[#450a0a] to-[#000000] bg-[length:300%_300%] animate-gradient-x',
+                    border: 'border-red-600 border-opacity-70',
+                    borderGlow: 'shadow-[0_0_50px_rgba(220,38,38,0.6),inset_0_0_20px_rgba(220,38,38,0.3)]',
+                    borderInner: 'border-red-500/30',
+                    text: 'text-white drop-shadow-[0_0_10px_rgba(220,38,38,0.8)]',
+                    textSecondary: 'text-red-400',
+                    shadow: 'shadow-[0_0_120px_rgba(220,38,38,0.5),0_40px_80px_rgba(0,0,0,0.9)]',
+                    overlay: 'bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-red-600/30 via-transparent to-black/90',
+                    badgeBg: 'bg-red-950/40 backdrop-blur-md',
+                    badgeBorder: 'border-red-500/40',
                     roleAccentText, roleAccentBg,
                     pattern: (
-                        <div className="absolute inset-0 z-0 pointer-events-none">
-                            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" className="opacity-40 mix-blend-overlay">
+                        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                            {/* Aggressive Sharp Lines */}
+                            <svg width="100%" height="100%" className="opacity-40 mix-blend-color-dodge">
                                 <defs>
-                                    <pattern id={patternId} width="60" height="60" patternUnits="userSpaceOnUse">
-                                        <path d="M30 0 L60 30 L30 60 L0 30 Z" stroke="rgba(255,255,255,0.4)" strokeWidth="0.5" fill="none" />
-                                        <circle cx="30" cy="30" r="3" fill="rgba(255,255,255,0.6)" />
+                                    <pattern id={patternId} width="120" height="120" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
+                                        <path d="M0 0 L60 120 M120 0 L60 120" stroke="red" strokeWidth="2" fill="none" opacity="0.5" />
+                                        <path d="M0 60 L120 60" stroke="red" strokeWidth="0.5" fill="none" opacity="0.3" />
                                     </pattern>
-                                    <linearGradient id={foilId} x1="0%" y1="0%" x2="100%" y2="100%">
-                                        <stop offset="0%" stopColor="rgba(186,230,253,0.3)" />
-                                        <stop offset="50%" stopColor="rgba(14,165,233,0.5)" />
-                                        <stop offset="100%" stopColor="rgba(186,230,253,0.3)" />
-                                    </linearGradient>
                                 </defs>
                                 <rect width="100%" height="100%" fill={`url(#${patternId})`} />
-                                <path d="M0 0 L320 200 L0 400 Z" fill={`url(#${foilId})`} opacity="0.5" />
-                                <path d="M320 0 L0 200 L320 400 Z" fill={`url(#${foilId})`} opacity="0.3" />
                             </svg>
-                            <div className="absolute inset-0 bg-gradient-to-t from-[#0ea5e9]/40 via-transparent to-[#38bdf8]/20 animate-pulse"></div>
+                            {/* Pulsing Red Energy Hub */}
+                            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[50%] bg-[radial-gradient(circle,rgba(220,38,38,0.2)_0%,transparent_100%)] animate-pulse-slow"></div>
+                            {/* Glitch Layer */}
+                            <div className="absolute inset-0 opacity-10 animate-glitch bg-red-500/20 mix-blend-overlay"></div>
+                            {/* Animated Red Particles */}
+                            <svg width="100%" height="100%" className="absolute inset-0 animate-pulse">
+                                <defs>
+                                    <pattern id={`${patternId}-particles`} width="50" height="50" patternUnits="userSpaceOnUse">
+                                        <circle cx="25" cy="25" r="1" fill="#ef4444" />
+                                    </pattern>
+                                </defs>
+                                <rect width="100%" height="100%" fill={`url(#${patternId}-particles)`} />
+                            </svg>
                         </div>
                     )
                 };
@@ -165,25 +180,37 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             case 'Gold':
                 return {
                     wrapper: 'bg-[#422006]',
-                    bg: 'bg-gradient-to-br from-[#854d0e] via-[#fbbf24] to-[#92400e] bg-[length:400%_400%] animate-gradient-x',
+                    bg: 'bg-gradient-to-br from-[#b45309] via-[#fbbf24] to-[#78350f] bg-[length:400%_400%] animate-gradient-x',
                     border: 'border-[#fde047]',
-                    borderGlow: 'shadow-[0_0_30px_rgba(253,224,71,0.9),inset_0_0_30px_rgba(251,191,36,0.4)]',
-                    borderInner: 'border-[#fef08a]/70',
-                    text: 'text-[#422006]',
-                    textSecondary: 'text-[#854d0e]',
-                    shadow: 'shadow-[0_0_80px_rgba(234,179,8,0.8),0_20px_60px_rgba(0,0,0,0.5)]',
-                    overlay: 'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-yellow-50/60 via-transparent to-yellow-900/50',
-                    badgeBg: 'bg-[#fffbeb]/95',
-                    badgeBorder: 'border-[#fde047]',
+                    borderGlow: 'shadow-[0_0_40px_rgba(253,224,71,0.8),inset_0_0_40px_rgba(251,191,36,0.3)]',
+                    borderInner: 'border-yellow-200/50',
+                    text: 'text-[#422006] drop-shadow-[0_1px_2px_rgba(255,255,255,0.4)]',
+                    textSecondary: 'text-[#92400e]',
+                    shadow: 'shadow-[0_0_90px_rgba(234,179,8,0.7),0_30px_70px_rgba(0,0,0,0.6)]',
+                    overlay: 'bg-[radial-gradient(circle_at_center,_rgba(255,255,255,0.4),transparent_80%)]',
+                    badgeBg: 'bg-white/95 backdrop-blur-md',
+                    badgeBorder: 'border-yellow-400',
                     roleAccentText, roleAccentBg,
                     pattern: (
-                        <div className="absolute inset-0 z-0 pointer-events-none">
-                            <svg width="100%" height="100%" viewBox="0 0 320 480" xmlns="http://www.w3.org/2000/svg" className="opacity-35 mix-blend-overlay">
-                                <circle cx="160" cy="240" r="120" stroke="white" strokeWidth="1.5" fill="none" opacity="0.5" />
-                                <circle cx="160" cy="240" r="200" stroke="white" strokeWidth="0.5" fill="none" opacity="0.3" />
+                        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                            {/* Golden Sunburst */}
+                            <div className="absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,transparent_0deg,rgba(255,255,255,0.05)_10deg,transparent_20deg)] animate-rotate-slow"></div>
+                            {/* Luxurious Texture */}
+                            <svg width="100%" height="100%" className="opacity-30 mix-blend-overlay">
+                                <defs>
+                                    <pattern id={patternId} width="60" height="60" patternUnits="userSpaceOnUse">
+                                        <circle cx="30" cy="30" r="25" stroke="white" strokeWidth="0.5" fill="none" />
+                                        <path d="M30 5 L30 55 M5 30 L55 30" stroke="white" strokeWidth="0.2" fill="none" />
+                                    </pattern>
+                                </defs>
+                                <rect width="100%" height="100%" fill={`url(#${patternId})`} />
                             </svg>
-                            <div className="absolute inset-0 bg-gradient-to-t from-yellow-900/50 via-transparent to-yellow-100/30"></div>
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-yellow-200/30 to-transparent animate-shimmer-slow"></div>
+                            {/* Sparkles */}
+                            <div className="absolute top-1/4 left-1/4 w-4 h-4 text-yellow-100/60 animate-sparkle">✦</div>
+                            <div className="absolute top-1/2 right-1/3 w-3 h-3 text-yellow-100/40 animate-sparkle" style={{ animationDelay: '0.5s' }}>✦</div>
+                            <div className="absolute bottom-1/4 right-1/4 w-5 h-5 text-yellow-100/50 animate-sparkle" style={{ animationDelay: '1.2s' }}>✦</div>
+                            {/* Golden Sweep */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent w-[40%] -skew-x-20 animate-shimmer-fast"></div>
                         </div>
                     )
                 };
@@ -192,29 +219,35 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
             default:
                 return {
                     wrapper: 'bg-[#111827]',
-                    bg: 'bg-gradient-to-br from-[#374151] via-[#e5e7eb] to-[#4b5563] bg-[length:400%_400%] animate-gradient-x',
-                    border: 'border-[#d1d5db]',
-                    borderGlow: 'shadow-[0_0_25px_rgba(209,213,219,0.7),inset_0_0_25px_rgba(229,231,235,0.3)]',
-                    borderInner: 'border-[#9ca3af]/60',
-                    text: 'text-[#111827]',
+                    bg: 'bg-gradient-to-br from-[#374151] via-[#9ca3af] to-[#4b5563] bg-[length:400%_400%] animate-gradient-x',
+                    border: 'border-[#d1d5db] border-opacity-90',
+                    borderGlow: 'shadow-[0_0_30px_rgba(209,213,219,0.5),inset_0_0_20px_rgba(229,231,235,0.3)]',
+                    borderInner: 'border-[#f3f4f6]/60',
+                    text: 'text-[#111827] drop-shadow-[0_1px_1px_rgba(255,255,255,0.3)]',
                     textSecondary: 'text-[#374151]',
-                    shadow: 'shadow-[0_0_70px_rgba(156,163,175,0.6),0_20px_60px_rgba(0,0,0,0.5)]',
-                    overlay: 'bg-[linear-gradient(135deg,transparent_30%,rgba(255,255,255,0.6)_50%,transparent_70%)]',
-                    badgeBg: 'bg-[#f3f4f6]/95',
-                    badgeBorder: 'border-[#e5e7eb]',
+                    shadow: 'shadow-[0_0_80px_rgba(156,163,175,0.5),0_20px_50px_rgba(0,0,0,0.4)]',
+                    overlay: 'bg-[linear-gradient(135deg,transparent_20%,rgba(255,255,255,0.3)_50%,transparent_80%)]',
+                    badgeBg: 'bg-[#f3f4f6]/95 backdrop-blur-sm',
+                    badgeBorder: 'border-[#d1d5db]',
                     roleAccentText, roleAccentBg,
                     pattern: (
-                        <div className="absolute inset-0 z-0 pointer-events-none">
-                            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" className="opacity-25 mix-blend-color-burn">
+                        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
+                            {/* Metallic Brushed Texture */}
+                            <div className="absolute inset-0 opacity-10 bg-[length:200%_200%] animate-energy-flow bg-gradient-to-tr from-black via-white to-black"></div>
+                            {/* Clean Geometric Patterns */}
+                            <svg width="100%" height="100%" className="opacity-20 mix-blend-multiply">
                                 <defs>
-                                    <pattern id={patternId} width="24" height="41.6" patternUnits="userSpaceOnUse" patternTransform="scale(2.5)">
-                                        <path d="M12 0 L24 6.93 L24 20.8 L12 27.73 L0 20.8 L0 6.93 Z" fill="none" stroke="black" strokeWidth="0.8" />
+                                    <pattern id={patternId} width="20" height="20" patternUnits="userSpaceOnUse">
+                                        <rect width="10" height="10" fill="white" fillOpacity="0.5" />
+                                        <rect x="10" y="10" width="10" height="10" fill="white" fillOpacity="0.5" />
                                     </pattern>
                                 </defs>
                                 <rect width="100%" height="100%" fill={`url(#${patternId})`} />
                             </svg>
-                            <div className="absolute inset-0 bg-gradient-to-tr from-gray-900/40 via-gray-100/20 to-gray-900/40"></div>
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/70 to-transparent w-[40%] skew-x-[-20deg] animate-sheen-slide mix-blend-overlay"></div>
+                            {/* Cool Light Reflection */}
+                            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/30 to-transparent skew-x-12 animate-shimmer"></div>
+                            {/* Energy Scanning Line */}
+                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent animate-energy-flow" style={{ animationDuration: '3s' }}></div>
                         </div>
                     )
                 };
@@ -300,7 +333,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                         </div>
 
                         {/* Right: Interaction (Elkawera logo removed) */}
-                        <div className="flex flex-col items-center gap-3">
+                        <div className="flex flex-col items-center gap-3" data-download-ignore="true">
                             <div className="z-30">
                                 <button
                                     onClick={handleLike}

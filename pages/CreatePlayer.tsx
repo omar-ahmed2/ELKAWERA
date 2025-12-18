@@ -148,23 +148,7 @@ export const CreatePlayer: React.FC = () => {
       // Ensure ID is set - use a local variable to avoid async state update issues
       const playerId = formData.id || generateId();
 
-      const baseScore = computeOverall(formData.stats, formData.position);
-      const score = computeOverallWithPerformance(
-        baseScore,
-        formData.position,
-        {
-          goals: formData.goals,
-          assists: formData.assists,
-          matchesPlayed: formData.matchesPlayed,
-          defensiveContributions: formData.defensiveContributions,
-          cleanSheets: formData.cleanSheets,
-          saves: formData.saves,
-          penaltySaves: formData.penaltySaves,
-          ownGoals: formData.ownGoals,
-          goalsConceded: formData.goalsConceded,
-          penaltyMissed: formData.penaltyMissed
-        }
-      );
+      const score = formData.overallScore;
 
       // Ensure all required fields are present and valid
       const playerToSave: Player = {
@@ -197,13 +181,6 @@ export const CreatePlayer: React.FC = () => {
       // Validate all required fields before saving
       if (!playerToSave.id || !playerToSave.name || !playerToSave.position || !playerToSave.country) {
         throw new Error('Missing required fields. Please fill in all required information.');
-      }
-
-      // Validate stats object has all required properties
-      const requiredStats = ['pace', 'dribbling', 'shooting', 'passing', 'defending', 'stamina', 'physical', 'agility', 'acceleration'];
-      const missingStats = requiredStats.filter(stat => typeof playerToSave.stats[stat as keyof typeof playerToSave.stats] !== 'number');
-      if (missingStats.length > 0) {
-        throw new Error(`Missing or invalid stats: ${missingStats.join(', ')}`);
       }
 
       // Validate numeric fields
@@ -331,28 +308,9 @@ export const CreatePlayer: React.FC = () => {
     }
   };
 
-  // Live preview update - use manually selected card type
-  const baseScore = computeOverall(formData.stats, formData.position);
+  // Live preview update
   const previewPlayer = {
     ...formData,
-    overallScore: computeOverallWithPerformance(
-      baseScore,
-      formData.position,
-      {
-        goals: formData.goals,
-        assists: formData.assists,
-        matchesPlayed: formData.matchesPlayed,
-        defensiveContributions: formData.defensiveContributions,
-        cleanSheets: formData.cleanSheets,
-        saves: formData.saves,
-        penaltySaves: formData.penaltySaves,
-        ownGoals: formData.ownGoals,
-        goalsConceded: formData.goalsConceded,
-        penaltyMissed: formData.penaltyMissed
-      }
-    ),
-    // Use the manually selected cardType for preview
-    cardType: formData.cardType,
   };
 
   // Simplified Download Handler
@@ -627,55 +585,36 @@ export const CreatePlayer: React.FC = () => {
             </div>
           )}
 
-          {/* Stats Section - Show for Card Builder mode or when editing */}
+          {/* Overall Rating Section - Now manual as physical stats are removed */}
           {(requestId || editId) && (
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                <h3 className="text-xl font-bold text-elkawera-accent">Performance Stats</h3>
-                {editId && (
-                  <Link to={`/stats?id=${formData.id}`} className="text-xs bg-white/10 px-2 py-1 rounded hover:bg-white/20">Edit in Detail</Link>
-                )}
+                <h3 className="text-xl font-bold text-elkawera-accent">Card Rating</h3>
               </div>
 
-              {/* Stats Sliders for Card Builder */}
-              {requestId && (
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs uppercase text-gray-400 mb-2">Pace: {formData.stats.pace}</label>
-                    <input type="range" min="1" max="99" value={formData.stats.pace} onChange={(e) => setFormData(prev => ({ ...prev, stats: { ...prev.stats, pace: parseInt(e.target.value) } }))} className="w-full" />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase text-gray-400 mb-2">Shooting: {formData.stats.shooting}</label>
-                    <input type="range" min="1" max="99" value={formData.stats.shooting} onChange={(e) => setFormData(prev => ({ ...prev, stats: { ...prev.stats, shooting: parseInt(e.target.value) } }))} className="w-full" />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase text-gray-400 mb-2">Passing: {formData.stats.passing}</label>
-                    <input type="range" min="1" max="99" value={formData.stats.passing} onChange={(e) => setFormData(prev => ({ ...prev, stats: { ...prev.stats, passing: parseInt(e.target.value) } }))} className="w-full" />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase text-gray-400 mb-2">Dribbling: {formData.stats.dribbling}</label>
-                    <input type="range" min="1" max="99" value={formData.stats.dribbling} onChange={(e) => setFormData(prev => ({ ...prev, stats: { ...prev.stats, dribbling: parseInt(e.target.value) } }))} className="w-full" />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase text-gray-400 mb-2">Defending: {formData.stats.defending}</label>
-                    <input type="range" min="1" max="99" value={formData.stats.defending} onChange={(e) => setFormData(prev => ({ ...prev, stats: { ...prev.stats, defending: parseInt(e.target.value) } }))} className="w-full" />
-                  </div>
-                  <div>
-                    <label className="block text-xs uppercase text-gray-400 mb-2">Physical: {formData.stats.physical}</label>
-                    <input type="range" min="1" max="99" value={formData.stats.physical} onChange={(e) => setFormData(prev => ({ ...prev, stats: { ...prev.stats, physical: parseInt(e.target.value) } }))} className="w-full" />
-                  </div>
+              <div className="bg-black/40 p-6 rounded-xl border border-white/10">
+                <div className="flex items-center justify-between mb-4">
+                  <label className="text-sm font-bold text-gray-400 uppercase">Overall Rating</label>
+                  <span className="text-3xl font-display font-black text-elkawera-accent">{formData.overallScore}</span>
                 </div>
-              )}
+                <input
+                  type="range"
+                  min="1"
+                  max="99"
+                  value={formData.overallScore}
+                  onChange={(e) => setFormData(prev => ({ ...prev, overallScore: parseInt(e.target.value) }))}
+                  className="w-full h-3 bg-white/10 rounded-lg appearance-none cursor-pointer accent-elkawera-accent"
+                />
+                <div className="flex justify-between mt-2 text-[10px] text-gray-500 font-bold uppercase">
+                  <span>Beginner (1)</span>
+                  <span>Professional (50)</span>
+                  <span>Legendary (99)</span>
+                </div>
+              </div>
 
-              {/* Stats Display for Edit Mode */}
-              {editId && (
-                <div className="grid grid-cols-2 gap-4 text-sm text-gray-400">
-                  <div>Pace: <span className="text-white">{formData.stats.pace}</span></div>
-                  <div>Shooting: <span className="text-white">{formData.stats.shooting}</span></div>
-                  <div>Goals: <span className="text-white text-elkawera-accent font-bold">{formData.goals}</span></div>
-                  <div>Assists: <span className="text-white text-elkawera-accent font-bold">{formData.assists}</span></div>
-                </div>
-              )}
+              <p className="text-xs text-gray-500 italic">
+                The overall rating now reflects the player's rarity and prestige. Physical attributes have been removed from the system.
+              </p>
             </div>
           )}
 
@@ -746,6 +685,16 @@ export const CreatePlayer: React.FC = () => {
             >
               <Download size={16} /> Back
             </button>
+          </div>
+
+          {/* Hidden Capture Targets for Download */}
+          <div className="fixed -left-[9999px] top-0 pointer-events-none" aria-hidden="true">
+            <div id="card-front-preview">
+              <PlayerCard player={previewPlayer} uniqueId="dl-front" isFlipped={false} />
+            </div>
+            <div id="card-back-preview">
+              <PlayerCard player={previewPlayer} uniqueId="dl-back" isFlipped={true} />
+            </div>
           </div>
 
           <div className="text-center text-sm text-gray-500 max-w-xs mt-4">
