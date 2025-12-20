@@ -18,6 +18,10 @@ import { RequestCard } from './pages/RequestCard';
 import { AdminMatches } from './pages/AdminMatches';
 import { MatchDetails } from './pages/MatchDetails';
 import { EndMatch } from './pages/EndMatch';
+
+import { Kits } from './pages/Kits';
+import { AdminKits } from './pages/AdminKits';
+import { AdminKitRequests } from './pages/AdminKitRequests';
 import { PlayerEvaluationPage } from './pages/PlayerEvaluationPage';
 import { CaptainDashboard } from './pages/CaptainDashboard';
 import { ExternalMatchScheduler } from './pages/ExternalMatchScheduler';
@@ -27,8 +31,7 @@ import { EventManagement } from './pages/EventManagement';
 import { Settings } from './pages/Settings';
 import { CaptainSignUp } from './pages/CaptainSignUp';
 import { PlayerPublicProfile } from './pages/PlayerPublicProfile';
-import { MatchReporter } from './pages/MatchReporter';
-import { MatchResults } from './pages/MatchResults';
+
 import { ScoutSignUp } from './pages/ScoutSignUp';
 import { ScoutDashboard } from './pages/ScoutDashboard';
 import { AdminScoutControl } from './pages/AdminScoutControl';
@@ -58,8 +61,7 @@ const App: React.FC = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/leaderboard" element={<Leaderboard />} /> {/* Added Route */}
                 <Route path="/teams" element={<Teams />} />
-                <Route path="/match-reporter" element={<MatchReporter />} />
-                <Route path="/match-results" element={<MatchResults />} />
+
 
                 <Route path="/compare" element={<Compare />} />
                 <Route path="/player/:playerId" element={<PlayerPublicProfile />} />
@@ -87,6 +89,11 @@ const App: React.FC = () => {
                 {/* Admin Scout Control */}
                 <Route path="/admin/scouts" element={<AdminScoutControl />} />
                 <Route path="/admin/rankings" element={<AdminTeamRankings />} />
+
+                {/* Kit System */}
+                <Route path="/kits" element={<Kits />} />
+                <Route path="/admin/kits" element={<AdminKits />} />
+                <Route path="/admin/kit-requests" element={<AdminKitRequests />} />
               </Route>
             </Routes>
           </Layout>

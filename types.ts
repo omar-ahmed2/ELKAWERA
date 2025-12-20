@@ -357,3 +357,49 @@ export interface ScoutActivity {
   // Optional metadata
   userAgent?: string;
 }
+
+// ============================================
+// KIT SYSTEM TYPES
+// ============================================
+
+export interface Kit {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  sizes: string[]; // e.g. ['S', 'M', 'L', 'XL']
+  badge?: 'Official' | 'Limited' | 'Special Edition';
+  isVisible: boolean;
+  createdAt: number;
+}
+
+export type KitRequestType = 'official_kit' | 'custom_design';
+export type KitRequestStatus = 'pending' | 'processing' | 'ready' | 'delivered' | 'archived';
+
+export interface KitRequest {
+  id: string;
+  userId: string;
+  userName: string;
+  userRole: UserRole;
+  teamId?: string;
+  teamName?: string;
+  type: KitRequestType;
+  status: KitRequestStatus;
+
+  // For Official Kit
+  kitId?: string;
+  kitName?: string;
+  selectedSize?: string;
+  quantity: number;
+
+  // For Custom Design
+  customImageUrl?: string;
+  notes?: string;
+
+  contactEmail: string;
+  contactPhone: string;
+
+  adminNotes?: string;
+  createdAt: number;
+  updatedAt: number;
+}

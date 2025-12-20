@@ -1,9 +1,9 @@
-import { User, Player, CardType, Position, Match, MatchStatus, MatchEvent, PlayerEvaluation, Team, TeamInvitation, MatchVerification, MatchDispute, Notification, UserRole, PlayerRegistrationRequest, CaptainStats, CaptainRank, MatchRequest, Event as AppEvent, ScoutProfile, ScoutActivity } from '../types';
+import { User, Player, CardType, Position, Match, MatchStatus, MatchEvent, PlayerEvaluation, Team, TeamInvitation, MatchVerification, MatchDispute, Notification, UserRole, PlayerRegistrationRequest, CaptainStats, CaptainRank, MatchRequest, Event as AppEvent, ScoutProfile, ScoutActivity, Kit, KitRequest, KitRequestStatus } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { getCardTypeFromScore } from './matchCalculations';
 
 const DB_NAME = 'ElkaweraDB';
-const DB_VERSION = 20; // Bumped for Scout system
+const DB_VERSION = 22; // Bumped for Kits system
 const PLAYER_STORE = 'players';
 const TEAM_STORE = 'teams';
 const USER_STORE = 'users';
@@ -18,6 +18,8 @@ const MATCH_REQUEST_STORE = 'match_requests';
 const EVENT_STORE = 'events';
 const SCOUT_PROFILE_STORE = 'scout_profiles';
 const SCOUT_ACTIVITY_STORE = 'scout_activity';
+const KITS_STORE = 'kits';
+const KIT_REQUESTS_STORE = 'kit_requests';
 
 // Broadcast Channel for Real-time Sync
 const syncChannel = new BroadcastChannel('elkawera_sync');
@@ -194,6 +196,22 @@ export const openDB = (): Promise<IDBDatabase> => {
             scoutActivityStore.createIndex('scoutId', 'scoutId', { unique: false });
             scoutActivityStore.createIndex('entityId', 'entityId', { unique: false });
             scoutActivityStore.createIndex('timestamp', 'timestamp', { unique: false });
+          }
+
+          // Kits Store (v22)
+          if (!db.objectStoreNames.contains(KITS_STORE)) {
+            console.log('Creating kits store...');
+            const kitStore = db.createObjectStore(KITS_STORE, { keyPath: 'id' });
+            kitStore.createIndex('isVisible', 'isVisible', { unique: false });
+          }
+
+          // Kit Requests Store (v22)
+          if (!db.objectStoreNames.contains(KIT_REQUESTS_STORE)) {
+            console.log('Creating kit requests store...');
+            const kitRequestStore = db.createObjectStore(KIT_REQUESTS_STORE, { keyPath: 'id' });
+            kitRequestStore.createIndex('userId', 'userId', { unique: false });
+            kitRequestStore.createIndex('status', 'status', { unique: false });
+            kitRequestStore.createIndex('type', 'type', { unique: false });
           }
 
           console.log('Database upgrade completed successfully');
@@ -1892,4 +1910,201 @@ export const registerScout = async (
   }
 
   return user;
+};
+
+// ============================================
+// KITS SYSTEM
+// ============================================
+
+export const saveKit = async (kit: Kit): Promise<void> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KITS_STORE], 'readwrite');
+    const store = transaction.objectStore(KITS_STORE);
+    const request = store.put(kit);
+    request.onsuccess = () => {
+      notifyChanges();
+      resolve();
+    };
+    request.onerror = () => reject('Error saving kit');
+  });
+};
+
+export const getAllKits = async (): Promise<Kit[]> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KITS_STORE], 'readonly');
+    const store = transaction.objectStore(KITS_STORE);
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject('Error fetching kits');
+  });
+};
+
+export const getVisibleKits = async (): Promise<Kit[]> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KITS_STORE], 'readonly');
+    const store = transaction.objectStore(KITS_STORE);
+    const allRequest = store.getAll();
+    allRequest.onsuccess = () => {
+      const kits = allRequest.result as Kit[];
+      resolve(kits.filter(k => k.isVisible));
+    };
+    allRequest.onerror = () => reject('Error fetching visible kits');
+  });
+};
+
+export const deleteKit = async (id: string): Promise<void> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KITS_STORE], 'readwrite');
+    const store = transaction.objectStore(KITS_STORE);
+    const request = store.delete(id);
+    request.onsuccess = () => {
+      notifyChanges();
+      resolve();
+    };
+    request.onerror = () => reject('Error deleting kit');
+  });
+};
+
+// --- KIT REQUESTS ---
+
+export const saveKitRequest = async (req: KitRequest): Promise<void> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KIT_REQUESTS_STORE], 'readwrite');
+    const store = transaction.objectStore(KIT_REQUESTS_STORE);
+    const request = store.put(req);
+    request.onsuccess = () => {
+      notifyChanges();
+      resolve();
+    };
+    request.onerror = () => reject('Error saving kit request');
+  });
+};
+
+export const createKitRequest = async (req: KitRequest): Promise<void> => {
+  await saveKitRequest(req);
+  // Notify all admins
+  const users = await getAllUsers();
+  const admins = users.filter(u => u.role === 'admin');
+  for (const admin of admins) {
+    const notification: Notification = {
+      id: uuidv4(),
+      userId: admin.id,
+      type: 'system_announcement',
+      title: 'New Kit Request',
+      message: `New kit request from ${req.userName} (${req.type})`,
+      read: false,
+      createdAt: Date.now(),
+      actionUrl: '/admin/kit-requests'
+    };
+    await createNotification(notification);
+  }
+};
+
+export const updateKitRequestStatus = async (requestId: string, status: KitRequestStatus, adminNotes?: string): Promise<void> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KIT_REQUESTS_STORE], 'readwrite');
+    const store = transaction.objectStore(KIT_REQUESTS_STORE);
+    const getReq = store.get(requestId);
+
+    getReq.onsuccess = async () => {
+      const req = getReq.result as KitRequest;
+      if (!req) { reject('Request not found'); return; }
+
+      const updatedReq = { ...req, status, adminNotes: adminNotes ?? req.adminNotes, updatedAt: Date.now() };
+      const putReq = store.put(updatedReq);
+
+      putReq.onsuccess = async () => {
+        notifyChanges();
+        // Notify User
+        const notification: Notification = {
+          id: uuidv4(),
+          userId: req.userId,
+          type: 'system_announcement',
+          title: 'Kit Request Update 👕',
+          message: adminNotes
+            ? `Your request is now ${status}. Admin says: ${adminNotes}`
+            : `Your kit request status has been updated to: ${status}`,
+          read: false,
+          createdAt: Date.now(),
+          actionUrl: '/kits?tab=requests'
+        };
+        await addNotificationToUser(req.userId, notification);
+        resolve();
+      };
+      putReq.onerror = () => reject('Error updating request');
+    };
+    getReq.onerror = () => reject('Error fetching request');
+  });
+};
+
+export const addKitRequestMessage = async (requestId: string, message: string): Promise<void> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KIT_REQUESTS_STORE], 'readwrite');
+    const store = transaction.objectStore(KIT_REQUESTS_STORE);
+    const getReq = store.get(requestId);
+
+    getReq.onsuccess = async () => {
+      const req = getReq.result as KitRequest;
+      if (!req) { reject('Request not found'); return; }
+
+      const updatedReq = { ...req, adminNotes: message, updatedAt: Date.now() };
+      const putReq = store.put(updatedReq);
+
+      putReq.onsuccess = async () => {
+        notifyChanges();
+        // Notify User
+        const notification: Notification = {
+          id: uuidv4(),
+          userId: req.userId,
+          type: 'system_announcement',
+          title: 'New Kit Request Message 📩',
+          message: `Admin sent you a message: ${message}`,
+          read: false,
+          createdAt: Date.now(),
+          actionUrl: '/kits?tab=requests'
+        };
+        await addNotificationToUser(req.userId, notification);
+        resolve();
+      };
+      putReq.onerror = () => reject('Error updating message');
+    };
+    getReq.onerror = () => reject('Error fetching request');
+  });
+};
+
+export const getAllKitRequests = async (): Promise<KitRequest[]> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KIT_REQUESTS_STORE], 'readonly');
+    const store = transaction.objectStore(KIT_REQUESTS_STORE);
+    const request = store.getAll();
+    request.onsuccess = () => {
+      const results = request.result as KitRequest[];
+      results.sort((a, b) => b.createdAt - a.createdAt);
+      resolve(results);
+    };
+    request.onerror = () => reject('Error fetching kit requests');
+  });
+};
+export const getKitRequestsByUserId = async (userId: string): Promise<KitRequest[]> => {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction([KIT_REQUESTS_STORE], 'readonly');
+    const store = transaction.objectStore(KIT_REQUESTS_STORE);
+    const index = store.index('userId');
+    const request = index.getAll(userId);
+    request.onsuccess = () => {
+      const results = request.result as KitRequest[];
+      results.sort((a, b) => b.createdAt - a.createdAt);
+      resolve(results);
+    };
+    request.onerror = () => reject('Error fetching kit requests');
+  });
 };

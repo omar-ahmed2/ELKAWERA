@@ -85,7 +85,7 @@ const translations: Record<Language, Record<string, string>> = {
         'dashboard.metrics.matches': 'Matches',
         'dashboard.update_performance': 'Update Performance',
         'dashboard.backup_data': 'Backup Data',
-        'dashboard.match_results': 'Match Results',
+
         'dashboard.add_new_card': 'Add New Card',
         'dashboard.admin_team_cards': 'Admin Team Cards',
         'dashboard.match_requests': 'Match Requests to Arbitrate',
@@ -252,7 +252,7 @@ const translations: Record<Language, Record<string, string>> = {
         'dashboard.metrics.matches': 'مباريات',
         'dashboard.update_performance': 'تحديث الأداء',
         'dashboard.backup_data': 'نسخ احتياطي',
-        'dashboard.match_results': 'نتائج المباريات',
+
         'dashboard.add_new_card': 'إضافة بطاقة جديدة',
         'dashboard.admin_team_cards': 'بطاقات الفريق الإداري',
         'dashboard.match_requests': 'طلبات المباريات للتحكيم',

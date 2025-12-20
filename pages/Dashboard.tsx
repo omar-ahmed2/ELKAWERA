@@ -343,9 +343,7 @@ export const Dashboard: React.FC = () => {
           <Link to="/admin/rankings" className="flex items-center gap-2 px-6 py-3 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold rounded-full hover:bg-[var(--text-primary)]/80 transition-all shadow-lg">
             <TrendingUp size={18} /> Team Rankings
           </Link>
-          <Link to="/match-reporter" className="flex items-center gap-2 px-6 py-3 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold rounded-full hover:bg-[var(--text-primary)]/80 transition-all shadow-lg">
-            <Trophy size={18} /> {t('dashboard.match_results')}
-          </Link>
+
           <Link to="/create" className="flex items-center gap-2 px-6 py-3 bg-elkawera-accent text-black font-bold rounded-full hover:bg-[var(--text-primary)] hover:text-white transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(0,255,157,0.3)]">
             <PlusCircle size={18} /> {t('dashboard.add_new_card')}
           </Link>

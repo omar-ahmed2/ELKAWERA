@@ -79,22 +79,19 @@ export const ScoutDashboard: React.FC = () => {
                     <div className="space-y-4">
                         {uniquePlayers.length > 0 ? (
                             uniquePlayers.map((activity) => (
-                                <Link to={`/match-results`} onClick={(e) => { e.preventDefault(); /* We don't have direct player link easily without ID lookup unless we assume standard route. PlayerPublicProfile route is /player/:playerId */ }} key={activity.id}>
-                                    {/* Actually, let's link to the player profile properly */}
-                                    <Link to={`/player/${activity.entityId}`} className="block block bg-[var(--bg-primary)]/40 hover:bg-[var(--bg-primary)]/60 p-4 rounded-xl border border-[var(--border-color)] transition-all flex justify-between items-center group">
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-white">
-                                                {activity.entityName.substring(0, 2).toUpperCase()}
-                                            </div>
-                                            <div>
-                                                <div className="text-[var(--text-primary)] font-bold group-hover:text-purple-400 transition-colors">{activity.entityName}</div>
-                                                <div className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
-                                                    <Clock size={10} /> {new Date(activity.timestamp).toLocaleDateString()}
-                                                </div>
+                                <Link to={`/player/${activity.entityId}`} key={activity.id} className="block bg-[var(--bg-primary)]/40 hover:bg-[var(--bg-primary)]/60 p-4 rounded-xl border border-[var(--border-color)] transition-all flex justify-between items-center group">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-white">
+                                            {activity.entityName.substring(0, 2).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <div className="text-[var(--text-primary)] font-bold group-hover:text-purple-400 transition-colors">{activity.entityName}</div>
+                                            <div className="text-xs text-[var(--text-secondary)] flex items-center gap-1">
+                                                <Clock size={10} /> {new Date(activity.timestamp).toLocaleDateString()}
                                             </div>
                                         </div>
-                                        <Eye size={16} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
-                                    </Link>
+                                    </div>
+                                    <Eye size={16} className="text-[var(--text-secondary)] group-hover:text-[var(--text-primary)] transition-colors" />
                                 </Link>
                             ))
                         ) : (

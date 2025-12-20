@@ -17,16 +17,19 @@ import {
     LogOut,
     ChevronLeft,
     ChevronRight,
-    Calendar
+    Calendar,
+    Shirt,
+    Package
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 interface AdminSidebarProps {
     pendingRequestsCount: number;
     unreadNotifications: number;
+    kitRequestsCount: number;
 }
 
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({ pendingRequestsCount, unreadNotifications }) => {
+export const AdminSidebar: React.FC<AdminSidebarProps> = ({ pendingRequestsCount, unreadNotifications, kitRequestsCount }) => {
     const { user, signOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
@@ -108,6 +111,8 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ pendingRequestsCount
 
                 <NavItem to="/admin/matches" icon={Target} label="Matches" />
                 <NavItem to="/admin/scouts" icon={Shield} label="Scouts" />
+                <NavItem to="/admin/kits" icon={Shirt} label="Kit Management" />
+                <NavItem to="/admin/kit-requests" icon={Package} label="Kit Requests" count={kitRequestsCount} />
                 <NavItem to="/compare" icon={BarChart2} label="Compare" />
                 <NavItem to="/create" icon={Plus} label="New Card" />
 

@@ -1,9 +1,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, Settings, ChevronDown, BarChart2, Gamepad2, User, Bell, Trophy, Shield, Calendar } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, Settings, ChevronDown, BarChart2, Gamepad2, User, Bell, Trophy, Shield, Calendar, Shirt } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { getAllPlayerRegistrationRequests, subscribeToChanges, getUnreadCount } from '../utils/db';
+import { getAllPlayerRegistrationRequests, getAllKitRequests, subscribeToChanges, getUnreadCount } from '../utils/db';
 import { useSettings } from '../context/SettingsContext';
 import { AdminSidebar } from './AdminSidebar';
 
@@ -11,6 +11,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [pendingRequestsCount, setPendingRequestsCount] = useState(0);
+  const [pendingKitRequestsCount, setPendingKitRequestsCount] = useState(0);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -35,6 +36,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         const requests = await getAllPlayerRegistrationRequests();
         const pending = requests.filter(r => r.status === 'pending');
         setPendingRequestsCount(pending.length);
+
+        const kitRequests = await getAllKitRequests();
+        const pendingKits = kitRequests.filter(r => r.status === 'pending');
+        setPendingKitRequestsCount(pendingKits.length);
       }
       if (user) {
         const count = await getUnreadCount(user.id);
@@ -77,6 +82,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         <AdminSidebar
           pendingRequestsCount={pendingRequestsCount}
           unreadNotifications={unreadNotifications}
+          kitRequestsCount={pendingKitRequestsCount}
         />
       )}
 
@@ -114,7 +120,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         <Link to="/leaderboard" className={`${isActive('/leaderboard')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1`}><Trophy size={14} /> <span className="hidden lg:inline">{t('nav.leaderboard')}</span><span className="lg:hidden">Board</span></Link>
                         <Link to="/events" className={`${isActive('/events')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1`}><Calendar size={14} /> <span className="hidden lg:inline">Events</span><span className="lg:hidden">Events</span></Link>
                         <Link to="/teams" className={`${isActive('/teams')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300`}>{t('nav.teams')}</Link>
-                        <Link to="/match-results" className={`${isActive('/match-results')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1`}><Trophy size={14} className="text-elkawera-accent" /> <span className="hidden lg:inline">Matches</span></Link>
+                        <Link to="/kits" className={`${isActive('/kits')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1`}><Shirt size={14} /> <span className="hidden lg:inline">Kits</span><span className="lg:hidden">Kits</span></Link>
+
 
                         {/* Notifications Bell */}
                         <Link to="/notifications" className={`${isActive('/notifications')} px-2 lg:px-3 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1 relative`}>
@@ -290,9 +297,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/teams" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all">
                       {t('nav.teams')}
                     </Link>
-                    <Link to="/match-results" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
-                      <Trophy size={18} className="text-elkawera-accent" /> Match Results
+                    <Link to="/kits" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                      <Shirt size={18} /> Official Kits
                     </Link>
+
                     {user.role === 'captain' && (
                       <Link to="/captain/dashboard" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
                         <Shield size={18} /> Captain Dashboard
