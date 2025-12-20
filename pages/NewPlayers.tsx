@@ -57,9 +57,11 @@ export const NewPlayers: React.FC = () => {
         // Add notification
         await addNotificationToUser(request.userId, {
           id: uuidv4(),
+          userId: request.userId,
           type: 'card_rejected',
+          title: 'Registration Rejected',
           message: 'Your player card request was rejected. Please review and submit a new request.',
-          timestamp: Date.now(),
+          createdAt: Date.now(),
           read: false
         });
 
@@ -76,19 +78,25 @@ export const NewPlayers: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-display font-bold uppercase tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl md:text-3xl font-display font-bold uppercase tracking-tight flex items-center gap-3">
             <User className="text-elkawera-accent" /> New Players
           </h1>
           <p className="text-gray-400 mt-1">Review and create player cards for new registrations.</p>
         </div>
-        <div className="bg-white/10 px-6 py-3 rounded-xl border border-white/20">
-          <span className="text-xs uppercase font-bold text-gray-400 block">Total Requests</span>
-          <span className="text-3xl font-display font-bold text-white">{requests.length}</span>
-          <span className="text-xs text-gray-500 block mt-1">
-            {requests.filter(r => r.status === 'pending').length} Pending
-          </span>
+        <div className="bg-white/10 px-6 py-3 rounded-xl border border-white/20 w-full md:w-auto">
+          <div className="flex md:block items-center justify-between gap-4">
+            <div>
+              <span className="text-xs uppercase font-bold text-gray-400 block">Total Requests</span>
+              <span className="text-2xl md:text-3xl font-display font-bold text-white">{requests.length}</span>
+            </div>
+            <div className="md:mt-1 text-right md:text-left">
+              <span className="text-xs text-gray-500 block">
+                {requests.filter(r => r.status === 'pending').length} Pending
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -102,23 +110,25 @@ export const NewPlayers: React.FC = () => {
           {requests.map((request) => (
             <div
               key={request.id}
-              className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all"
+              className="bg-white/5 border border-white/10 rounded-2xl p-4 md:p-6 hover:bg-white/10 transition-all"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-full bg-elkawera-accent/20 flex items-center justify-center border-2 border-elkawera-accent">
-                      <User size={32} className="text-elkawera-accent" />
+              <div className="flex flex-col md:flex-row items-start justify-between gap-6">
+                <div className="w-full">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-elkawera-accent/20 flex items-center justify-center border-2 border-elkawera-accent shrink-0">
+                        <User size={28} className="text-elkawera-accent" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl md:text-2xl font-display font-bold text-white uppercase line-clamp-1">{request.name}</h3>
+                        <p className="text-gray-400 text-sm truncate">{request.email}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="text-2xl font-display font-bold text-white uppercase">{request.name}</h3>
-                      <p className="text-gray-400 text-sm">{request.email}</p>
-                    </div>
-                    <div className={`ml-auto flex items-center gap-2 px-3 py-1 rounded-full border ${request.status === 'approved'
-                        ? 'bg-green-500/20 border-green-500/30'
-                        : request.status === 'rejected'
-                          ? 'bg-red-500/20 border-red-500/30'
-                          : 'bg-yellow-500/20 border-yellow-500/30'
+                    <div className={`sm:ml-auto self-start sm:self-center flex items-center gap-2 px-3 py-1 rounded-full border ${request.status === 'approved'
+                      ? 'bg-green-500/20 border-green-500/30'
+                      : request.status === 'rejected'
+                        ? 'bg-red-500/20 border-red-500/30'
+                        : 'bg-yellow-500/20 border-yellow-500/30'
                       }`}>
                       {request.status === 'approved' ? (
                         <CheckCircle size={14} className="text-green-400" />
@@ -128,10 +138,10 @@ export const NewPlayers: React.FC = () => {
                         <Clock size={14} className="text-yellow-400" />
                       )}
                       <span className={`text-xs font-bold uppercase ${request.status === 'approved'
-                          ? 'text-green-400'
-                          : request.status === 'rejected'
-                            ? 'text-red-400'
-                            : 'text-yellow-400'
+                        ? 'text-green-400'
+                        : request.status === 'rejected'
+                          ? 'text-red-400'
+                          : 'text-yellow-400'
                         }`}>
                         {request.status === 'approved' ? 'Confirmed' : request.status === 'rejected' ? 'Rejected' : 'Pending'}
                       </span>
@@ -157,18 +167,18 @@ export const NewPlayers: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-4">
                     <div className="bg-black/30 rounded-lg px-4 py-2 border border-white/10">
                       <span className="text-xs uppercase text-gray-400 block">Position</span>
-                      <span className="text-xl font-bold text-elkawera-accent">{request.position}</span>
+                      <span className="text-lg md:text-xl font-bold text-elkawera-accent">{request.position}</span>
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 ml-auto sm:ml-0">
                       Registered: {new Date(request.createdAt).toLocaleDateString()}
                     </div>
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-3 ml-6">
+                <div className="flex flex-col gap-3 w-full md:w-auto md:min-w-[200px]">
                   {request.status === 'pending' ? (
                     <>
                       <button
