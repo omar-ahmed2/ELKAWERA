@@ -4,7 +4,43 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ELKAWERA | Player Card Manager</title>
+  <meta name="description"
+    content="ELKAWERA - The ultimate football player card manager. Create, manage, and showcase professional football player cards. الكويرة - المنصة الأفضل لإدارة بطاقات لاعبي كرة القدم المحترفين." />
+  <meta name="keywords"
+    content="football, player cards, soccer manager, ELKAWERA, football stats, sports management, كرة قدم, بطاقات لاعبين, إدارة رياضية, الكويرة, إحصائيات كرة القدم" />
+  <meta name="author" content="ELKAWERA Team" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://elkawera-main.vercel.app/" />
+  <meta property="og:title" content="ELKAWERA | Football Player Card Manager" />
+  <meta property="og:description"
+    content="Manage your football dynasty. Create player cards, track stats, and compete. الكويرة - تحكم في إمبراطوريتك لكرة القدم." />
+  <meta property="og:image" content="https://elkawera-main.vercel.app/elkawera.jpg" />
+
+  <!-- Twitter -->
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:url" content="https://elkawera-main.vercel.app/" />
+  <meta property="twitter:title" content="ELKAWERA | Football Player Card Manager" />
+  <meta property="twitter:description"
+    content="Manage your football dynasty. Create player cards, track stats, and compete. الكويرة - تحكم في إمبراطوريتك لكرة القدم." />
+  <meta property="twitter:image" content="https://elkawera-main.vercel.app/elkawera.jpg" />
+
+  <!-- Canonical and Language -->
+  <link rel="canonical" href="https://elkawera-main.vercel.app/" />
+  <link rel="alternate" hreflang="en" href="https://elkawera-main.vercel.app/" />
+  <link rel="alternate" hreflang="ar" href="https://elkawera-main.vercel.app/" />
+  <link rel="alternate" hreflang="x-default" href="https://elkawera-main.vercel.app/" />
+
+  <title>ELKAWERA | Player Card Manager - الكويرة | إدارة بطاقات اللاعبين</title>
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="/elkawera.jpg" />
+  <link rel="apple-touch-icon" href="/elkawera.jpg" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#000000" />
+
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -206,9 +242,10 @@
   <script>
       (function () {
         const theme = localStorage.getItem('elkawera_theme');
-        const lang = localStorage.getItem('elkawera_lang');
+        const lang = localStorage.getItem('elkawera_lang') || 'en';
         if (theme === 'light') document.documentElement.classList.add('light-mode');
-        if (lang === 'ar') document.documentElement.dir = 'rtl';
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+        document.documentElement.lang = lang;
       })();
   </script>
 </head>

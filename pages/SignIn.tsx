@@ -13,16 +13,23 @@ export const SignIn: React.FC = () => {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (user) navigate('/dashboard');
+    if (user) {
+      if (user.role === 'captain') navigate('/captain/dashboard');
+      else if (user.role === 'scout') navigate('/scout/dashboard');
+      else navigate('/dashboard');
+    }
   }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     try {
-      await signIn(email, password);
-      // Navigation is handled by auth state change or explicit navigate below
-      navigate('/dashboard');
+      const loggedInUser = await signIn(email, password);
+      if (loggedInUser) {
+        if (loggedInUser.role === 'captain') navigate('/captain/dashboard');
+        else if (loggedInUser.role === 'scout') navigate('/scout/dashboard');
+        else navigate('/dashboard');
+      }
     } catch (err) {
       setError('Invalid email or password');
     }
@@ -45,8 +52,8 @@ export const SignIn: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-xs uppercase text-gray-400 mb-2 font-bold tracking-wider">Email Address</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               name="email"
               autoComplete="email"
               required
@@ -58,7 +65,7 @@ export const SignIn: React.FC = () => {
           </div>
           <div>
             <label className="block text-xs uppercase text-gray-400 mb-2 font-bold tracking-wider">Password</label>
-            <input 
+            <input
               type="password"
               name="password"
               autoComplete="current-password"
@@ -70,7 +77,7 @@ export const SignIn: React.FC = () => {
             />
           </div>
 
-          <button 
+          <button
             type="submit"
             className="w-full py-4 bg-elkawera-accent text-black font-bold uppercase rounded-xl hover:bg-white transition-all transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,255,157,0.3)] flex items-center justify-center gap-2"
           >

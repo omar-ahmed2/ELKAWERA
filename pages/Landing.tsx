@@ -3,9 +3,11 @@ import { Link } from 'react-router-dom';
 import { ChevronRight, Zap, Shield, TrendingUp, Users } from 'lucide-react';
 import { StatProgression } from '../components/StatProgression';
 import { useSettings } from '../context/SettingsContext';
+import { useAuth } from '../context/AuthContext';
 
 export const Landing: React.FC = () => {
   const { t, dir } = useSettings();
+  const { user } = useAuth();
 
   return (
     <div className="space-y-20 animate-fade-in-up" dir={dir}>
@@ -22,12 +24,14 @@ export const Landing: React.FC = () => {
             <div className="flex flex-wrap gap-4">
               <Link
                 to="/create"
+                aria-label={t('landing.cta.create')}
                 className="inline-flex items-center px-8 py-4 bg-elkawera-accent text-elkawera-black rounded-full font-bold text-lg hover:bg-[var(--text-primary)] hover:text-[var(--bg-primary)] transition-all transform hover:scale-105 shadow-[0_0_20px_rgba(0,255,157,0.3)]"
               >
                 {t('landing.cta.create')} <ChevronRight className={`ml-2 transform ${dir === 'rtl' ? 'rotate-180' : ''}`} />
               </Link>
               <Link
                 to="/teams"
+                aria-label={t('landing.cta.teams')}
                 className="inline-flex items-center px-8 py-4 border border-[var(--text-secondary)] text-[var(--text-primary)] rounded-full font-bold text-lg hover:border-elkawera-accent hover:text-elkawera-accent transition-colors"
               >
                 {t('landing.cta.teams')}
@@ -35,7 +39,8 @@ export const Landing: React.FC = () => {
             </div>
             <div className="pt-4">
               <Link
-                to="/dashboard"
+                to={!user ? "/dashboard" : user.role === 'captain' ? "/captain/dashboard" : user.role === 'scout' ? "/scout/dashboard" : "/dashboard"}
+                aria-label={t('landing.cta.database')}
                 className="inline-flex items-center gap-2 px-8 py-3 bg-[var(--bg-secondary)] text-[var(--text-primary)] rounded-lg font-bold hover:bg-[var(--bg-secondary)]/80 transition-all border border-[var(--border-color)] hover:border-[var(--text-primary)]"
               >
                 <Users size={20} /> {t('landing.cta.database')}

@@ -25,7 +25,11 @@ export const SignUp: React.FC = () => {
 
     // Redirect if already logged in
     useEffect(() => {
-        if (user) navigate('/dashboard');
+        if (user) {
+            if (user.role === 'captain') navigate('/captain/dashboard');
+            else if (user.role === 'scout') navigate('/scout/dashboard');
+            else navigate('/dashboard');
+        }
     }, [user, navigate]);
 
     const handleSubmit = async (e: React.FormEvent) => {

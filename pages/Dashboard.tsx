@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getAllPlayers, deletePlayerAndNotifyUser, getAllTeams, getPlayerById, getUserById, getAllPlayerRegistrationRequests, clearUserNotifications, deletePlayerRegistrationRequest, subscribeToChanges, getAllUsers, deleteUser, getAllMatchRequests, approveMatchRequest, rejectMatchRequest } from '../utils/db';
+import { getAllPlayers, deletePlayerAndNotifyUser, getAllTeams, getPlayerById, getUserById, getAllPlayerRegistrationRequests, clearUserNotifications, deletePlayerRegistrationRequest, subscribeToChanges, getAllUsers, getAllMatchRequests, approveMatchRequest, rejectMatchRequest } from '../utils/db';
 import { Player, Team, User, PlayerRegistrationRequest, MatchRequest } from '../types';
 import { Link, useNavigate } from 'react-router-dom';
-import { Edit2, Trash2, Activity, Download, Search, Filter, PlusCircle, Trophy, Sparkles, User as UserIcon, Clock, Bell, X, Shield, Users, CheckCircle, TrendingUp } from 'lucide-react';
+import { Edit2, Trash2, Activity, Download, Search, PlusCircle, Sparkles, User as UserIcon, Clock, Bell, X, Shield, CheckCircle, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { PlayerCard } from '../components/PlayerCard';
 import { ConfirmationDialog } from '../components/ConfirmationDialog';
@@ -22,9 +22,6 @@ export const Dashboard: React.FC = () => {
   const [adminCards, setAdminCards] = useState<Player[]>([]);
   const [requests, setRequests] = useState<PlayerRegistrationRequest[]>([]);
   const [matchRequests, setMatchRequests] = useState<MatchRequest[]>([]);
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
-  const [userSearchTerm, setUserSearchTerm] = useState('');
   const { user } = useAuth();
   const { t, dir } = useSettings();
   const navigate = useNavigate();
@@ -47,7 +44,6 @@ export const Dashboard: React.FC = () => {
       setRequests(allRequests.filter(r => r.status === 'pending'));
 
       const allUsersList = await getAllUsers();
-      setAllUsers(allUsersList);
       const adminUsers = allUsersList.filter(u => u.role === 'admin' && u.playerCardId);
       const cards: Player[] = [];
       for (const admin of adminUsers) {
@@ -71,21 +67,9 @@ export const Dashboard: React.FC = () => {
         setRegistrationStatus(null);
       }
 
-      const storedUser = localStorage.getItem('elkawera_user');
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        if (parsedUser.playerCardId) {
-          const player = await getPlayerById(parsedUser.playerCardId);
-          if (player) {
-            setMyPlayer(player);
-            return;
-          }
-        }
-      }
-
-      const targetUser = freshUser || user;
-      if (targetUser.playerCardId) {
-        const player = await getPlayerById(targetUser.playerCardId);
+      const freshUserData = freshUser || user;
+      if (freshUserData.playerCardId) {
+        const player = await getPlayerById(freshUserData.playerCardId);
         if (player) {
           setMyPlayer(player);
         } else {
@@ -96,6 +80,16 @@ export const Dashboard: React.FC = () => {
       }
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      if (user.role === 'captain') {
+        navigate('/captain/dashboard');
+      } else if (user.role === 'scout') {
+        navigate('/scout/dashboard');
+      }
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     loadData();
@@ -110,20 +104,6 @@ export const Dashboard: React.FC = () => {
       await deletePlayerAndNotifyUser(deleteId);
       setDeleteId(null);
       loadData();
-    }
-  };
-
-  const confirmDeleteUser = async () => {
-    if (deleteUserId) {
-      if (user && user.id === deleteUserId) {
-        alert("You cannot delete your own account while logged in.");
-        setDeleteUserId(null);
-        return;
-      }
-      await deleteUser(deleteUserId);
-      setDeleteUserId(null);
-      loadData();
-      showToast('User deleted successfully', 'success');
     }
   };
 
@@ -176,7 +156,10 @@ export const Dashboard: React.FC = () => {
 
   const topPlayer = user?.role === 'admin' && players.length > 0 ? players[0] : null;
 
-  // Player Dashboard View
+  if (user?.role === 'captain' || user?.role === 'scout') {
+    return <div className="flex justify-center items-center min-h-[60vh] text-white">Redirecting to your dashboard...</div>;
+  }
+
   if (user?.role === 'player') {
     return (
       <div className="space-y-12 pb-12" dir={dir}>
@@ -217,7 +200,6 @@ export const Dashboard: React.FC = () => {
                 <Clock size={48} className="mx-auto text-yellow-500 mb-4" />
                 <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">{t('dashboard.pending_card')}</h2>
                 <p className="text-[var(--text-secondary)] mb-4">{t('dashboard.pending_desc')}</p>
-                <p className="text-sm text-[var(--text-secondary)]"></p>
               </>
             ) : registrationStatus === 'rejected' ? (
               <>
@@ -253,7 +235,6 @@ export const Dashboard: React.FC = () => {
         await approveMatchRequest(req.id, user?.id || 'admin');
         showToast(t('dashboard.match_approved'), 'success');
         setMatchRequests(prev => prev.filter(r => r.id !== req.id));
-        // Optional: Navigate to Admin Matches or offer link
         navigate('/admin/matches');
       } catch (error) {
         console.error(error);
@@ -276,7 +257,6 @@ export const Dashboard: React.FC = () => {
     }
   };
 
-  // Admin Dashboard View
   return (
     <div className="space-y-12 pb-12" dir={dir}>
       <ConfirmationDialog
@@ -287,7 +267,6 @@ export const Dashboard: React.FC = () => {
         message={t('dashboard.delete_confirm_msg')}
       />
 
-      {/* Hero / Spotlight Section */}
       {topPlayer && (
         <div className="bg-gradient-to-r from-elkawera-green to-[var(--bg-primary)] rounded-3xl p-8 md:p-10 border border-elkawera-accent/30 shadow-[0_0_40px_rgba(0,255,157,0.1)] relative overflow-hidden animate-fade-in-up">
           <div className="absolute top-0 right-0 w-96 h-96 bg-elkawera-accent/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/3"></div>
@@ -330,7 +309,6 @@ export const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Header Actions */}
       <div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
         <div>
           <h1 className="text-4xl font-display font-bold uppercase tracking-tight text-[var(--text-primary)]">{t('dashboard.title')}</h1>
@@ -340,17 +318,22 @@ export const Dashboard: React.FC = () => {
           <button onClick={handleExportJSON} className="flex items-center gap-2 px-5 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full hover:border-elkawera-accent text-sm font-bold transition-colors text-[var(--text-primary)]">
             <Download size={18} /> {t('dashboard.backup_data')}
           </button>
-          <Link to="/admin/rankings" className="flex items-center gap-2 px-6 py-3 bg-[var(--text-primary)] text-[var(--bg-primary)] font-bold rounded-full hover:bg-[var(--text-primary)]/80 transition-all shadow-lg">
+          <Link to="/admin/rankings" className="flex items-center gap-2 px-6 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full hover:border-elkawera-accent text-sm font-bold transition-colors text-[var(--text-primary)]">
             <TrendingUp size={18} /> Team Rankings
           </Link>
+          <Link to="/admin/users" className="flex items-center gap-2 px-6 py-3 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full hover:border-elkawera-accent text-sm font-bold transition-colors text-[var(--text-primary)]">
+            <UserIcon size={18} /> Users
+          </Link>
 
-          <Link to="/create" className="flex items-center gap-2 px-6 py-3 bg-elkawera-accent text-black font-bold rounded-full hover:bg-[var(--text-primary)] hover:text-white transition-all transform hover:scale-105 shadow-[0_0_15px_rgba(0,255,157,0.3)]">
+          <Link
+            to="/create"
+            className="flex items-center gap-2 px-6 py-3 bg-elkawera-accent border border-elkawera-accent text-black font-bold rounded-full hover:bg-black hover:text-elkawera-accent transition-all duration-300 shadow-[0_0_15px_rgba(0,255,157,0.3)]"
+          >
             <PlusCircle size={18} /> {t('dashboard.add_new_card')}
           </Link>
         </div>
       </div>
 
-      {/* Admins Cards Section */}
       {adminCards.length > 0 && (
         <div className="mb-12">
           <h2 className="text-2xl font-display font-bold text-[var(--text-primary)] mb-6 flex items-center gap-2">
@@ -370,7 +353,6 @@ export const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Match Arbitration Section */}
       {matchRequests.length > 0 && (
         <div className="mb-12">
           <h2 className="text-2xl font-display font-bold text-[var(--text-primary)] mb-6 flex items-center gap-2">
@@ -423,9 +405,7 @@ export const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* Stats & Filter Section */}
       <div className="grid lg:grid-cols-3 gap-8">
-        {/* Chart */}
         <div className="lg:col-span-2 bg-[var(--bg-secondary)] p-6 rounded-3xl border border-[var(--border-color)] shadow-lg backdrop-blur-sm">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold uppercase tracking-widest text-[var(--text-secondary)]">{t('dashboard.squad_composition')}</h3>
@@ -450,7 +430,6 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Filters */}
         <div className="lg:col-span-1 bg-[var(--bg-secondary)] p-6 rounded-3xl border border-[var(--border-color)] flex flex-col gap-4 shadow-lg backdrop-blur-sm">
           <div>
             <label className="text-xs font-bold uppercase text-[var(--text-secondary)] mb-2 block">{t('dashboard.search_db')}</label>
@@ -482,7 +461,6 @@ export const Dashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Cards Grid */}
       <div className="space-y-4">
         <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-3 text-[var(--text-primary)]">
           {t('dashboard.player_cards')} <span className="w-full h-px bg-[var(--border-color)] block flex-1"></span>
@@ -501,14 +479,12 @@ export const Dashboard: React.FC = () => {
                 className="relative group animate-fade-in-up"
                 style={{ animationDelay: `${index * 50}ms` }}
               >
-                {/* The Card */}
                 <PlayerCard
                   player={player}
                   uniqueId={player.id}
                   allowFlipClick={true}
                   className="shadow-2xl"
                 >
-                  {/* Hover Overlay with Actions */}
                   <div className="absolute inset-0 bg-black/80 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-all duration-300 rounded-[24px] flex flex-col items-center justify-center gap-6 z-50 border border-white/20">
 
                     <div className="transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
@@ -548,127 +524,6 @@ export const Dashboard: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* User Management Section - Admin Only */}
-      {user?.role === 'admin' && (
-        <div className="space-y-4 pt-8 border-t border-[var(--border-color)] mt-12">
-          <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-3 text-[var(--text-primary)]">
-              {t('dashboard.user_db')} <span className="w-full h-px bg-[var(--border-color)] block flex-1"></span>
-            </h2>
-          </div>
-
-          {/* Search Bar */}
-          <div className="relative">
-            <Search className={`absolute ${dir === 'rtl' ? 'right-4' : 'left-4'} top-1/2 -translate-y-1/2 text-[var(--text-secondary)]`} size={20} />
-            <input
-              type="text"
-              placeholder={t('common.search')}
-              value={userSearchTerm}
-              onChange={(e) => setUserSearchTerm(e.target.value)}
-              className={`w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl ${dir === 'rtl' ? 'pr-12 pl-4' : 'pl-12 pr-4'} py-3 text-[var(--text-primary)] placeholder-[var(--text-secondary)] focus:border-elkawera-accent focus:outline-none transition-colors`}
-            />
-            {userSearchTerm && (
-              <button
-                onClick={() => setUserSearchTerm('')}
-                className={`absolute ${dir === 'rtl' ? 'left-4' : 'right-4'} top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors`}
-              >
-                <X size={20} />
-              </button>
-            )}
-          </div>
-
-          <div className="bg-[var(--bg-secondary)] rounded-3xl border border-[var(--border-color)] overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left rtl:text-right border-collapse">
-                <thead>
-                  <tr className="bg-[var(--bg-primary)]/30 border-b border-[var(--border-color)] text-xs uppercase font-bold text-[var(--text-secondary)]">
-                    <th className="p-4">{t('dashboard.user_table.user')}</th>
-                    <th className="p-4">{t('dashboard.user_table.email')}</th>
-                    <th className="p-4">{t('dashboard.user_table.role')}</th>
-                    <th className="p-4">{t('dashboard.user_table.joined')}</th>
-                    <th className="p-4 text-right rtl:text-left">{t('dashboard.user_table.actions')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border-color)]">
-                  {allUsers
-                    .filter(u => {
-                      if (!userSearchTerm) return true;
-                      const searchLower = userSearchTerm.toLowerCase();
-                      return (
-                        u.name.toLowerCase().includes(searchLower) ||
-                        u.email.toLowerCase().includes(searchLower)
-                      );
-                    })
-                    .map(u => (
-                      <tr key={u.id} className="hover:bg-[var(--bg-primary)]/50 transition-colors group">
-                        <td className="p-4 font-medium text-[var(--text-primary)] flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-elkawera-accent/10 flex items-center justify-center text-elkawera-accent">
-                            <UserIcon size={16} />
-                          </div>
-                          {u.name}
-                        </td>
-                        <td className="p-4 text-[var(--text-secondary)]">{u.email}</td>
-                        <td className="p-4">
-                          <span className={`px-2 py-1 rounded-md text-[10px] uppercase font-bold ${u.role === 'admin' ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'
-                            }`}>
-                            {u.role}
-                          </span>
-                        </td>
-                        <td className="p-4 text-[var(--text-secondary)] text-sm">
-                          {new Date(u.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="p-4 text-right rtl:text-left relative">
-                          {deleteUserId === u.id ? (
-                            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-rose-600 border-2 border-red-500/50 rounded-xl px-4 py-2 shadow-[0_0_25px_rgba(220,38,38,0.5)] animate-scale-in">
-                              <span className="text-white text-sm font-bold">{t('dashboard.user_table.delete_confirm')}</span>
-                              <button
-                                onClick={confirmDeleteUser}
-                                className="px-3 py-1 bg-white text-red-600 rounded-lg text-xs font-bold hover:bg-gray-100 transition-all hover:scale-105 active:scale-95"
-                              >
-                                {t('dashboard.user_table.yes')}
-                              </button>
-                              <button
-                                onClick={() => setDeleteUserId(null)}
-                                className="px-3 py-1 bg-white/20 text-white rounded-lg text-xs font-bold hover:bg-white/30 transition-all hover:scale-105 active:scale-95"
-                              >
-                                {t('dashboard.user_table.no')}
-                              </button>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => setDeleteUserId(u.id)}
-                              className="p-2 text-[var(--text-secondary)] hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-                              title={t('dashboard.user_table.delete_user')}
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  {allUsers.filter(u => {
-                    if (!userSearchTerm) return true;
-                    const searchLower = userSearchTerm.toLowerCase();
-                    return (
-                      u.name.toLowerCase().includes(searchLower) ||
-                      u.email.toLowerCase().includes(searchLower)
-                    );
-                  }).length === 0 && (
-                      <tr>
-                        <td colSpan={5} className="p-8 text-center text-[var(--text-secondary)]">
-                          {userSearchTerm
-                            ? `${t('common.no_data')} "${userSearchTerm}"`
-                            : t('common.no_data')}
-                        </td>
-                      </tr>
-                    )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

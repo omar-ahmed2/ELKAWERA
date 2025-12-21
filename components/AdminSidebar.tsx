@@ -111,6 +111,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ pendingRequestsCount
 
                 <NavItem to="/admin/matches" icon={Target} label="Matches" />
                 <NavItem to="/admin/scouts" icon={Shield} label="Scouts" />
+                <NavItem to="/admin/users" icon={Users} label="Users" />
                 <NavItem to="/admin/kits" icon={Shirt} label="Kit Management" />
                 <NavItem to="/admin/kit-requests" icon={Package} label="Kit Requests" count={kitRequestsCount} />
                 <NavItem to="/compare" icon={BarChart2} label="Compare" />
