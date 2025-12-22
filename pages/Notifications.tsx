@@ -5,7 +5,6 @@ import {
     getUserNotifications,
     markNotificationAsRead,
     deleteNotification,
-    clearUserNotifications,
     confirmMatchRequestByOpponent,
     getTeamById,
     subscribeToChanges,
@@ -67,14 +66,6 @@ export const Notifications: React.FC = () => {
             showToast('Failed to mark all as read', 'error');
             // Re-sync with DB on error
             loadNotifications();
-        }
-    };
-
-    const handleClearAll = async () => {
-        if (!user) return;
-        if (window.confirm('Are you sure you want to clear all notifications?')) {
-            await clearUserNotifications(user.id);
-            setNotifications([]);
         }
     };
 
@@ -142,21 +133,13 @@ export const Notifications: React.FC = () => {
                     </h1>
                     <p className="text-[var(--text-secondary)] text-sm sm:text-base">Manage your alerts and requests</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex items-center">
                     {notifications.some(n => !n.read) && (
                         <button
                             onClick={handleMarkAllRead}
-                            className="px-4 py-2 bg-elkawera-accent/10 text-elkawera-accent hover:bg-elkawera-accent hover:text-black rounded-lg transition-all text-xs sm:text-sm font-bold flex items-center gap-2 border border-elkawera-accent/20"
+                            className="px-4 py-2 bg-elkawera-accent text-black hover:bg-white rounded-xl transition-all text-xs sm:text-sm font-bold flex items-center gap-2 shadow-[0_0_15px_rgba(0,255,157,0.3)] group"
                         >
-                            <Check size={14} className="sm:size-[16px]" /> Mark All Read
-                        </button>
-                    )}
-                    {notifications.length > 0 && (
-                        <button
-                            onClick={handleClearAll}
-                            className="px-4 py-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors text-xs sm:text-sm font-bold flex items-center gap-2"
-                        >
-                            <Trash2 size={14} className="sm:size-[16px]" /> Clear All
+                            <CheckCircle size={16} className="group-hover:scale-110 transition-transform" /> Mark All Read
                         </button>
                     )}
                 </div>
@@ -203,15 +186,7 @@ export const Notifications: React.FC = () => {
                             onClick={async () => {
                                 try {
                                     if (!notification || notification.read) return;
-
-                                    // Mark as read first for responsiveness
                                     await handleMarkAsRead(notification.id);
-
-                                    if (notification.type === 'match_request') {
-                                        await handleMatchRequestAction(notification, 'confirm');
-                                    } else if (notification.type === 'team_invitation') {
-                                        await handleInvitationAction(notification, 'accepted');
-                                    }
                                 } catch (err) {
                                     console.error('Error handling notification click:', err);
                                 }

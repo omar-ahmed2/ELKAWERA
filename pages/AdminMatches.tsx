@@ -4,7 +4,8 @@ import { useAuth } from '../context/AuthContext';
 import { getAllMatches, getMatchesByStatus, saveMatch, getAllTeams, getPlayersByTeamId, subscribeToChanges, getAllMatchRequests, updateMatchRequestStatus, deleteMatch } from '../utils/db';
 import { Match, Team, Player, MatchRequest } from '../types';
 import { v4 as uuidv4 } from 'uuid';
-import { PlusCircle, PlayCircle, StopCircle, Trophy, Users, Clock, CheckCircle, XCircle, Inbox, ThumbsUp, ThumbsDown, Trash2, Eye } from 'lucide-react';
+import { PlusCircle, PlayCircle, StopCircle, Trophy, Users, Clock, CheckCircle, XCircle, Inbox, ThumbsUp, ThumbsDown, Trash2, Eye, X, Check } from 'lucide-react';
+import { showToast } from '../components/Toast';
 
 export const AdminMatches: React.FC = () => {
     const { user } = useAuth();
@@ -203,22 +204,34 @@ export const AdminMatches: React.FC = () => {
 // Match Request Card Component
 const MatchRequestCard: React.FC<{ request: MatchRequest; onUpdate: () => void }> = ({ request, onUpdate }) => {
     const [processing, setProcessing] = useState(false);
+    const [confirmingApprove, setConfirmingApprove] = useState(false);
+    const [confirmingReject, setConfirmingReject] = useState(false);
+    const [rejectReason, setRejectReason] = useState('');
 
     const handleAction = async (status: 'approved' | 'rejected') => {
-        if (status === 'rejected') {
-            const reason = prompt('Enter rejection reason:');
-            if (!reason) return;
-
-            setProcessing(true);
-            await updateMatchRequestStatus(request.id, 'rejected', reason);
-        } else {
-            if (!confirm('Approve this match request? This will start the match immediately.')) return;
-            setProcessing(true);
-            await updateMatchRequestStatus(request.id, 'approved');
+        if (status === 'rejected' && !rejectReason.trim()) {
+            showToast('Please provide a reason', 'error');
+            return;
         }
 
-        setProcessing(false);
-        onUpdate();
+        setProcessing(true);
+        try {
+            if (status === 'rejected') {
+                await updateMatchRequestStatus(request.id, 'rejected', rejectReason);
+                showToast('Match request rejected', 'info');
+            } else {
+                await updateMatchRequestStatus(request.id, 'approved');
+                showToast('Match request approved and started!', 'success');
+            }
+            onUpdate();
+        } catch (error) {
+            console.error(error);
+            showToast('Failed to update match request', 'error');
+        } finally {
+            setProcessing(false);
+            setConfirmingApprove(false);
+            setConfirmingReject(false);
+        }
     };
 
     return (
@@ -247,21 +260,75 @@ const MatchRequestCard: React.FC<{ request: MatchRequest; onUpdate: () => void }
                 </div>
             </div>
 
-            <div className="flex gap-3 justify-end border-t border-white/10 pt-4">
-                <button
-                    onClick={() => handleAction('rejected')}
-                    disabled={processing}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors font-bold text-sm disabled:opacity-50"
-                >
-                    <ThumbsDown size={16} /> Reject
-                </button>
-                <button
-                    onClick={() => handleAction('approved')}
-                    disabled={processing}
-                    className="flex items-center gap-2 px-4 py-2 bg-elkawera-accent text-black rounded-lg hover:bg-white transition-colors font-bold text-sm disabled:opacity-50"
-                >
-                    <ThumbsUp size={16} /> Approve & Start
-                </button>
+            <div className="flex flex-col gap-3 justify-end border-t border-white/10 pt-4">
+                {!confirmingApprove && !confirmingReject && (
+                    <div className="flex gap-3 justify-end">
+                        <button
+                            onClick={() => setConfirmingReject(true)}
+                            disabled={processing}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500/20 transition-colors font-bold text-sm disabled:opacity-50"
+                        >
+                            <ThumbsDown size={16} /> Reject
+                        </button>
+                        <button
+                            onClick={() => setConfirmingApprove(true)}
+                            disabled={processing}
+                            className="flex items-center gap-2 px-4 py-2 bg-elkawera-accent text-black rounded-lg hover:bg-white transition-colors font-bold text-sm disabled:opacity-50"
+                        >
+                            <ThumbsUp size={16} /> Approve & Start
+                        </button>
+                    </div>
+                )}
+
+                {confirmingApprove && (
+                    <div className="bg-elkawera-accent/10 border border-elkawera-accent/30 rounded-xl p-4 animate-in slide-in-from-top-2">
+                        <p className="text-sm font-bold text-elkawera-accent mb-3">Approve this match request? It will start immediately.</p>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => handleAction('approved')}
+                                disabled={processing}
+                                className="px-6 py-2 bg-elkawera-accent text-black font-bold rounded-lg hover:bg-white transition-all text-xs"
+                            >
+                                {processing ? 'Starting...' : 'Confirm & Start'}
+                            </button>
+                            <button
+                                onClick={() => setConfirmingApprove(false)}
+                                className="px-6 py-2 bg-white/5 text-white font-bold rounded-lg text-xs"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {confirmingReject && (
+                    <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 animate-in slide-in-from-top-2">
+                        <p className="text-sm font-bold text-red-500 mb-3">Reason for rejection:</p>
+                        <textarea
+                            value={rejectReason}
+                            onChange={(e) => setRejectReason(e.target.value)}
+                            className="w-full bg-black/40 border border-red-500/30 rounded-lg p-3 text-sm text-white focus:outline-none focus:border-red-500 mb-3"
+                            placeholder="Type reason..."
+                            rows={2}
+                            autoFocus
+                        />
+                        <div className="flex gap-2">
+                            <button
+                                onClick={() => handleAction('rejected')}
+                                disabled={processing}
+                                className="px-6 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-all text-xs"
+                            >
+                                Confirm Reject
+                            </button>
+                            <button
+                                onClick={() => { setConfirmingReject(false); setRejectReason(''); }}
+                                className="px-6 py-2 bg-white/5 text-white font-bold rounded-lg text-xs"
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -283,9 +350,10 @@ const MatchCard: React.FC<{ match: Match; teams: Team[]; onUpdate: () => void }>
             await deleteMatch(match.id);
             setShowDeleteConfirm(false);
             onUpdate();
+            showToast('Match deleted', 'info');
         } catch (error) {
             console.error('Error deleting match:', error);
-            alert('Failed to delete match');
+            showToast('Failed to delete match', 'error');
         }
     };
 
@@ -440,12 +508,12 @@ const CreateMatchModal: React.FC<{
 
     const handleCreate = async () => {
         if (!homeTeamId || !awayTeamId || selectedHomePlayers.length === 0 || selectedAwayPlayers.length === 0) {
-            alert('Please select both teams and at least one player from each team');
+            showToast('Please select both teams and at least one player from each team', 'error');
             return;
         }
 
         if (homeTeamId === awayTeamId) {
-            alert('Home and away teams must be different');
+            showToast('Home and away teams must be different', 'error');
             return;
         }
 
@@ -469,10 +537,11 @@ const CreateMatchModal: React.FC<{
             };
 
             await saveMatch(newMatch);
+            showToast('Match created and started!', 'success');
             onCreated();
         } catch (error) {
             console.error('Error creating match:', error);
-            alert('Failed to create match');
+            showToast('Failed to create match', 'error');
         } finally {
             setCreating(false);
         }

@@ -44,7 +44,7 @@ export const UserDatabase: React.FC = () => {
     const confirmDeleteUser = async () => {
         if (deleteUserId) {
             if (user && user.id === deleteUserId) {
-                alert("You cannot delete your own account while logged in.");
+                showToast("You cannot delete your own account while logged in.", "error");
                 setDeleteUserId(null);
                 return;
             }
@@ -138,9 +138,9 @@ export const UserDatabase: React.FC = () => {
                                         <td className="p-6 text-[var(--text-secondary)]">{u.email}</td>
                                         <td className="p-6">
                                             <span className={`px-3 py-1 rounded-md text-[10px] uppercase font-bold border ${u.role === 'admin' ? 'bg-purple-500/10 text-purple-400 border-purple-500/30' :
-                                                    u.role === 'captain' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' :
-                                                        u.role === 'scout' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' :
-                                                            'bg-gray-500/10 text-gray-400 border-gray-500/30'
+                                                u.role === 'captain' ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' :
+                                                    u.role === 'scout' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30' :
+                                                        'bg-gray-500/10 text-gray-400 border-gray-500/30'
                                                 }`}>
                                                 {u.role}
                                             </span>

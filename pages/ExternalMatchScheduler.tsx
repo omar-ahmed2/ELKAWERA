@@ -5,6 +5,7 @@ import { getAllTeams, saveMatchRequest, getPlayersByTeamId } from '../utils/db';
 import { Team, MatchRequest, Player } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { Calendar, Users, Trophy, ArrowLeft, CheckCircle, User as UserIcon } from 'lucide-react';
+import { showToast } from '../components/Toast';
 
 export const ExternalMatchScheduler: React.FC = () => {
     const { user } = useAuth();
@@ -55,7 +56,7 @@ export const ExternalMatchScheduler: React.FC = () => {
                 return prev.filter(id => id !== playerId);
             } else {
                 if (prev.length >= 7) {
-                    alert('You can only select up to 7 players');
+                    showToast('You can only select up to 7 players', 'error');
                     return prev;
                 }
                 return [...prev, playerId];
@@ -67,7 +68,7 @@ export const ExternalMatchScheduler: React.FC = () => {
         if (!myTeam || !selectedOpponent) return;
 
         if (selectedLineup.length < 5) {
-            alert('Please select at least 5 players for your lineup');
+            showToast('Please select at least 5 players for your lineup', 'error');
             return;
         }
 
@@ -95,11 +96,11 @@ export const ExternalMatchScheduler: React.FC = () => {
 
             await saveMatchRequest(newRequest);
 
-            alert('Match request sent successfully! An admin will review your request shortly.');
+            showToast('Match request sent successfully! An admin will review your request shortly.', 'success');
             navigate('/captain/dashboard');
         } catch (error) {
             console.error('Error scheduling match:', error);
-            alert('Failed to send match request');
+            showToast('Failed to send match request', 'error');
         } finally {
             setScheduling(false);
         }

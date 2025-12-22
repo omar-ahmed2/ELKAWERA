@@ -6,6 +6,7 @@ import { Match, Player, Team, PlayerEvaluation, MatchEvent } from '../types';
 import { calculatePlayerOverallRating, getCardTypeFromScore } from '../utils/matchCalculations';
 import { Trophy, ArrowLeft, Save, CheckCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
+import { showToast } from '../components/Toast';
 
 export const PlayerEvaluationPage: React.FC = () => {
     const { matchId } = useParams<{ matchId: string }>();
@@ -34,13 +35,13 @@ export const PlayerEvaluationPage: React.FC = () => {
             try {
                 const matchData = await getMatchById(matchId);
                 if (!matchData) {
-                    alert('Match not found');
+                    showToast('Match not found', 'error');
                     navigate('/admin/matches');
                     return;
                 }
 
                 if (matchData.status === 'finished') {
-                    alert('This match has already been evaluated');
+                    showToast('This match has already been evaluated', 'info');
                     navigate('/admin/matches');
                     return;
                 }
@@ -80,7 +81,7 @@ export const PlayerEvaluationPage: React.FC = () => {
                 setLoading(false);
             } catch (error) {
                 console.error('Error loading match:', error);
-                alert('Failed to load match data');
+                showToast('Failed to load match data', 'error');
                 navigate('/admin/matches');
             }
         };
@@ -278,11 +279,11 @@ export const PlayerEvaluationPage: React.FC = () => {
             }
 
             // Show success and redirect
-            alert('Player evaluations saved successfully! All player cards have been updated.');
+            showToast('Player evaluations saved successfully! All player cards have been updated.', 'success');
             navigate('/admin/matches');
         } catch (error) {
             console.error('Error saving evaluations:', error);
-            alert('Failed to save evaluations');
+            showToast('Failed to save evaluations', 'error');
             setSaving(false);
         }
     };

@@ -27,6 +27,8 @@ import { Team, Player, TeamInvitation, CaptainStats, User, MatchRequest, Match }
 import { v4 as uuidv4 } from 'uuid';
 import { Users, PlusCircle, Send, Trophy, TrendingUp, Calendar, UserPlus, CheckCircle, XCircle, Upload, Shield, Award, Star, Edit3, Trash2, HelpCircle } from 'lucide-react';
 import { PlayerCard } from '../components/PlayerCard';
+import { showToast } from '../components/Toast';
+import { X, Check } from 'lucide-react';
 
 export const CaptainDashboard: React.FC = () => {
     const { user } = useAuth();
@@ -45,6 +47,8 @@ export const CaptainDashboard: React.FC = () => {
     const [selectedRequest, setSelectedRequest] = useState<MatchRequest | null>(null); // Added
     const [captainStats, setCaptainStats] = useState<CaptainStats | null>(null);
     const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+    const [confirmingDeleteInvId, setConfirmingDeleteInvId] = useState<string | null>(null);
+    const [confirmingRejectRequestId, setConfirmingRejectRequestId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
 
     // Only captains can access
@@ -332,19 +336,39 @@ export const CaptainDashboard: React.FC = () => {
                                             <p className="text-sm text-gray-400">Invited {new Date(invitation.createdAt).toLocaleDateString()}</p>
                                         </div>
                                         <div className="flex items-center gap-3">
-                                            <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold uppercase">Pending</span>
-                                            <button
-                                                onClick={async () => {
-                                                    if (confirm(`Are you sure you want to cancel the invitation to ${invitation.playerName}?`)) {
-                                                        await deleteTeamInvitation(invitation.id);
-                                                        loadData();
-                                                    }
-                                                }}
-                                                className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
-                                                title="Cancel Invitation"
-                                            >
-                                                <Trash2 size={16} />
-                                            </button>
+                                            {confirmingDeleteInvId === invitation.id ? (
+                                                <div className="flex items-center gap-2 animate-in slide-in-from-right-2">
+                                                    <span className="text-[10px] font-bold text-red-500 uppercase">Cancel?</span>
+                                                    <button
+                                                        onClick={async () => {
+                                                            await deleteTeamInvitation(invitation.id);
+                                                            showToast('Invitation cancelled', 'info');
+                                                            setConfirmingDeleteInvId(null);
+                                                            loadData();
+                                                        }}
+                                                        className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                                                    >
+                                                        <Check size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setConfirmingDeleteInvId(null)}
+                                                        className="p-2 bg-white/10 text-gray-400 rounded-lg hover:bg-white/20 transition-colors"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <span className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-bold uppercase">Pending</span>
+                                                    <button
+                                                        onClick={() => setConfirmingDeleteInvId(invitation.id)}
+                                                        className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                        title="Cancel Invitation"
+                                                    >
+                                                        <Trash2 size={16} />
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 ))}
@@ -369,27 +393,47 @@ export const CaptainDashboard: React.FC = () => {
                                                 <p className="text-sm text-gray-400">Challenged by Captain {req.requestedByName}</p>
                                             </div>
                                             <div className="flex gap-2">
-                                                <button
-                                                    onClick={async () => {
-                                                        if (confirm('Reject this match request?')) {
-                                                            await rejectMatchRequest(req.id, user!.id, 'Declined by captain');
-                                                            loadData();
-                                                        }
-                                                    }}
-                                                    className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg font-bold hover:bg-red-500/30 transition-colors"
-                                                >
-                                                    Decline
-                                                </button>
-                                                <button
-                                                    onClick={() => {
-                                                        setSelectedRequest(req);
-                                                        setShowAcceptMatchModal(true);
-                                                    }}
-                                                    className="px-4 py-2 bg-elkawera-accent text-black rounded-lg font-bold hover:bg-white transition-colors flex items-center gap-2"
-                                                >
-                                                    <CheckCircle size={16} />
-                                                    Accept & Lineup
-                                                </button>
+                                                {confirmingRejectRequestId === req.id ? (
+                                                    <div className="flex items-center gap-2 animate-in slide-in-from-right-2">
+                                                        <span className="text-xs font-bold text-red-500 uppercase">Reject Match?</span>
+                                                        <button
+                                                            onClick={async () => {
+                                                                await rejectMatchRequest(req.id, user!.id, 'Declined by captain');
+                                                                showToast('Match challenge rejected', 'info');
+                                                                setConfirmingRejectRequestId(null);
+                                                                loadData();
+                                                            }}
+                                                            className="px-4 py-2 bg-red-500 text-white rounded-lg font-bold hover:bg-red-600 transition-colors text-xs"
+                                                        >
+                                                            Confirm
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setConfirmingRejectRequestId(null)}
+                                                            className="px-4 py-2 bg-white/10 text-white rounded-lg font-bold hover:bg-white/20 transition-colors text-xs"
+                                                        >
+                                                            Cancel
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            onClick={() => setConfirmingRejectRequestId(req.id)}
+                                                            className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg font-bold hover:bg-red-500/30 transition-colors"
+                                                        >
+                                                            Decline
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                setSelectedRequest(req);
+                                                                setShowAcceptMatchModal(true);
+                                                            }}
+                                                            className="px-4 py-2 bg-elkawera-accent text-black rounded-lg font-bold hover:bg-white transition-colors flex items-center gap-2"
+                                                        >
+                                                            <CheckCircle size={16} />
+                                                            Accept & Lineup
+                                                        </button>
+                                                    </>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -677,7 +721,7 @@ const CreateTeamModal: React.FC<{
 
     const handleCreate = async () => {
         if (!teamName || !shortName) {
-            alert('Please fill in team name and short name');
+            showToast('Please fill in team name and short name', 'error');
             return;
         }
 
@@ -726,7 +770,7 @@ const CreateTeamModal: React.FC<{
             onCreated();
         } catch (error) {
             console.error('Error creating team:', error);
-            alert('Failed to create team');
+            showToast('Failed to create team', 'error');
         } finally {
             setCreating(false);
         }
@@ -808,7 +852,7 @@ const CreateTeamModal: React.FC<{
                                                 onChange={(e) => {
                                                     if (e.target.checked) {
                                                         if (selectedPlayers.length >= 7) {
-                                                            alert('Maximum 7 players can be added to a team');
+                                                            showToast('Maximum 7 players can be added to a team', 'error');
                                                             return;
                                                         }
                                                         setSelectedPlayers([...selectedPlayers, u.id]);
@@ -924,7 +968,7 @@ const InvitePlayerModal: React.FC<{
 
     const handleSend = async () => {
         if (selectedUsers.length === 0) {
-            alert('Please select at least one player');
+            showToast('Please select at least one player', 'error');
             return;
         }
 
@@ -951,10 +995,10 @@ const InvitePlayerModal: React.FC<{
             }
 
             onInvited();
-            alert('Invitations sent successfully');
+            showToast('Invitations sent successfully', 'success');
         } catch (error) {
             console.error('Error sending invitations:', error);
-            alert('Failed to send invitations');
+            showToast('Failed to send invitations', 'error');
         } finally {
             setSending(false);
         }
@@ -1061,6 +1105,7 @@ const EditTeamModal: React.FC<{
     const [shortName, setShortName] = useState(team.shortName);
     const [logoUrl, setLogoUrl] = useState(team.logoUrl || '');
     const [saving, setSaving] = useState(false);
+    const [confirmingRemovePlayerId, setConfirmingRemovePlayerId] = useState<string | null>(null);
 
     // Get current team players
     const teamPlayers = players.filter(p => p.teamId === team.id);
@@ -1077,24 +1122,24 @@ const EditTeamModal: React.FC<{
     };
 
     const handleRemovePlayer = async (playerId: string) => {
-        if (!confirm('Are you sure you want to remove this player from the team?')) return;
-
         try {
             const player = await getPlayerById(playerId);
             if (player) {
                 player.teamId = undefined;
                 await savePlayer(player);
+                showToast('Player removed from team', 'info');
+                setConfirmingRemovePlayerId(null);
                 onUpdated();
             }
         } catch (error) {
             console.error('Error removing player:', error);
-            alert('Failed to remove player');
+            showToast('Failed to remove player', 'error');
         }
     };
 
     const handleSave = async () => {
         if (!teamName || !shortName) {
-            alert('Please fill in team name and short name');
+            showToast('Please fill in team name and short name', 'error');
             return;
         }
 
@@ -1109,10 +1154,11 @@ const EditTeamModal: React.FC<{
             };
 
             await saveTeam(updatedTeam);
+            showToast('Team updated successfully', 'success');
             onUpdated();
         } catch (error) {
             console.error('Error updating team:', error);
-            alert('Failed to update team');
+            showToast('Failed to update team', 'error');
         } finally {
             setSaving(false);
         }
@@ -1192,13 +1238,33 @@ const EditTeamModal: React.FC<{
                                                 <p className="text-xs text-gray-400">{player.position}</p>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={() => handleRemovePlayer(player.id)}
-                                            className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
-                                            title="Remove player"
-                                        >
-                                            <Trash2 size={16} className="text-red-400" />
-                                        </button>
+                                        <div className="flex items-center gap-2">
+                                            {confirmingRemovePlayerId === player.id ? (
+                                                <div className="flex items-center gap-2 animate-in slide-in-from-right-2">
+                                                    <span className="text-[10px] font-bold text-red-500 uppercase">Remove?</span>
+                                                    <button
+                                                        onClick={() => handleRemovePlayer(player.id)}
+                                                        className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                                                    >
+                                                        <Check size={14} />
+                                                    </button>
+                                                    <button
+                                                        onClick={() => setConfirmingRemovePlayerId(null)}
+                                                        className="p-1.5 bg-white/10 text-gray-400 rounded-lg hover:bg-white/20 transition-colors"
+                                                    >
+                                                        <X size={14} />
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={() => setConfirmingRemovePlayerId(player.id)}
+                                                    className="p-2 hover:bg-red-500/20 rounded-lg transition-colors"
+                                                    title="Remove player"
+                                                >
+                                                    <Trash2 size={16} className="text-red-400" />
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 ))
                             )}
@@ -1265,7 +1331,7 @@ const AcceptMatchModal: React.FC<{
                 return prev.filter(id => id !== playerId);
             } else {
                 if (prev.length >= 7) {
-                    alert('You can only select up to 7 players');
+                    showToast('You can only select up to 7 players', 'error');
                     return prev;
                 }
                 return [...prev, playerId];
@@ -1280,10 +1346,11 @@ const AcceptMatchModal: React.FC<{
 
         try {
             await confirmMatchRequestByOpponent(request.id, user.id, selectedLineup);
+            showToast('Challenge accepted! Waiting for admin approval.', 'success');
             onAccepted();
         } catch (error) {
             console.error('Error accepting match:', error);
-            alert('Failed to accept match');
+            showToast('Failed to accept match', 'error');
         } finally {
             setSubmitting(false);
         }

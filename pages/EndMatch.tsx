@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { getMatchById, saveMatch, getPlayerById, getAllTeams } from '../utils/db';
 import { Match, Player, Team } from '../types';
 import { Trophy, ArrowLeft, Save } from 'lucide-react';
+import { showToast } from '../components/Toast';
 
 export const EndMatch: React.FC = () => {
     const { matchId } = useParams<{ matchId: string }>();
@@ -36,13 +37,13 @@ export const EndMatch: React.FC = () => {
             try {
                 const matchData = await getMatchById(matchId);
                 if (!matchData) {
-                    alert('Match not found');
+                    showToast('Match not found', 'error');
                     navigate('/admin/matches');
                     return;
                 }
 
                 if (matchData.status !== 'running' && matchData.status !== 'awaiting_confirmation') {
-                    alert('This match has already ended');
+                    showToast('This match has already ended', 'info');
                     navigate('/admin/matches');
                     return;
                 }
@@ -69,7 +70,7 @@ export const EndMatch: React.FC = () => {
                 setLoading(false);
             } catch (error) {
                 console.error('Error loading match:', error);
-                alert('Failed to load match data');
+                showToast('Failed to load match data', 'error');
                 navigate('/admin/matches');
             }
         };
@@ -81,7 +82,7 @@ export const EndMatch: React.FC = () => {
         if (!match) return;
 
         if (!mvpId) {
-            alert('Please select the Man of the Match');
+            showToast('Please select the Man of the Match', 'error');
             return;
         }
 
@@ -104,7 +105,7 @@ export const EndMatch: React.FC = () => {
             navigate(`/admin/evaluation/${match.id}`);
         } catch (error) {
             console.error('Error ending match:', error);
-            alert('Failed to end match');
+            showToast('Failed to end match', 'error');
             setSaving(false);
         }
     };

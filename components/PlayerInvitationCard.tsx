@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { TeamInvitation } from '../types';
 import { updateInvitationStatus, addPlayerToTeam } from '../utils/db';
-import { CheckCircle, XCircle, Shield, User } from 'lucide-react';
+import { CheckCircle, XCircle, Shield, User, X, Check } from 'lucide-react';
+import { showToast } from './Toast';
 
 interface PlayerInvitationCardProps {
     invitation: TeamInvitation;
@@ -10,6 +11,7 @@ interface PlayerInvitationCardProps {
 
 export const PlayerInvitationCard: React.FC<PlayerInvitationCardProps> = ({ invitation, onRespond }) => {
     const [processing, setProcessing] = useState(false);
+    const [confirmReject, setConfirmReject] = useState(false);
 
     const handleAccept = async () => {
         setProcessing(true);
@@ -23,7 +25,7 @@ export const PlayerInvitationCard: React.FC<PlayerInvitationCardProps> = ({ invi
             onRespond();
         } catch (error) {
             console.error('Error accepting invitation:', error);
-            alert('Failed to accept invitation');
+            showToast('Failed to accept invitation', 'error');
         } finally {
             setProcessing(false);
         }
@@ -36,9 +38,10 @@ export const PlayerInvitationCard: React.FC<PlayerInvitationCardProps> = ({ invi
             onRespond();
         } catch (error) {
             console.error('Error rejecting invitation:', error);
-            alert('Failed to reject invitation');
+            showToast('Failed to reject invitation', 'error');
         } finally {
             setProcessing(false);
+            setConfirmReject(false);
         }
     };
 
@@ -61,28 +64,49 @@ export const PlayerInvitationCard: React.FC<PlayerInvitationCardProps> = ({ invi
             </div>
 
             <div className="flex gap-3 w-full md:w-auto">
-                <button
-                    onClick={handleReject}
-                    disabled={processing}
-                    className="flex-1 md:flex-none px-6 py-3 bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500 hover:text-white transition-all font-bold flex items-center justify-center gap-2"
-                >
-                    <XCircle size={18} />
-                    Reject
-                </button>
-                <button
-                    onClick={handleAccept}
-                    disabled={processing}
-                    className="flex-1 md:flex-none px-6 py-3 bg-elkawera-accent text-black rounded-lg hover:bg-white transition-all font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,255,157,0.3)]"
-                >
-                    {processing ? (
-                        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                    ) : (
-                        <>
-                            <CheckCircle size={18} />
-                            Join Team
-                        </>
-                    )}
-                </button>
+                {confirmReject ? (
+                    <div className="flex items-center gap-2 animate-in slide-in-from-right-2">
+                        <span className="text-xs font-bold text-red-400 mr-2 uppercase">Are you sure?</span>
+                        <button
+                            onClick={handleReject}
+                            disabled={processing}
+                            className="p-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all font-bold"
+                        >
+                            {processing ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div> : <Check size={18} />}
+                        </button>
+                        <button
+                            onClick={() => setConfirmReject(false)}
+                            className="p-3 bg-gray-500/20 text-gray-300 rounded-lg hover:bg-gray-500/40 transition-all font-bold"
+                        >
+                            <X size={18} />
+                        </button>
+                    </div>
+                ) : (
+                    <>
+                        <button
+                            onClick={() => setConfirmReject(true)}
+                            disabled={processing}
+                            className="flex-1 md:flex-none px-6 py-3 bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg hover:bg-red-500 hover:text-white transition-all font-bold flex items-center justify-center gap-2"
+                        >
+                            <XCircle size={18} />
+                            Reject
+                        </button>
+                        <button
+                            onClick={handleAccept}
+                            disabled={processing}
+                            className="flex-1 md:flex-none px-6 py-3 bg-elkawera-accent text-black rounded-lg hover:bg-white transition-all font-bold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,255,157,0.3)]"
+                        >
+                            {processing ? (
+                                <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                                <>
+                                    <CheckCircle size={18} />
+                                    Join Team
+                                </>
+                            )}
+                        </button>
+                    </>
+                )}
             </div>
         </div>
     );

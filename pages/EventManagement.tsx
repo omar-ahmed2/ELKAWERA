@@ -5,6 +5,7 @@ import { getEventById, updateEventRegistrationStatus, getAllTeams, updateEvent, 
 import { Event, Team, EventStatus } from '../types';
 import { ArrowLeft, CheckCircle, XCircle, Trophy, Users, Calendar, MapPin, Loader, AlertTriangle, PlusCircle } from 'lucide-react';
 import { EventMatchMaker } from '../components/EventMatchMaker';
+import { showToast } from '../components/Toast';
 
 export const EventManagement: React.FC = () => {
     const { eventId } = useParams<{ eventId: string }>();
@@ -15,7 +16,9 @@ export const EventManagement: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [showMatchMaker, setShowMatchMaker] = useState(false);
     const [showAddTeamModal, setShowAddTeamModal] = useState(false);
-    const [allTeams, setAllTeams] = useState<Team[]>([]); // To resolve team names if needed, though event has them
+    const [allTeams, setAllTeams] = useState<Team[]>([]);
+    const [confirmingEnd, setConfirmingEnd] = useState(false);
+    const [removingTeamId, setRemovingTeamId] = useState<string | null>(null);
 
     useEffect(() => {
         loadEvent();
@@ -33,13 +36,13 @@ export const EventManagement: React.FC = () => {
             if (ev) {
                 setEvent(ev);
             } else {
-                alert('Event not found');
+                showToast('Event not found', 'error');
                 navigate('/events');
             }
             setAllTeams(teamsData);
         } catch (error) {
             console.error(error);
-            alert('Failed to load data');
+            showToast('Failed to load data', 'error');
         } finally {
             if (showLoading) setLoading(false);
         }
@@ -60,20 +63,21 @@ export const EventManagement: React.FC = () => {
             loadEvent(false); // Silent refresh
         } catch (error) {
             console.error('Failed to update status:', error);
-            alert('Failed to update status');
+            showToast('Failed to update status', 'error');
             loadEvent(true); // Revert on error
         }
     };
 
     const handleEndEvent = async () => {
         if (!event) return;
-        if (!confirm('Are you sure you want to mark this event as ended?')) return;
         try {
             await updateEvent({ ...event, status: 'ended' });
+            showToast('Event marked as ended', 'success');
+            setConfirmingEnd(false);
             loadEvent();
         } catch (error) {
             console.error(error);
-            alert('Failed to end event');
+            showToast('Failed to end event', 'error');
         }
     };
 
@@ -147,13 +151,32 @@ export const EventManagement: React.FC = () => {
 
                     <div className="flex flex-col xs:flex-row gap-3 w-full sm:w-auto">
                         {event.status === 'ongoing' && (
-                            <button
-                                onClick={handleEndEvent}
-                                className="flex-1 xs:flex-none px-6 py-3 bg-red-500/10 border border-red-500/30 text-red-400 font-bold uppercase text-xs sm:text-sm rounded-xl hover:bg-red-500/20 transition-all flex items-center justify-center gap-2 group backdrop-blur-sm"
-                            >
-                                <CheckCircle size={18} className="group-hover:scale-110 transition-transform" />
-                                End Event
-                            </button>
+                            <div className="flex-1 xs:flex-none">
+                                {confirmingEnd ? (
+                                    <div className="flex gap-2 animate-in slide-in-from-top-2 duration-300">
+                                        <button
+                                            onClick={handleEndEvent}
+                                            className="px-4 py-3 bg-red-600 text-white font-bold uppercase text-[10px] sm:text-xs rounded-xl hover:bg-red-700 transition-all shadow-lg"
+                                        >
+                                            Confirm
+                                        </button>
+                                        <button
+                                            onClick={() => setConfirmingEnd(false)}
+                                            className="px-4 py-3 bg-white/10 text-white font-bold uppercase text-[10px] sm:text-xs rounded-xl hover:bg-white/20 transition-all"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <button
+                                        onClick={() => setConfirmingEnd(true)}
+                                        className="w-full px-6 py-3 bg-red-500/10 border border-red-500/30 text-red-400 font-bold uppercase text-xs sm:text-sm rounded-xl hover:bg-red-500/20 transition-all flex items-center justify-center gap-2 group backdrop-blur-sm animate-in fade-in duration-300"
+                                    >
+                                        <CheckCircle size={18} className="group-hover:scale-110 transition-transform" />
+                                        End Event
+                                    </button>
+                                )}
+                            </div>
                         )}
                         <button
                             onClick={() => setShowMatchMaker(true)}
@@ -262,17 +285,32 @@ export const EventManagement: React.FC = () => {
                                             </div>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => {
-                                            if (confirm(`Remove team ${reg.teamName} from this event?`)) {
-                                                handleStatusUpdate(reg.teamId, 'rejected');
-                                            }
-                                        }}
-                                        className="w-10 h-10 rounded-full bg-white/5 hover:bg-red-500/20 text-gray-500 hover:text-red-400 flex items-center justify-center transition-all"
-                                        title="Remove Team"
-                                    >
-                                        <XCircle size={18} />
-                                    </button>
+                                    <div className="flex items-center gap-2">
+                                        {removingTeamId === reg.teamId ? (
+                                            <div className="flex gap-2 animate-in slide-in-from-right-2 duration-300">
+                                                <button
+                                                    onClick={() => { handleStatusUpdate(reg.teamId, 'rejected'); setRemovingTeamId(null); }}
+                                                    className="px-3 py-1 bg-red-600 text-white text-xs font-bold rounded-lg hover:bg-red-700 transition-colors"
+                                                >
+                                                    Confirm
+                                                </button>
+                                                <button
+                                                    onClick={() => setRemovingTeamId(null)}
+                                                    className="px-3 py-1 bg-white/10 text-white text-xs font-bold rounded-lg hover:bg-white/20 transition-colors"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => setRemovingTeamId(reg.teamId)}
+                                                className="w-10 h-10 rounded-full bg-white/5 hover:bg-red-500/20 text-gray-500 hover:text-red-400 flex items-center justify-center transition-all animate-in fade-in duration-300"
+                                                title="Remove Team"
+                                            >
+                                                <XCircle size={18} />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             ))
                         )}
@@ -307,23 +345,20 @@ export const EventManagement: React.FC = () => {
                                     <button
                                         key={team.id}
                                         onClick={async () => {
-                                            if (!confirm(`Add ${team.name} to this event?`)) return;
                                             try {
-                                                // Register as pending first
                                                 await registerTeamForEvent(event.id, {
                                                     teamId: team.id,
                                                     teamName: team.name,
                                                     captainId: team.captainId,
-                                                    captainName: team.captainName || 'Unknown' // Ideally captainName should be in team object
+                                                    captainName: team.captainName || 'Unknown'
                                                 });
-                                                // Then approve immediately
                                                 await updateEventRegistrationStatus(event.id, team.id, 'approved');
-
+                                                showToast(`${team.name} added to event`, 'success');
                                                 loadEvent();
                                                 setShowAddTeamModal(false);
                                             } catch (e) {
                                                 console.error(e);
-                                                alert('Failed to add team');
+                                                showToast('Failed to add team', 'error');
                                             }
                                         }}
                                         className="w-full bg-white/5 hover:bg-elkawera-accent/20 border border-white/5 hover:border-elkawera-accent/50 p-4 rounded-xl flex items-center justify-between group transition-all"

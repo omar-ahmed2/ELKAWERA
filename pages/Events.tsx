@@ -6,12 +6,14 @@ import { Event, EventStatus, EventCategory, Team } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import {
     Calendar, MapPin, Clock, PlusCircle, Edit3, Trash2,
-    XCircle, CheckCircle, Trophy, Users, Star, Info, Bell
+    XCircle, CheckCircle, Trophy, Users, Star, Info, Bell, AlertTriangle
 } from 'lucide-react';
 import { EventMatchMaker } from '../components/EventMatchMaker';
+import { showToast } from '../components/Toast';
 
 export const Events: React.FC = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
@@ -19,6 +21,7 @@ export const Events: React.FC = () => {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [showMatchMaker, setShowMatchMaker] = useState(false);
     const [toast, setToast] = useState<{ title: string; message: string } | null>(null);
+    const [deletingEventId, setDeletingEventId] = useState<string | null>(null);
     const lastCheckRef = React.useRef<number>(Date.now());
 
     const isAdmin = user?.role === 'admin';
@@ -55,8 +58,6 @@ export const Events: React.FC = () => {
 
     useEffect(() => {
         loadEvents();
-        // Initial check to set watermark
-        // checkNotifications(); // Don't show toast on load
         const unsubscribe = subscribeToChanges(() => {
             loadEvents();
             checkNotifications();
@@ -64,14 +65,14 @@ export const Events: React.FC = () => {
         return () => unsubscribe();
     }, [user]);
 
-    const handleDelete = async (e: React.MouseEvent, id: string) => {
-        e.stopPropagation();
-        if (!confirm('Are you sure you want to delete this event?')) return;
+    const handleDelete = async (id: string) => {
         try {
             await deleteEvent(id);
+            showToast('Event deleted successfully', 'success');
+            setDeletingEventId(null);
         } catch (error) {
             console.error('Error deleting event:', error);
-            alert('Failed to delete event');
+            showToast('Failed to delete event', 'error');
         }
     };
 
@@ -188,19 +189,38 @@ export const Events: React.FC = () => {
                                 </div>
 
                                 {isAdmin && (
-                                    <div className="flex gap-2 mt-6 pt-4 border-t border-white/10">
-                                        <button
-                                            onClick={(e) => handleEdit(e, event)}
-                                            className="flex-1 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <Edit3 size={14} /> Edit
-                                        </button>
-                                        <button
-                                            onClick={(e) => handleDelete(e, event.id)}
-                                            className="flex-1 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <Trash2 size={14} /> Delete
-                                        </button>
+                                    <div className="mt-6 pt-4 border-t border-white/10">
+                                        {deletingEventId === event.id ? (
+                                            <div className="flex gap-2 animate-in slide-in-from-top-2 duration-300">
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); handleDelete(event.id); }}
+                                                    className="flex-1 py-2 bg-red-600 text-white rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-1 shadow-lg"
+                                                >
+                                                    Confirm
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setDeletingEventId(null); }}
+                                                    className="flex-1 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition-colors text-white"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex gap-2 animate-in fade-in duration-300">
+                                                <button
+                                                    onClick={(e) => handleEdit(e, event)}
+                                                    className="flex-1 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                                                >
+                                                    <Edit3 size={14} /> Edit
+                                                </button>
+                                                <button
+                                                    onClick={(e) => { e.stopPropagation(); setDeletingEventId(event.id); }}
+                                                    className="flex-1 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg text-sm font-bold transition-colors flex items-center justify-center gap-2"
+                                                >
+                                                    <Trash2 size={14} /> Delete
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -278,6 +298,7 @@ const EventDetailModal: React.FC<{
     const [registering, setRegistering] = useState(false);
     const [showParticipants, setShowParticipants] = useState(false);
     const [optimisticIsRegistered, setOptimisticIsRegistered] = useState(false);
+    const [confirmingEnd, setConfirmingEnd] = useState(false);
 
     useEffect(() => {
         const fetchTeam = async () => {
@@ -296,7 +317,6 @@ const EventDetailModal: React.FC<{
     const handleRegister = async () => {
         if (!captainTeam) return;
 
-        // Optimistic Update
         setOptimisticIsRegistered(true);
         setRegistering(true);
 
@@ -307,12 +327,11 @@ const EventDetailModal: React.FC<{
                 captainId: user?.id || '',
                 captainName: user?.name || 'Unknown'
             });
-            // alert('Successfully registered for the event!'); // Removed for seamlessness
             onRegister();
         } catch (error) {
             console.error(error);
-            alert('Failed to register.');
-            setOptimisticIsRegistered(false); // Revert on error
+            showToast('Failed to register.', 'error');
+            setOptimisticIsRegistered(false);
         } finally {
             setRegistering(false);
         }
@@ -321,10 +340,10 @@ const EventDetailModal: React.FC<{
     const handleStatusUpdate = async (teamId: string, status: 'approved' | 'rejected') => {
         try {
             await updateEventRegistrationStatus(event.id, teamId, status);
-            onRegister(); // Refresh
+            onRegister();
         } catch (error) {
             console.error('Failed to update status:', error);
-            alert('Failed to update status');
+            showToast('Failed to update status', 'error');
         }
     };
 
@@ -338,7 +357,6 @@ const EventDetailModal: React.FC<{
                     <XCircle size={24} />
                 </button>
 
-                {/* Hero Image */}
                 <div className="h-64 md:h-80 bg-black/50 relative">
                     {event.imageUrl ? (
                         <img src={event.imageUrl} alt={event.title} className="w-full h-full object-cover" />
@@ -362,7 +380,6 @@ const EventDetailModal: React.FC<{
                 </div>
 
                 <div className="p-6 md:p-10 space-y-8">
-                    {/* Meta Info */}
                     <div className="flex flex-wrap gap-6 text-gray-300 border-b border-white/10 pb-8">
                         <div className="flex items-center gap-3">
                             <Calendar className="text-elkawera-accent" size={24} />
@@ -387,7 +404,6 @@ const EventDetailModal: React.FC<{
                         </div>
                     </div>
 
-                    {/* Description */}
                     <div>
                         <h3 className="text-xl font-bold text-white mb-4 uppercase">Event Details</h3>
                         <p className="text-gray-300 leading-relaxed whitespace-pre-wrap text-lg">
@@ -395,24 +411,23 @@ const EventDetailModal: React.FC<{
                         </p>
                     </div>
 
-                    {/* Actions */}
                     <div className="flex flex-col md:flex-row gap-4 pt-4">
                         {user?.role === 'captain' && (
                             <div className="flex-1">
                                 {isRegistered ? (
-                                    <button disabled className="w-full py-4 bg-green-500/20 border border-green-500/50 text-green-400 font-bold rounded-xl flex items-center justify-center gap-2 cursor-not-allowed">
+                                    <button disabled className="w-full py-4 bg-green-500/20 border border-green-500/50 text-green-400 font-bold rounded-xl flex items-center justify-center gap-2 cursor-not-allowed text-lg">
                                         <CheckCircle size={20} /> Registered
                                     </button>
                                 ) : (
                                     <button
                                         onClick={handleRegister}
                                         disabled={registering || !captainTeam}
-                                        className="w-full py-4 bg-elkawera-accent text-black font-bold uppercase rounded-xl hover:bg-white transition-all transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,255,157,0.3)] disabled:opacity-50 disabled:transform-none"
+                                        className="w-full py-4 bg-elkawera-accent text-black font-bold uppercase rounded-xl hover:bg-white transition-all transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,255,157,0.3)] disabled:opacity-50 disabled:transform-none text-lg"
                                     >
                                         {registering ? 'Registering...' : 'Register Team for Event'}
                                     </button>
                                 )}
-                                {!captainTeam && <p className="text-xs text-red-400 mt-2 text-center">You need a team to register.</p>}
+                                {!captainTeam && <p className="text-xs text-red-400 mt-2 text-center font-bold">You need an active team to register for league events.</p>}
                             </div>
                         )}
 
@@ -420,7 +435,7 @@ const EventDetailModal: React.FC<{
                             <div className="flex-1 space-y-3">
                                 <button
                                     onClick={() => setShowParticipants(!showParticipants)}
-                                    className="w-full py-4 bg-white/10 text-white font-bold uppercase rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-4 bg-white/10 text-white font-bold uppercase rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-2 text-lg"
                                 >
                                     <Users size={20} /> {showParticipants ? 'Hide Participants' : 'View Registered Teams'}
                                 </button>
@@ -429,65 +444,86 @@ const EventDetailModal: React.FC<{
                                     onClick={() => {
                                         navigate(`/events/${event.id}/manage`);
                                     }}
-                                    className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold uppercase rounded-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg"
+                                    className="w-full py-4 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-bold uppercase rounded-xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 shadow-lg text-lg"
                                 >
                                     <Trophy size={20} /> Manage Event & Matches
                                 </button>
+
                                 {event.status === 'ongoing' && (
-                                    <button
-                                        onClick={async () => {
-                                            if (!confirm('Are you sure you want to mark this event as ended?')) return;
-                                            try {
-                                                await updateEvent({ ...event, status: 'ended' });
-                                                onRegister();
-                                                onClose();
-                                            } catch (error) {
-                                                console.error(error);
-                                                alert('Failed to end event');
-                                            }
-                                        }}
-                                        className="w-full py-4 bg-red-600/80 text-white font-bold uppercase rounded-xl hover:bg-red-600 transition-all flex items-center justify-center gap-2 shadow-lg"
-                                    >
-                                        <CheckCircle size={20} /> Mark as Ended
-                                    </button>
+                                    <div className="w-full">
+                                        {confirmingEnd ? (
+                                            <div className="flex gap-3 animate-in slide-in-from-top-2 duration-300">
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            await updateEvent({ ...event, status: 'ended' });
+                                                            showToast('Event ended successfully', 'success');
+                                                            onRegister();
+                                                            onClose();
+                                                        } catch (error) {
+                                                            console.error(error);
+                                                            showToast('Failed to end event', 'error');
+                                                        }
+                                                    }}
+                                                    className="flex-1 py-4 bg-red-600 text-white font-bold uppercase rounded-xl hover:bg-red-700 transition-all shadow-lg"
+                                                >
+                                                    Confirm
+                                                </button>
+                                                <button
+                                                    onClick={() => setConfirmingEnd(false)}
+                                                    className="flex-1 py-4 bg-white/10 text-white font-bold uppercase rounded-xl hover:bg-white/20 transition-all"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <button
+                                                onClick={() => setConfirmingEnd(true)}
+                                                className="w-full py-4 bg-red-600/80 text-white font-bold uppercase rounded-xl hover:bg-red-600 transition-all flex items-center justify-center gap-2 shadow-lg animate-in fade-in duration-300 text-lg"
+                                            >
+                                                <CheckCircle size={20} /> Mark as Ended
+                                            </button>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         )}
                     </div>
 
-                    {/* Admin: Participants List */}
                     {isAdmin && showParticipants && (
                         <div className="bg-black/30 rounded-xl p-6 border border-white/10 animate-fade-in-up">
-                            <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2 uppercase tracking-wide">
                                 <Trophy size={18} className="text-elkawera-accent" />
                                 Registered Teams ({event.registeredTeams?.length || 0})
                             </h4>
                             {event.registeredTeams && event.registeredTeams.length > 0 ? (
                                 <div className="space-y-2">
                                     {event.registeredTeams.map((reg, idx) => (
-                                        <div key={idx} className="flex justify-between items-center bg-white/5 p-4 rounded-lg border border-white/5">
+                                        <div key={idx} className="flex justify-between items-center bg-white/5 p-4 rounded-lg border border-white/5 group">
                                             <div>
-                                                <p className="font-bold text-white text-lg">{reg.teamName}</p>
+                                                <p className="font-bold text-white text-lg group-hover:text-elkawera-accent transition-colors">{reg.teamName}</p>
                                                 <p className="text-sm text-gray-400">Capt. {reg.captainName}</p>
                                             </div>
                                             <div className="text-right">
-                                                <span className={`px-2 py-1 text-xs rounded uppercase font-bold ${reg.status === 'approved' ? 'bg-green-500/20 text-green-400' :
-                                                    reg.status === 'rejected' ? 'bg-red-500/20 text-red-400' :
-                                                        'bg-yellow-500/20 text-yellow-400'
-                                                    }`}>{reg.status}</span>
-                                                <p className="text-xs text-gray-500 mt-1">{new Date(reg.registeredAt).toLocaleDateString()}</p>
+                                                <span className={`px-2 py-1 text-[10px] rounded uppercase font-black tracking-tighter ${reg.status === 'approved' ? 'bg-green-500/20 text-green-400 border border-green-500/30' :
+                                                        reg.status === 'rejected' ? 'bg-red-500/20 text-red-400 border border-red-500/30' :
+                                                            'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                                                    }`}>
+                                                    {reg.status}
+                                                </span>
+                                                <p className="text-[10px] text-gray-500 mt-1 uppercase font-bold">{new Date(reg.registeredAt).toLocaleDateString()}</p>
 
                                                 {reg.status === 'pending' && (
                                                     <div className="flex gap-2 mt-2 justify-end">
                                                         <button
                                                             onClick={() => handleStatusUpdate(reg.teamId, 'approved')}
-                                                            className="px-2 py-1 bg-green-500/20 hover:bg-green-500/40 text-green-400 text-xs rounded transition-colors"
+                                                            className="px-3 py-1 bg-green-500/20 hover:bg-green-500 text-white text-xs rounded-lg transition-all font-bold"
                                                         >
                                                             Accept
                                                         </button>
                                                         <button
                                                             onClick={() => handleStatusUpdate(reg.teamId, 'rejected')}
-                                                            className="px-2 py-1 bg-red-500/20 hover:bg-red-500/40 text-red-400 text-xs rounded transition-colors"
+                                                            className="px-3 py-1 bg-red-500/20 hover:bg-red-500 text-white text-xs rounded-lg transition-all font-bold"
                                                         >
                                                             Reject
                                                         </button>
@@ -498,7 +534,7 @@ const EventDetailModal: React.FC<{
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-gray-500 italic">No teams registered yet.</p>
+                                <p className="text-gray-500 italic text-center py-4">No teams registered yet.</p>
                             )}
                         </div>
                     )}
@@ -508,9 +544,6 @@ const EventDetailModal: React.FC<{
     );
 };
 
-
-
-
 const EventFormModal: React.FC<{
     event: Event | null;
     onClose: () => void;
@@ -519,14 +552,14 @@ const EventFormModal: React.FC<{
     const { user } = useAuth();
     const [title, setTitle] = useState(event?.title || '');
     const [description, setDescription] = useState(event?.description || '');
-    // Helper to format date for datetime-local (yyyy-MM-ddThh:mm)
+
     const formatDateForInput = (timestamp?: number) => {
         if (!timestamp) return '';
         const date = new Date(timestamp);
-        // We need local time string
         const pad = (n: number) => n < 10 ? '0' + n : n;
         return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
     };
+
     const [date, setDate] = useState(formatDateForInput(event?.date));
     const [location, setLocation] = useState(event?.location || '');
     const [status, setStatus] = useState<EventStatus>(event?.status || 'upcoming');
@@ -554,7 +587,7 @@ const EventFormModal: React.FC<{
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!title || !date || !location) {
-            alert('Please fill in all required fields.');
+            showToast('Please fill in all required fields.', 'error');
             return;
         }
 
@@ -575,6 +608,7 @@ const EventFormModal: React.FC<{
                 category,
                 imageUrl,
                 participants: event?.participants || [],
+                registeredTeams: event?.registeredTeams || [],
                 createdBy: event?.createdBy || user?.id || '',
                 createdByName: event?.createdByName || user?.name || '',
                 createdAt: event?.createdAt || Date.now(),
@@ -583,7 +617,6 @@ const EventFormModal: React.FC<{
 
             await saveEvent(newEvent);
 
-            // Notify all users if it's a new event
             if (!event) {
                 notifyAllUsers(
                     'New Event Added',
@@ -595,14 +628,8 @@ const EventFormModal: React.FC<{
             onSave();
         } catch (error: any) {
             console.error('Error saving event:', error);
-            // More specific error message if possible
-            const errorMessage = error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Failed to save event. Database might not be ready.');
-
-            if (errorMessage.includes('One of the specified object stores was not found')) {
-                alert('Database Error: The "Events" storage is missing. This happens when the database update was blocked.\n\nPlease CLOSING ALL OTHER TABS of this application and RELOADING this page to fix it.');
-            } else {
-                alert(`Error: ${errorMessage}. Try reloading the page.`);
-            }
+            const errorMessage = error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Failed to save event.');
+            showToast(`Error: ${errorMessage}`, 'error');
         } finally {
             setSaving(false);
         }
@@ -610,25 +637,24 @@ const EventFormModal: React.FC<{
 
     return (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-            <div className="bg-elkawera-dark border border-white/20 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div className="bg-elkawera-dark border border-white/20 rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto custom-scrollbar shadow-2xl">
                 <form onSubmit={handleSubmit} className="p-8 space-y-6">
                     <div className="flex justify-between items-center">
-                        <h2 className="text-3xl font-display font-bold uppercase">{event ? 'Edit Event' : 'Add New Event'}</h2>
-                        <button type="button" onClick={onClose} className="p-2 hover:bg-white/10 rounded-full">
-                            <XCircle size={24} />
+                        <h2 className="text-3xl font-display font-bold uppercase text-white">{event ? 'Edit Event' : 'Add New Event'}</h2>
+                        <button type="button" onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+                            <XCircle size={24} className="text-white" />
                         </button>
                     </div>
 
                     <div className="space-y-4">
-                        {/* Image Upload */}
                         <div>
-                            <label className="block text-sm font-bold text-gray-400 mb-1">Event Image</label>
+                            <label className="block text-xs uppercase font-bold text-gray-500 mb-2">Event Image</label>
                             <div className="flex items-center gap-4">
-                                <div className="w-20 h-20 bg-black/50 border border-white/20 rounded-lg overflow-hidden flex items-center justify-center">
+                                <div className="w-20 h-20 bg-black/50 border border-white/10 rounded-xl overflow-hidden flex items-center justify-center">
                                     {imageUrl ? (
                                         <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
                                     ) : (
-                                        <div className="text-gray-500">No Image</div>
+                                        <Trophy size={24} className="text-white/10" />
                                     )}
                                 </div>
                                 <div className="flex-1">
@@ -636,75 +662,66 @@ const EventFormModal: React.FC<{
                                         type="file"
                                         accept="image/*"
                                         onChange={handleImageUpload}
-                                        className="w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-elkawera-accent file:text-black hover:file:bg-white"
+                                        className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-black file:bg-elkawera-accent file:text-black hover:file:bg-white file:transition-colors file:cursor-pointer"
                                     />
-                                    <p className="text-xs text-gray-500 mt-1">Recommended: 16:9 aspect ratio</p>
                                 </div>
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-400 mb-1">Event Title</label>
+                            <label className="block text-xs uppercase font-bold text-gray-500 mb-2 font-mono">Event Title</label>
                             <input
                                 type="text"
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
-                                className="w-full bg-black/50 border border-white/20 rounded-lg p-3 focus:border-elkawera-accent focus:outline-none text-white"
-                                placeholder="e.g., Summer Tournament Finals"
+                                className="w-full bg-black/50 border border-white/10 rounded-xl p-4 focus:border-elkawera-accent focus:outline-none text-white font-bold"
+                                placeholder="Summer Tournament Finals"
                                 required
                             />
                         </div>
 
                         <div>
-                            <label className="block text-sm font-bold text-gray-400 mb-1">Description</label>
+                            <label className="block text-xs uppercase font-bold text-gray-500 mb-2 font-mono">Description</label>
                             <textarea
                                 value={description}
                                 onChange={e => setDescription(e.target.value)}
-                                className="w-full bg-black/50 border border-white/20 rounded-lg p-3 focus:border-elkawera-accent focus:outline-none text-white h-24"
+                                className="w-full bg-black/50 border border-white/10 rounded-xl p-4 focus:border-elkawera-accent focus:outline-none text-white h-24 font-medium"
                                 placeholder="Event details..."
                             />
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-1">Date & Time</label>
-                                <div className="relative">
-                                    <input
-                                        type="datetime-local"
-                                        value={date}
-                                        onChange={e => setDate(e.target.value)}
-                                        min={getMinDateForInput()}
-                                        // Open picker on click for better UX
-                                        onClick={(e) => (e.target as HTMLInputElement).showPicker()}
-                                        className="w-full bg-black/50 border border-white/20 rounded-lg p-3 focus:border-elkawera-accent focus:outline-none text-white cursor-pointer [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
-                                        required
-                                    />
-                                    <Calendar className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
-                                </div>
+                                <label className="block text-xs uppercase font-bold text-gray-500 mb-2 font-mono">Date & Time</label>
+                                <input
+                                    type="datetime-local"
+                                    value={date}
+                                    onChange={e => setDate(e.target.value)}
+                                    min={getMinDateForInput()}
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl p-4 focus:border-elkawera-accent focus:outline-none text-white font-bold [&::-webkit-calendar-picker-indicator]:filter [&::-webkit-calendar-picker-indicator]:invert"
+                                    required
+                                />
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-1">Location</label>
-                                <div className="relative">
-                                    <input
-                                        type="text"
-                                        value={location}
-                                        onChange={e => setLocation(e.target.value)}
-                                        className="w-full bg-black/50 border border-white/20 rounded-lg p-3 focus:border-elkawera-accent focus:outline-none text-white"
-                                        placeholder="e.g., Cairo Stadium"
-                                        required
-                                    />
-                                    <MapPin className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={18} />
-                                </div>
+                                <label className="block text-xs uppercase font-bold text-gray-500 mb-2 font-mono">Location</label>
+                                <input
+                                    type="text"
+                                    value={location}
+                                    onChange={e => setLocation(e.target.value)}
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl p-4 focus:border-elkawera-accent focus:outline-none text-white font-bold"
+                                    placeholder="Cairo Stadium"
+                                    required
+                                />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-1">Category</label>
+                                <label className="block text-xs uppercase font-bold text-gray-500 mb-2 font-mono">Category</label>
                                 <select
                                     value={category}
                                     onChange={e => setCategory(e.target.value as EventCategory)}
-                                    className="w-full bg-black/50 border border-white/20 rounded-lg p-3 focus:border-elkawera-accent focus:outline-none text-white"
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl p-4 focus:border-elkawera-accent focus:outline-none text-white font-bold"
                                 >
                                     <option value="match">Match</option>
                                     <option value="tournament">Tournament</option>
@@ -714,11 +731,11 @@ const EventFormModal: React.FC<{
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-bold text-gray-400 mb-1">Status</label>
+                                <label className="block text-xs uppercase font-bold text-gray-500 mb-2 font-mono">Status</label>
                                 <select
                                     value={status}
                                     onChange={e => setStatus(e.target.value as EventStatus)}
-                                    className="w-full bg-black/50 border border-white/20 rounded-lg p-3 focus:border-elkawera-accent focus:outline-none text-white"
+                                    className="w-full bg-black/50 border border-white/10 rounded-xl p-4 focus:border-elkawera-accent focus:outline-none text-white font-bold"
                                 >
                                     <option value="upcoming">Upcoming</option>
                                     <option value="ongoing">Ongoing</option>
@@ -733,14 +750,14 @@ const EventFormModal: React.FC<{
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-3 bg-white/10 rounded-lg font-bold hover:bg-white/20 transition-colors"
+                            className="flex-1 py-4 bg-white/10 rounded-xl font-bold hover:bg-white/20 transition-all text-white uppercase text-sm tracking-widest"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
                             disabled={saving}
-                            className="flex-1 py-3 bg-elkawera-accent text-black rounded-lg font-bold hover:bg-white transition-colors disabled:opacity-50"
+                            className="flex-1 py-4 bg-elkawera-accent text-black rounded-xl font-black hover:bg-white transition-all disabled:opacity-50 uppercase text-sm tracking-widest"
                         >
                             {saving ? 'Saving...' : 'Save Event'}
                         </button>

@@ -6,6 +6,7 @@ import { User, Shield, Users, Save, Calendar, Mail, Camera, Upload, RotateCcw, C
 import { Player, TeamInvitation } from '../types';
 import { PlayerCard } from '../components/PlayerCard';
 import { PlayerStatistics } from '../components/PlayerStatistics';
+import { showToast } from '../components/Toast';
 
 export const Profile: React.FC = () => {
    const { user, updateProfile } = useAuth();
@@ -55,7 +56,7 @@ export const Profile: React.FC = () => {
       const file = e.target.files?.[0];
       if (file) {
          if (file.size > 2 * 1024 * 1024) {
-            alert("Image size must be less than 2MB");
+            showToast("Image size must be less than 2MB", "error");
             return;
          }
          const reader = new FileReader();
@@ -85,7 +86,7 @@ export const Profile: React.FC = () => {
          setInvitations(prev => prev.filter(inv => inv.id !== invitationId));
 
          if (status === 'accepted') {
-            alert('Invitation accepted! You have joined the team.');
+            showToast('Invitation accepted! You have joined the team.', 'success');
             // Refresh player card to show new team
             if (user?.playerCardId) {
                const card = await getPlayerById(user.playerCardId);
@@ -94,7 +95,7 @@ export const Profile: React.FC = () => {
          }
       } catch (error) {
          console.error('Error updating invitation:', error);
-         alert('Failed to update invitation status');
+         showToast('Failed to update invitation status', 'error');
       } finally {
          setProcessingInvite(null);
       }

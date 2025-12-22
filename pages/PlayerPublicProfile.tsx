@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { PlayerCard } from '../components/PlayerCard';
 import { PlayerStatistics } from '../components/PlayerStatistics';
 import { ArrowLeft, RotateCcw } from 'lucide-react';
+import { showToast } from '../components/Toast';
 
 export const PlayerPublicProfile: React.FC = () => {
     const { playerId } = useParams<{ playerId: string }>();
@@ -30,7 +31,7 @@ export const PlayerPublicProfile: React.FC = () => {
 
                 if (!playerData) {
                     // Handle not found
-                    alert('Player not found');
+                    showToast('Player not found', 'error');
                     navigate('/leaderboard');
                     return;
                 }

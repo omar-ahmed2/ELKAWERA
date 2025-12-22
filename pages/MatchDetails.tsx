@@ -3,7 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getMatchById, getAllTeams, getPlayerById } from '../utils/db';
 import { Match, Team, Player, MatchEvent } from '../types';
-import { ArrowLeft, Trophy, Calendar, Users, Award, Shield, Activity } from 'lucide-react';
+import { ArrowLeft, Trophy, Calendar, Users, Award, Shield, Activity, Download, FileText } from 'lucide-react';
+import { showToast } from '../components/Toast';
+import { MatchReport } from '../components/MatchReport';
+import { toPng } from 'html-to-image';
+import { useRef } from 'react';
 
 export const MatchDetails: React.FC = () => {
     const { matchId } = useParams<{ matchId: string }>();
@@ -15,6 +19,8 @@ export const MatchDetails: React.FC = () => {
     const [awayTeam, setAwayTeam] = useState<Team | null>(null);
     const [players, setPlayers] = useState<Player[]>([]);
     const [loading, setLoading] = useState(true);
+    const [downloading, setDownloading] = useState(false);
+    const reportRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const loadMatchData = async () => {
@@ -23,7 +29,7 @@ export const MatchDetails: React.FC = () => {
             try {
                 const matchData = await getMatchById(matchId);
                 if (!matchData) {
-                    alert('Match not found');
+                    showToast('Match not found', 'error');
                     navigate('/admin/matches');
                     return;
                 }
@@ -79,6 +85,57 @@ export const MatchDetails: React.FC = () => {
 
     const mvpPlayer = players.find(p => p.id === match.manOfTheMatch);
 
+    const handleDownloadReport = async () => {
+        if (!reportRef.current || !match) return;
+
+        setDownloading(true);
+        showToast('Generating high-resolution report...', 'info');
+
+        try {
+            // Give it a moment to ensure everything is rendered
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            const dataUrl = await toPng(reportRef.current, {
+                quality: 1.0,
+                pixelRatio: 2, // High resolution for professional print
+                backgroundColor: '#000000',
+            });
+
+            // Dynamically load jsPDF from CDN for robustness
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';
+            document.head.appendChild(script);
+
+            script.onload = () => {
+                const { jsPDF } = (window as any).jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const imgProps = pdf.getImageProperties(dataUrl);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight, undefined, 'FAST');
+                pdf.save(`Match-Report-${match.id.slice(0, 8)}.pdf`);
+                showToast('Match Report PDF downloaded successfully!', 'success');
+                setDownloading(false);
+            };
+
+            script.onerror = () => {
+                // Fallback to PNG if CDN fails
+                const link = document.createElement('a');
+                link.download = `Match-Report-${match.id.slice(0, 8)}.png`;
+                link.href = dataUrl;
+                link.click();
+                showToast('Downloaded as PNG (PDF generator unavailable)', 'info');
+                setDownloading(false);
+            };
+
+        } catch (error) {
+            console.error('Error generating report:', error);
+            showToast('Failed to generate report', 'error');
+            setDownloading(false);
+        }
+    };
+
     return (
         <div className="max-w-6xl mx-auto space-y-8 pb-12">
             {/* Header / Nav */}
@@ -98,6 +155,31 @@ export const MatchDetails: React.FC = () => {
                         <Users size={14} />
                         {players.length} Players
                     </p>
+                </div>
+
+                <div className="ml-auto">
+                    <button
+                        onClick={handleDownloadReport}
+                        disabled={downloading}
+                        className={`
+                            flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all
+                            ${downloading
+                                ? 'bg-gray-600 cursor-not-allowed text-white/50'
+                                : 'bg-elkawera-accent text-black hover:bg-white hover:scale-105 shadow-[0_0_20px_rgba(0,255,157,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.4)]'}
+                        `}
+                    >
+                        {downloading ? (
+                            <>
+                                <Activity className="animate-spin" size={18} />
+                                Generating PDF...
+                            </>
+                        ) : (
+                            <>
+                                <FileText size={18} />
+                                Download PDF Report
+                            </>
+                        )}
+                    </button>
                 </div>
             </div>
 
@@ -290,6 +372,15 @@ export const MatchDetails: React.FC = () => {
                     )}
                 </div>
             </div>
+
+            {/* Hidden Report Template for Capture */}
+            <MatchReport
+                match={match}
+                homeTeam={homeTeam}
+                awayTeam={awayTeam}
+                players={players}
+                reportRef={reportRef}
+            />
         </div>
     );
 };

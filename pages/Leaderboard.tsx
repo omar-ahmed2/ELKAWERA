@@ -25,8 +25,8 @@ export const Leaderboard: React.FC = () => {
     const [ageFilter, setAgeFilter] = useState<'ALL' | '8 : 12' | '12 : 15' | '15 : 18' | '18+'>('ALL');
     const [showAgeDropdown, setShowAgeDropdown] = useState(false);
 
-    const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-    const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
+    const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+    const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
 
     useEffect(() => {
         loadData();
@@ -133,104 +133,223 @@ export const Leaderboard: React.FC = () => {
 
     const renderPlayerRow = (player: Player, index: number) => {
         const team = player.teamId ? teamMap[player.teamId] : null;
+        const isExpanded = selectedPlayerId === player.id;
         return (
-            <div
-                key={player.id}
-                className="group flex items-center justify-between p-3 sm:p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-elkawera-accent hover:border-1 dark:hover:border-elkawera-accent/30 rounded-xl mb-3 cursor-pointer transition-all animate-fade-in-up hover:scale-[1.01] shadow-sm"
-                style={{ animationDelay: `${index * 50}ms` }}
-                onClick={() => setSelectedPlayer(player)}
-            >
-                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
-                    <span className={`text-base sm:text-xl font-bold w-6 sm:w-10 text-center ${index < 3 ? 'text-elkawera-accent' : 'text-[var(--text-secondary)]'}`}>
-                        {index + 1}
-                    </span>
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden border border-[var(--border-color)] relative shrink-0">
-                        {player.imageUrl ? (
-                            <img src={player.imageUrl} alt={player.name} className="w-full h-full object-cover" />
-                        ) : (
-                            <UserIcon className="w-full h-full p-2 text-gray-500" />
-                        )}
-                    </div>
-                    <div className="min-w-0">
-                        <h3 className="text-[var(--text-primary)] font-bold text-sm sm:text-lg leading-tight group-hover:text-elkawera-accent transition-colors truncate">
-                            {player.name}
-                        </h3>
-                        <div className="flex items-center gap-2 text-[10px] sm:text-sm text-[var(--text-secondary)] truncate">
-                            {team ? (
-                                <>
-                                    {team.logoUrl ? (
-                                        <img src={team.logoUrl} alt={team.name} className="w-3 h-3 sm:w-4 sm:h-4 object-contain" />
-                                    ) : (
-                                        <Shield size={10} className="sm:size-[12px]" />
-                                    )}
-                                    <span className="truncate">{team.name}</span>
-                                </>
+            <div key={player.id} className="mb-3">
+                <div
+                    className={`group flex items-center justify-between p-3 sm:p-4 bg-[var(--bg-secondary)] border ${isExpanded ? 'border-elkawera-accent' : 'border-[var(--border-color)]'} hover:border-elkawera-accent hover:border-1 dark:hover:border-elkawera-accent/30 rounded-xl cursor-pointer transition-all animate-fade-in-up hover:scale-[1.01] shadow-sm`}
+                    style={{ animationDelay: `${index * 50}ms` }}
+                    onClick={() => {
+                        setSelectedTeamId(null);
+                        setSelectedPlayerId(isExpanded ? null : player.id);
+                    }}
+                >
+                    <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
+                        <span className={`text-base sm:text-xl font-bold w-6 sm:w-10 text-center ${index < 3 ? 'text-elkawera-accent' : 'text-[var(--text-secondary)]'}`}>
+                            {index + 1}
+                        </span>
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden border border-[var(--border-color)] relative shrink-0">
+                            {player.imageUrl ? (
+                                <img src={player.imageUrl} alt={player.name} className="w-full h-full object-cover" />
                             ) : (
-                                <span className="opacity-70 italic">Free Agent</span>
+                                <UserIcon className="w-full h-full p-2 text-gray-500" />
                             )}
+                        </div>
+                        <div className="min-w-0">
+                            <h3 className="text-[var(--text-primary)] font-bold text-sm sm:text-lg leading-tight group-hover:text-elkawera-accent transition-colors truncate">
+                                {player.name}
+                            </h3>
+                            <div className="flex items-center gap-2 text-[10px] sm:text-sm text-[var(--text-secondary)] truncate">
+                                {team ? (
+                                    <>
+                                        {team.logoUrl ? (
+                                            <img src={team.logoUrl} alt={team.name} className="w-3 h-3 sm:w-4 sm:h-4 object-contain" />
+                                        ) : (
+                                            <Shield size={10} className="sm:size-[12px]" />
+                                        )}
+                                        <span className="truncate">{team.name}</span>
+                                    </>
+                                ) : (
+                                    <span className="opacity-70 italic">Free Agent</span>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                    <div className="text-right rtl:text-left shrink-0">
+                        <div className="text-xl sm:text-2xl font-display font-bold text-elkawera-accent">
+                            {playerSort === 'OVERALL' && player.overallScore}
+                            {playerSort === 'GOALS' && (player.goals || 0)}
+                            {playerSort === 'ASSISTS' && (player.assists || 0)}
+                            {playerSort === 'DEFENSE' && (player.defensiveContributions || 0)}
+                            {playerSort === 'SAVES' && ((player.penaltySaves || 0) + (player.saves || 0) + (player.cleanSheets || 0))}
+                        </div>
+                        <div className="text-[8px] sm:text-xs text-[var(--text-secondary)] uppercase tracking-wider font-bold">
+                            {t(`stats.${playerSort.toLowerCase()}`)}
                         </div>
                     </div>
                 </div>
-                <div className="text-right rtl:text-left shrink-0">
-                    <div className="text-xl sm:text-2xl font-display font-bold text-elkawera-accent">
-                        {playerSort === 'OVERALL' && player.overallScore}
-                        {playerSort === 'GOALS' && (player.goals || 0)}
-                        {playerSort === 'ASSISTS' && (player.assists || 0)}
-                        {playerSort === 'DEFENSE' && (player.defensiveContributions || 0)}
-                        {playerSort === 'SAVES' && ((player.penaltySaves || 0) + (player.saves || 0) + (player.cleanSheets || 0))}
+                {isExpanded && (
+                    <div className="mt-2 p-2 sm:p-6 bg-[var(--bg-primary)] border border-elkawera-accent/30 rounded-2xl animate-in slide-in-from-top-4 duration-300 overflow-hidden shadow-inner w-full">
+                        <div className="flex flex-col lg:flex-row gap-6 items-center">
+                            <div className="flex-shrink-0 transform scale-75 sm:scale-95 origin-center">
+                                <PlayerCard player={player} allowFlipClick={true} />
+                            </div>
+                            <div className="flex-1 w-full space-y-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+                                    <div className="bg-[var(--bg-secondary)] p-3 rounded-xl border border-[var(--border-color)] text-center">
+                                        <span className="block text-xl font-bold text-elkawera-accent">{player.overallScore}</span>
+                                        <span className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">{t('stats.overall')}</span>
+                                    </div>
+                                    <div className="bg-[var(--bg-secondary)] p-3 rounded-xl border border-[var(--border-color)] text-center">
+                                        <span className="block text-xl font-bold text-[var(--text-primary)]">{player.matchesPlayed || 0}</span>
+                                        <span className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">{t('stats.matches')}</span>
+                                    </div>
+                                    <div className="bg-[var(--bg-secondary)] p-3 rounded-xl border border-[var(--border-color)] text-center">
+                                        <span className="block text-xl font-bold text-[var(--text-primary)]">{player.goals || 0}</span>
+                                        <span className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">{t('stats.goals')}</span>
+                                    </div>
+                                    <div className="bg-[var(--bg-secondary)] p-3 rounded-xl border border-[var(--border-color)] text-center">
+                                        <span className="block text-xl font-bold text-[var(--text-primary)]">{player.assists || 0}</span>
+                                        <span className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">{t('stats.assists')}</span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); navigate(`/player/${player.id}`); }}
+                                        className="flex-1 min-w-[150px] py-3 bg-elkawera-accent text-black font-bold uppercase rounded-xl hover:bg-white transition-colors flex items-center justify-center gap-2 text-sm shadow-lg shadow-elkawera-accent/20"
+                                    >
+                                        <TrendingUp size={16} /> {t('common.view_details')}
+                                    </button>
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); setSelectedPlayerId(null); }}
+                                        className="py-3 px-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] font-bold uppercase rounded-xl hover:bg-[var(--border-color)] transition-colors text-sm"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div className="text-[8px] sm:text-xs text-[var(--text-secondary)] uppercase tracking-wider font-bold">
-                        {t(`stats.${playerSort.toLowerCase()}`)}
-                    </div>
-                </div>
+                )}
             </div>
         );
     };
 
-    const renderTeamRow = (team: Team, index: number) => (
-        <div
-            key={team.id}
-            className="group flex items-center justify-between p-3 sm:p-4 bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:border-elkawera-accent hover:border-1 dark:hover:border-elkawera-accent/30 rounded-xl mb-3 cursor-pointer transition-all animate-fade-in-up hover:scale-[1.01] shadow-sm"
-            style={{ animationDelay: `${index * 50}ms` }}
-            onClick={() => setSelectedTeam(team)}
-        >
-            <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
-                <span className={`text-base sm:text-xl font-bold w-6 sm:w-10 text-center ${index < 3 ? 'text-elkawera-accent' : 'text-[var(--text-secondary)]'}`}>
-                    {index + 1}
-                </span>
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center overflow-hidden border border-[var(--border-color)] shrink-0">
-                    {team.logoUrl ? (
-                        <img src={team.logoUrl} alt={team.name} className="w-full h-full object-cover" />
-                    ) : (
-                        <Shield className="text-gray-500" />
-                    )}
+    const renderTeamRow = (team: Team, index: number) => {
+        const isExpanded = selectedTeamId === team.id;
+        return (
+            <div key={team.id} className="mb-3">
+                <div
+                    className={`group flex items-center justify-between p-3 sm:p-4 bg-[var(--bg-secondary)] border ${isExpanded ? 'border-elkawera-accent' : 'border-[var(--border-color)]'} hover:border-elkawera-accent hover:border-1 dark:hover:border-elkawera-accent/30 rounded-xl cursor-pointer transition-all animate-fade-in-up hover:scale-[1.01] shadow-sm`}
+                    style={{ animationDelay: `${index * 50}ms` }}
+                    onClick={() => {
+                        setSelectedPlayerId(null);
+                        setSelectedTeamId(isExpanded ? null : team.id);
+                    }}
+                >
+                    <div className="flex items-center gap-3 sm:gap-4 overflow-hidden">
+                        <span className={`text-base sm:text-xl font-bold w-6 sm:w-10 text-center ${index < 3 ? 'text-elkawera-accent' : 'text-[var(--text-secondary)]'}`}>
+                            {index + 1}
+                        </span>
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gray-200 dark:bg-gray-800 flex items-center justify-center overflow-hidden border border-[var(--border-color)] shrink-0">
+                            {team.logoUrl ? (
+                                <img src={team.logoUrl} alt={team.name} className="w-full h-full object-cover" />
+                            ) : (
+                                <Shield className="text-gray-500" />
+                            )}
+                        </div>
+                        <div className="min-w-0">
+                            <h3 className="text-[var(--text-primary)] font-bold text-sm sm:text-lg group-hover:text-elkawera-accent transition-colors truncate">{team.name}</h3>
+                            <p className="text-[10px] sm:text-sm text-[var(--text-secondary)] truncate">Captain: {team.captainName}</p>
+                        </div>
+                    </div>
+                    <div className="text-right rtl:text-left flex flex-col items-end rtl:items-start gap-1 shrink-0">
+                        <div className="text-xl sm:text-2xl font-display font-bold text-elkawera-accent">
+                            {teamSort === 'OVERALL' && getTeamAverageRating(team.id)}
+                            {teamSort === 'WINS' && (team.wins ?? 0)}
+                            {teamSort === 'LOSSES' && (team.losses ?? 0)}
+                            {teamSort === 'DRAWS' && (team.draws ?? 0)}
+                        </div>
+                        <div className="text-[8px] sm:text-xs text-[var(--text-secondary)] uppercase tracking-wider font-bold">
+                            {t(`stats.${teamSort.toLowerCase()}`)}
+                        </div>
+                        <div className="text-[8px] sm:text-[10px] font-mono text-[var(--text-secondary)] mt-1 flex gap-1">
+                            <span className={teamSort === 'WINS' ? 'text-[var(--text-primary)] font-bold' : ''}>{team.wins ?? 0}W</span> -
+                            <span className={teamSort === 'DRAWS' ? 'text-[var(--text-primary)] font-bold' : ''}> {team.draws ?? 0}D</span> -
+                            <span className={teamSort === 'LOSSES' ? 'text-[var(--text-primary)] font-bold' : ''}> {team.losses ?? 0}L</span>
+                        </div>
+                    </div>
                 </div>
-                <div className="min-w-0">
-                    <h3 className="text-[var(--text-primary)] font-bold text-sm sm:text-lg group-hover:text-elkawera-accent transition-colors truncate">{team.name}</h3>
-                    <p className="text-[10px] sm:text-sm text-[var(--text-secondary)] truncate">Captain: {team.captainName}</p>
-                </div>
+                {isExpanded && (
+                    <div className="mt-2 p-4 sm:p-6 bg-[var(--bg-primary)] border border-elkawera-accent/30 rounded-2xl animate-in slide-in-from-top-4 duration-300 overflow-hidden w-full">
+                        <div className="flex flex-col sm:flex-row gap-6 items-center sm:items-start">
+                            <div className="w-24 h-24 sm:w-32 sm:h-32 bg-[var(--bg-secondary)] rounded-2xl flex items-center justify-center border border-[var(--border-color)] overflow-hidden shrink-0 shadow-lg">
+                                {team.logoUrl ? (
+                                    <img src={team.logoUrl} alt={team.name} className="w-full h-full object-cover" />
+                                ) : (
+                                    <Shield size={48} className="text-[var(--text-secondary)] opacity-50" />
+                                )}
+                            </div>
+                            <div className="flex-1 w-full">
+                                <h4 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                    <Users size={20} className="text-elkawera-accent" /> {t('leaderboard.clubs_ranking')} Details
+                                </h4>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-6">
+                                    <div className="bg-[var(--bg-secondary)] p-3 rounded-xl border border-[var(--border-color)] text-center">
+                                        <span className="block text-xl font-bold text-elkawera-accent">{getTeamAverageRating(team.id)}</span>
+                                        <span className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">OVR</span>
+                                    </div>
+                                    <div className="bg-green-500/10 p-3 rounded-xl border border-green-500/20 text-center">
+                                        <span className="block text-xl font-bold text-green-500">{team.wins || 0}</span>
+                                        <span className="text-[10px] text-green-500/70 uppercase font-bold">{t('stats.wins')}</span>
+                                    </div>
+                                    <div className="bg-red-500/10 p-3 rounded-xl border border-red-500/20 text-center">
+                                        <span className="block text-xl font-bold text-red-500">{team.losses || 0}</span>
+                                        <span className="text-[10px] text-red-500/70 uppercase font-bold">{t('stats.losses')}</span>
+                                    </div>
+                                    <div className="bg-gray-500/10 p-3 rounded-xl border border-gray-500/20 text-center">
+                                        <span className="block text-xl font-bold text-gray-400">{team.draws || 0}</span>
+                                        <span className="text-[10px] text-gray-400/70 uppercase font-bold">{t('stats.draws')}</span>
+                                    </div>
+                                </div>
+
+                                <div className="mb-4">
+                                    <h5 className="text-xs font-bold uppercase text-[var(--text-secondary)] mb-2 tracking-widest">Squad Players</h5>
+                                    <div className="flex flex-wrap gap-2">
+                                        {getTeamSquad(team.id).map(p => (
+                                            <div
+                                                key={p.id}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedTeamId(null);
+                                                    setSelectedPlayerId(p.id);
+                                                }}
+                                                className="flex items-center gap-2 px-3 py-1.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg hover:border-elkawera-accent transition-all cursor-pointer group/item"
+                                            >
+                                                <div className="w-6 h-6 rounded-full bg-gray-800 overflow-hidden">
+                                                    {p.imageUrl ? <img src={p.imageUrl} className="w-full h-full object-cover" /> : <UserIcon size={12} className="m-1.5" />}
+                                                </div>
+                                                <span className="text-xs font-bold group-hover/item:text-elkawera-accent transition-colors">{p.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); setSelectedTeamId(null); }}
+                                    className="w-full sm:w-auto px-6 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] font-bold uppercase rounded-xl hover:bg-[var(--border-color)] transition-colors text-xs"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
-            <div className="text-right rtl:text-left flex flex-col items-end rtl:items-start gap-1 shrink-0">
-                <div className="text-xl sm:text-2xl font-display font-bold text-elkawera-accent">
-                    {teamSort === 'OVERALL' && getTeamAverageRating(team.id)}
-                    {teamSort === 'WINS' && (team.wins ?? 0)}
-                    {teamSort === 'LOSSES' && (team.losses ?? 0)}
-                    {teamSort === 'DRAWS' && (team.draws ?? 0)}
-                </div>
-                <div className="text-[8px] sm:text-xs text-[var(--text-secondary)] uppercase tracking-wider font-bold">
-                    {t(`stats.${teamSort.toLowerCase()}`)}
-                </div>
-                <div className="text-[8px] sm:text-[10px] font-mono text-[var(--text-secondary)] mt-1 flex gap-1">
-                    <span className={teamSort === 'WINS' ? 'text-[var(--text-primary)] font-bold' : ''}>{team.wins ?? 0}W</span> -
-                    <span className={teamSort === 'DRAWS' ? 'text-[var(--text-primary)] font-bold' : ''}> {team.draws ?? 0}D</span> -
-                    <span className={teamSort === 'LOSSES' ? 'text-[var(--text-primary)] font-bold' : ''}> {team.losses ?? 0}L</span>
-                </div>
-            </div>
-        </div>
-    );
+        );
+    };
 
     return (
-        <div className="container mx-auto pb-20" dir={dir}>
+        <div className="container mx-auto pb-20 px-4 sm:px-6" dir={dir}>
             {/* Header */}
             <div className="flex flex-col md:flex-row items-end justify-between gap-6 mb-8">
                 <div>
@@ -380,161 +499,6 @@ export const Leaderboard: React.FC = () => {
                     )}
                 </div>
             )}
-
-            {/* --- MINIMUM PROFILE MODAL (PLAYER) --- */}
-            {selectedPlayer && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200" dir={dir}>
-                    <div
-                        className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl relative"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() => setSelectedPlayer(null)}
-                            className={`absolute top-4 ${dir === 'rtl' ? 'left-4' : 'right-4'} z-10 w-10 h-10 bg-[var(--bg-secondary)] hover:bg-[var(--bg-secondary)]/80 text-[var(--text-primary)] rounded-full flex items-center justify-center transition-all border border-[var(--border-color)]`}
-                        >
-                            <X size={20} />
-                        </button>
-
-                        <div className="p-6">
-                            <div className="text-center mb-6">
-                                <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-1">{selectedPlayer.name}</h2>
-                                <p className="text-[var(--text-secondary)] text-sm italic">
-                                    {selectedPlayer.teamId ? teamMap[selectedPlayer.teamId]?.name : 'Free Agent'}
-                                </p>
-                            </div>
-
-                            <div className="flex justify-center mb-8 transform scale-90 sm:scale-100">
-                                <PlayerCard player={selectedPlayer} allowFlipClick={true} />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 mb-6">
-                                <div className="bg-[var(--bg-secondary)] p-3 rounded-lg text-center border border-[var(--border-color)]">
-                                    <span className="block text-2xl font-bold text-[var(--text-primary)]">{selectedPlayer.matchesPlayed || 0}</span>
-                                    <span className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">{t('stats.matches')}</span>
-                                </div>
-                                <div className="bg-[var(--bg-secondary)] p-3 rounded-lg text-center border border-[var(--border-color)]">
-                                    <span className="block text-2xl font-bold text-elkawera-accent">
-                                        {((selectedPlayer.goals || 0) / (selectedPlayer.matchesPlayed || 1)).toFixed(1)}
-                                    </span>
-                                    <span className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">{t('stats.goals')} / {t('stats.matches')}</span>
-                                </div>
-                            </div>
-
-                            <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase mb-3 flex items-center gap-2">
-                                <Activity size={16} className="text-elkawera-accent" /> Performance Breakdown
-                            </h3>
-                            <div className="space-y-2 text-sm text-[var(--text-secondary)]">
-                                <div className="flex justify-between p-3 bg-[var(--bg-secondary)] rounded-lg border border-[var(--border-color)]">
-                                    <span>{t('stats.goals')}</span>
-                                    <span className="font-bold text-[var(--text-primary)] text-lg">{selectedPlayer.goals || 0}</span>
-                                </div>
-                                <div className="flex justify-between p-3 bg-[var(--bg-secondary)] rounded-lg border border-[var(--border-color)]">
-                                    <span>{t('stats.assists')}</span>
-                                    <span className="font-bold text-[var(--text-primary)] text-lg">{selectedPlayer.assists || 0}</span>
-                                </div>
-                                <div className="flex justify-between p-3 bg-[var(--bg-secondary)] rounded-lg border border-[var(--border-color)]">
-                                    <span>{t('stats.defense')}</span>
-                                    <span className="font-bold text-[var(--text-primary)] text-lg">{selectedPlayer.defensiveContributions || 0}</span>
-                                </div>
-                                <div className="flex justify-between p-3 bg-[var(--bg-secondary)] rounded-lg border border-[var(--border-color)]">
-                                    <span>{t('stats.clean_sheets')}</span>
-                                    <span className="font-bold text-[var(--text-primary)] text-lg">{selectedPlayer.cleanSheets || 0}</span>
-                                </div>
-                            </div>
-
-                            <button
-                                onClick={() => navigate(`/player/${selectedPlayer.id}`)}
-                                className="w-full mt-6 py-3 bg-elkawera-accent text-black font-bold uppercase rounded-xl hover:bg-white transition-colors flex items-center justify-center gap-2"
-                            >
-                                <TrendingUp size={18} /> {t('common.view_details')}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* --- MINIMUM PROFILE MODAL (TEAM) --- */}
-            {selectedTeam && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200" dir={dir}>
-                    <div
-                        className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl relative"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button
-                            onClick={() => setSelectedTeam(null)}
-                            className={`absolute top-4 ${dir === 'rtl' ? 'left-4' : 'right-4'} z-10 w-10 h-10 bg-[var(--bg-secondary)] hover:bg-[var(--text-primary)] text-[var(--text-primary)] hover:text-[var(--bg-primary)] rounded-full flex items-center justify-center transition-all border border-[var(--border-color)]`}
-                        >
-                            <X size={20} />
-                        </button>
-
-                        <div className="p-6">
-                            {/* Team Header */}
-                            <div className="text-center mb-8">
-                                <div className="w-24 h-24 mx-auto bg-gray-200 dark:bg-gray-800 rounded-2xl flex items-center justify-center border border-[var(--border-color)] mb-4 shadow-2xl overflow-hidden">
-                                    {selectedTeam.logoUrl ? (
-                                        <img src={selectedTeam.logoUrl} alt={selectedTeam.name} className="w-full h-full object-cover" />
-                                    ) : (
-                                        <Shield size={48} className="text-gray-500" />
-                                    )}
-                                </div>
-                                <h2 className="text-3xl font-display font-bold text-[var(--text-primary)] uppercase italic">{selectedTeam.name}</h2>
-                                <p className="text-[var(--text-secondary)] text-sm">Captain: {selectedTeam.captainName}</p>
-                            </div>
-
-                            {/* Team Stats */}
-                            <div className="grid grid-cols-4 gap-2 mb-8">
-                                <div className="bg-[var(--bg-secondary)] p-2 rounded-lg text-center border border-[var(--border-color)]">
-                                    <span className="block text-xl font-bold text-[var(--text-primary)]">{selectedTeam.totalMatches}</span>
-                                    <span className="text-[10px] text-[var(--text-secondary)] uppercase font-bold">{t('stats.matches')}</span>
-                                </div>
-                                <div className="bg-green-500/10 p-2 rounded-lg text-center border border-green-500/20">
-                                    <span className="block text-xl font-bold text-green-600 dark:text-green-400">{selectedTeam.wins}</span>
-                                    <span className="text-[10px] text-green-600/70 dark:text-green-500/70 uppercase font-bold">{t('stats.wins')}</span>
-                                </div>
-                                <div className="bg-red-500/10 p-2 rounded-lg text-center border border-red-500/20">
-                                    <span className="block text-xl font-bold text-red-600 dark:text-red-400">{selectedTeam.losses}</span>
-                                    <span className="text-[10px] text-red-600/70 dark:text-red-500/70 uppercase font-bold">{t('stats.losses')}</span>
-                                </div>
-                                <div className="bg-gray-500/10 p-2 rounded-lg text-center border border-gray-500/20">
-                                    <span className="block text-xl font-bold text-gray-600 dark:text-gray-300">{selectedTeam.draws}</span>
-                                    <span className="text-[10px] text-gray-600/70 dark:text-gray-500/70 uppercase font-bold">{t('stats.draws')}</span>
-                                </div>
-                            </div>
-
-                            {/* Squad List */}
-                            <h3 className="text-sm font-bold text-[var(--text-primary)] uppercase mb-3 flex items-center gap-2 px-1">
-                                <Users size={16} className="text-elkawera-accent" /> Active Squad
-                            </h3>
-                            <div className="space-y-2 max-h-60 overflow-y-auto pr-1 text-left rtl:text-right">
-                                {getTeamSquad(selectedTeam.id).length > 0 ? (
-                                    getTeamSquad(selectedTeam.id).map(player => (
-                                        <div key={player.id} className="flex items-center gap-3 p-3 bg-[var(--bg-secondary)] rounded-xl border border-[var(--border-color)] hover:bg-[var(--border-color)] transition-colors cursor-pointer" onClick={() => {
-                                            setSelectedTeam(null);
-                                            setSelectedPlayer(player);
-                                        }}>
-                                            <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden shrink-0">
-                                                {player.imageUrl ? (
-                                                    <img src={player.imageUrl} alt={player.name} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <UserIcon className="w-full h-full p-2 text-gray-500" />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <p className="text-[var(--text-primary)] font-bold text-sm">{player.name}</p>
-                                                <p className="text-xs text-[var(--text-secondary)]">{player.position} • {player.overallScore} OVR</p>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <div className="text-center py-4 text-[var(--text-secondary)] italic text-sm">{t('common.no_data')}</div>
-                                )}
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            )}
-
         </div>
     );
 };

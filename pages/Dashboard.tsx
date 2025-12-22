@@ -5,7 +5,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Edit2, Trash2, Activity, Download, Search, PlusCircle, Sparkles, User as UserIcon, Clock, Bell, X, Shield, CheckCircle, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { PlayerCard } from '../components/PlayerCard';
-import { ConfirmationDialog } from '../components/ConfirmationDialog';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import { showToast } from '../components/Toast';
@@ -18,10 +17,13 @@ export const Dashboard: React.FC = () => {
   const [teams, setTeams] = useState<Record<string, Team>>({});
   const [filterPos, setFilterPos] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
-  const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [adminCards, setAdminCards] = useState<Player[]>([]);
   const [requests, setRequests] = useState<PlayerRegistrationRequest[]>([]);
   const [matchRequests, setMatchRequests] = useState<MatchRequest[]>([]);
+  const [confirmingMatchApproveId, setConfirmingMatchApproveId] = useState<string | null>(null);
+  const [confirmingMatchRejectId, setConfirmingMatchRejectId] = useState<string | null>(null);
+  const [rejectReason, setRejectReason] = useState('');
   const { user } = useAuth();
   const { t, dir } = useSettings();
   const navigate = useNavigate();
@@ -99,12 +101,11 @@ export const Dashboard: React.FC = () => {
     return () => unsubscribe();
   }, [user]);
 
-  const confirmDelete = async () => {
-    if (deleteId) {
-      await deletePlayerAndNotifyUser(deleteId);
-      setDeleteId(null);
-      loadData();
-    }
+  const confirmDelete = async (id: string) => {
+    await deletePlayerAndNotifyUser(id);
+    setConfirmingDeleteId(null);
+    loadData();
+    showToast(t('dashboard.player_deleted'), 'success');
   };
 
   const handleDismissNotification = async () => {
@@ -229,43 +230,39 @@ export const Dashboard: React.FC = () => {
     );
   }
 
-  const handleApproveMatch = async (req: MatchRequest) => {
-    if (window.confirm(`${t('dashboard.approve_match_confirm')} ${req.homeTeamName} vs ${req.awayTeamName}?`)) {
-      try {
-        await approveMatchRequest(req.id, user?.id || 'admin');
-        showToast(t('dashboard.match_approved'), 'success');
-        setMatchRequests(prev => prev.filter(r => r.id !== req.id));
-        navigate('/admin/matches');
-      } catch (error) {
-        console.error(error);
-        showToast(t('errors.generic'), 'error');
-      }
+  const handleApproveMatch = async (reqId: string) => {
+    try {
+      await approveMatchRequest(reqId, user?.id || 'admin');
+      showToast(t('dashboard.match_approved'), 'success');
+      setMatchRequests(prev => prev.filter(r => r.id !== reqId));
+      setConfirmingMatchApproveId(null);
+      navigate('/admin/matches');
+    } catch (error) {
+      console.error(error);
+      showToast(t('errors.generic'), 'error');
     }
   };
 
-  const handleRejectMatch = async (req: MatchRequest) => {
-    const reason = prompt(t('dashboard.reject_reason'));
-    if (reason) {
-      try {
-        await rejectMatchRequest(req.id, user?.id || 'admin', reason);
-        showToast(t('dashboard.match_rejected'), 'info');
-        setMatchRequests(prev => prev.filter(r => r.id !== req.id));
-      } catch (error) {
-        console.error(error);
-        showToast(t('errors.generic'), 'error');
-      }
+  const handleRejectMatch = async (reqId: string) => {
+    if (!rejectReason.trim()) {
+      showToast('Please provide a reason', 'error');
+      return;
+    }
+    try {
+      await rejectMatchRequest(reqId, user?.id || 'admin', rejectReason);
+      showToast(t('dashboard.match_rejected'), 'info');
+      setMatchRequests(prev => prev.filter(r => r.id !== reqId));
+      setConfirmingMatchRejectId(null);
+      setRejectReason('');
+    } catch (error) {
+      console.error(error);
+      showToast(t('errors.generic'), 'error');
     }
   };
 
   return (
     <div className="space-y-12 pb-12" dir={dir}>
-      <ConfirmationDialog
-        isOpen={!!deleteId}
-        onClose={() => setDeleteId(null)}
-        onConfirm={confirmDelete}
-        title={t('dashboard.delete_confirm_title')}
-        message={t('dashboard.delete_confirm_msg')}
-      />
+
 
       {topPlayer && (
         <div className="bg-gradient-to-r from-elkawera-green to-[var(--bg-primary)] rounded-3xl p-8 md:p-10 border border-elkawera-accent/30 shadow-[0_0_40px_rgba(0,255,157,0.1)] relative overflow-hidden animate-fade-in-up">
@@ -361,43 +358,101 @@ export const Dashboard: React.FC = () => {
           <div className="grid gap-4">
             {matchRequests.map(req => {
               const isReady = req.status === 'pending_admin';
+              const isApproveConfirm = confirmingMatchApproveId === req.id;
+              const isRejectConfirm = confirmingMatchRejectId === req.id;
+
               return (
-                <div key={req.id} className={`bg-gradient-to-r ${isReady ? 'from-elkawera-accent/10 border-elkawera-accent/30' : 'from-yellow-500/10 border-yellow-500/30'} to-transparent border rounded-xl p-6 flex flex-col md:flex-row gap-4 items-center justify-between`}>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-xs font-bold uppercase ${isReady ? 'text-elkawera-accent' : 'text-yellow-500'}`}>
-                        {isReady ? t('dashboard.ready_to_start') : 'Awaiting Opponent'}
-                      </span>
-                      {req.opponentApproved ? (
-                        <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full flex items-center gap-1"><CheckCircle size={10} /> Captains Agreed</span>
-                      ) : (
-                        <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded-full flex items-center gap-1"><Clock size={10} /> Waiting for {req.awayTeamName}</span>
-                      )}
+                <div key={req.id} className={`bg-gradient-to-r ${isReady ? 'from-elkawera-accent/10 border-elkawera-accent/30' : 'from-yellow-500/10 border-yellow-500/30'} to-transparent border rounded-xl p-6 transition-all`}>
+                  <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`text-xs font-bold uppercase ${isReady ? 'text-elkawera-accent' : 'text-yellow-500'}`}>
+                          {isReady ? t('dashboard.ready_to_start') : 'Awaiting Opponent'}
+                        </span>
+                        {req.opponentApproved ? (
+                          <span className="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full flex items-center gap-1"><CheckCircle size={10} /> Captains Agreed</span>
+                        ) : (
+                          <span className="text-[10px] bg-yellow-500/20 text-yellow-500 px-2 py-0.5 rounded-full flex items-center gap-1"><Clock size={10} /> Waiting for {req.awayTeamName}</span>
+                        )}
+                      </div>
+                      <h4 className="text-xl font-bold text-[var(--text-primary)]">{req.homeTeamName} vs {req.awayTeamName}</h4>
+                      <p className="text-sm text-[var(--text-secondary)]">{t('dashboard.lineups_submitted')}</p>
                     </div>
-                    <h4 className="text-xl font-bold text-[var(--text-primary)]">{req.homeTeamName} vs {req.awayTeamName}</h4>
-                    <p className="text-sm text-[var(--text-secondary)]">{t('dashboard.lineups_submitted')}</p>
+
+                    {!isApproveConfirm && !isRejectConfirm && (
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => setConfirmingMatchRejectId(req.id)}
+                          className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/20 font-bold rounded-lg hover:bg-red-500 hover:text-white transition-colors flex items-center gap-2"
+                        >
+                          <X size={18} />
+                          {t('common.reject')}
+                        </button>
+                        <button
+                          onClick={() => setConfirmingMatchApproveId(req.id)}
+                          disabled={!isReady}
+                          className={`px-6 py-3 font-bold rounded-lg transition-colors flex items-center gap-2 ${isReady
+                            ? 'bg-elkawera-accent text-black hover:bg-[var(--text-primary)] hover:text-white'
+                            : 'bg-gray-700 text-gray-500 cursor-not-allowed border border-gray-600'
+                            }`}
+                          title={!isReady ? "Wait for opponent captain to approve" : "Approve Match"}
+                        >
+                          <CheckCircle size={18} />
+                          {t('common.approve')}
+                        </button>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleRejectMatch(req)}
-                      className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/20 font-bold rounded-lg hover:bg-red-500 hover:text-white transition-colors flex items-center gap-2"
-                    >
-                      <X size={18} />
-                      {t('common.reject')}
-                    </button>
-                    <button
-                      onClick={() => handleApproveMatch(req)}
-                      disabled={!isReady}
-                      className={`px-6 py-3 font-bold rounded-lg transition-colors flex items-center gap-2 ${isReady
-                        ? 'bg-elkawera-accent text-black hover:bg-[var(--text-primary)] hover:text-white'
-                        : 'bg-gray-700 text-gray-500 cursor-not-allowed border border-gray-600'
-                        }`}
-                      title={!isReady ? "Wait for opponent captain to approve" : "Approve Match"}
-                    >
-                      <CheckCircle size={18} />
-                      {t('common.approve')}
-                    </button>
-                  </div>
+
+                  {isApproveConfirm && (
+                    <div className="mt-4 p-4 bg-elkawera-accent/10 border border-elkawera-accent/30 rounded-xl animate-in slide-in-from-top-2">
+                      <p className="text-sm font-bold text-elkawera-accent mb-3 flex items-center gap-2">
+                        <CheckCircle size={16} /> {t('dashboard.approve_match_confirm')} {req.homeTeamName} vs {req.awayTeamName}?
+                      </p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleApproveMatch(req.id)}
+                          className="px-6 py-2 bg-elkawera-accent text-black font-bold rounded-lg hover:bg-white transition-all text-xs"
+                        >
+                          Confirm Approval
+                        </button>
+                        <button
+                          onClick={() => setConfirmingMatchApproveId(null)}
+                          className="px-6 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] font-bold rounded-lg text-xs"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {isRejectConfirm && (
+                    <div className="mt-4 p-4 bg-red-500/10 border border-red-500/30 rounded-xl animate-in slide-in-from-top-2">
+                      <p className="text-sm font-bold text-red-500 mb-3">{t('dashboard.reject_reason')}</p>
+                      <textarea
+                        value={rejectReason}
+                        onChange={(e) => setRejectReason(e.target.value)}
+                        className="w-full bg-[var(--bg-primary)] border border-red-500/30 rounded-lg p-3 text-sm text-[var(--text-primary)] focus:outline-none focus:border-red-500 mb-3"
+                        placeholder="Type rejection reason..."
+                        rows={2}
+                        autoFocus
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleRejectMatch(req.id)}
+                          className="px-6 py-2 bg-red-500 text-white font-bold rounded-lg hover:bg-red-600 transition-all text-xs"
+                        >
+                          Confirm Rejection
+                        </button>
+                        <button
+                          onClick={() => { setConfirmingMatchRejectId(null); setRejectReason(''); }}
+                          className="px-6 py-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] font-bold rounded-lg text-xs"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -493,25 +548,47 @@ export const Dashboard: React.FC = () => {
                     </div>
 
                     <div className="flex flex-col gap-3 w-full px-12 transform translate-y-8 group-hover:translate-y-0 transition-transform duration-300 delay-75">
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`/stats?id=${player.id}`); }}
-                        className="flex items-center justify-center gap-2 w-full py-3 bg-white/10 hover:bg-elkawera-accent hover:text-black text-white font-bold uppercase text-xs rounded-xl transition-all border border-white/10 hover:border-elkawera-accent"
-                      >
-                        <Activity size={16} /> {t('dashboard.update_performance')}
-                      </button>
-                      <button
-                        onClick={(e) => { e.stopPropagation(); navigate(`/create?id=${player.id}`); }}
-                        className="flex items-center justify-center gap-2 w-full py-3 bg-white/10 hover:bg-white text-white hover:text-black font-bold uppercase text-xs rounded-xl transition-all border border-white/10"
-                      >
-                        <Edit2 size={16} /> {t('dashboard.edit_card')}
-                      </button>
+                      {confirmingDeleteId === player.id ? (
+                        <div className="flex flex-col gap-2 animate-scale-in">
+                          <p className="text-[10px] text-red-400 font-bold uppercase tracking-wider text-center mb-1">Are you sure?</p>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={(e) => { e.stopPropagation(); setConfirmingDeleteId(null); }}
+                              className="flex-1 py-2 bg-white/10 hover:bg-white/20 text-white font-bold rounded-lg text-[10px] uppercase transition-all"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={(e) => { e.stopPropagation(); confirmDelete(player.id); }}
+                              className="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white font-bold rounded-lg text-[10px] uppercase shadow-[0_0_15px_rgba(220,38,38,0.4)] transition-all"
+                            >
+                              Confirm
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate(`/stats?id=${player.id}`); }}
+                            className="flex items-center justify-center gap-2 w-full py-3 bg-white/10 hover:bg-elkawera-accent hover:text-black text-white font-bold uppercase text-xs rounded-xl transition-all border border-white/10 hover:border-elkawera-accent"
+                          >
+                            <Activity size={16} /> {t('dashboard.update_performance')}
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); navigate(`/create?id=${player.id}`); }}
+                            className="flex items-center justify-center gap-2 w-full py-3 bg-white/10 hover:bg-white text-white hover:text-black font-bold uppercase text-xs rounded-xl transition-all border border-white/10"
+                          >
+                            <Edit2 size={16} /> {t('dashboard.edit_card')}
+                          </button>
 
-                      <button
-                        onClick={(e) => { e.stopPropagation(); setDeleteId(player.id); }}
-                        className="flex items-center justify-center gap-2 w-full py-3 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-bold uppercase text-xs rounded-xl transition-all border border-red-500/20"
-                      >
-                        <Trash2 size={16} /> {t('dashboard.delete_card')}
-                      </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setConfirmingDeleteId(player.id); }}
+                            className="flex items-center justify-center gap-2 w-full py-3 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-bold uppercase text-xs rounded-xl transition-all border border-red-500/20"
+                          >
+                            <Trash2 size={16} /> {t('dashboard.delete_card')}
+                          </button>
+                        </>
+                      )}
                     </div>
 
                     <p className="text-[10px] text-gray-500 uppercase tracking-widest absolute bottom-8 opacity-0 group-hover:opacity-100 transition-opacity delay-150">

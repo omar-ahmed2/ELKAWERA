@@ -17,6 +17,7 @@ import {
     Sun
 } from 'lucide-react';
 import { getAllPlayers, getPlayerById } from '../utils/db';
+import { showToast } from '../components/Toast';
 
 export const Settings: React.FC = () => {
     const { user, signOut } = useAuth();
@@ -37,7 +38,7 @@ export const Settings: React.FC = () => {
         // Simulate API call
         setTimeout(() => {
             setLoading(false);
-            alert(t('settings.save') + ' Success!');
+            showToast(t('settings.save') + ' Success!', 'success');
         }, 800);
     };
 
@@ -64,7 +65,7 @@ export const Settings: React.FC = () => {
             URL.revokeObjectURL(url);
         } catch (error) {
             console.error(error);
-            alert('Failed to export data');
+            showToast('Failed to export data', 'error');
         }
     };
 
@@ -96,8 +97,8 @@ export const Settings: React.FC = () => {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm uppercase tracking-wider ${activeTab === tab.id
-                                    ? 'bg-elkawera-accent text-black shadow-lg shadow-elkawera-accent/20'
-                                    : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
+                                ? 'bg-elkawera-accent text-black shadow-lg shadow-elkawera-accent/20'
+                                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]'
                                 }`}
                         >
                             <tab.icon size={18} />
@@ -267,7 +268,7 @@ export const Settings: React.FC = () => {
                                     <div className="font-bold text-red-500 mb-2">Delete Account</div>
                                     <p className="text-xs text-[var(--text-secondary)] mb-4">Once you delete your account, there is no going back. Please be certain.</p>
                                     <button
-                                        onClick={() => alert('Please contact administrator at support@elkawera.com to request account deletion.')}
+                                        onClick={() => showToast('Please contact administrator at support@elkawera.com to request account deletion.', 'info')}
                                         className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/50 rounded-lg text-sm font-bold hover:bg-red-500 hover:text-white transition-colors"
                                     >
                                         Delete My Account

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Kit } from '../types';
 import { getAllKits, saveKit, deleteKit } from '../utils/db';
 import { showToast } from '../components/Toast';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Save, X, Upload, Shirt } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Save, X, Upload, Shirt, Check } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { useNavigate } from 'react-router-dom';
@@ -21,6 +21,7 @@ export const AdminKits: React.FC = () => {
     }, [user, navigate]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingKit, setEditingKit] = useState<Kit | null>(null);
+    const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
 
     // Form State
     const [name, setName] = useState('');
@@ -107,14 +108,13 @@ export const AdminKits: React.FC = () => {
     };
 
     const handleDelete = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this kit?')) {
-            try {
-                await deleteKit(id);
-                showToast('Kit deleted', 'success');
-                loadKits();
-            } catch (error) {
-                showToast('Failed to delete kit', 'error');
-            }
+        try {
+            await deleteKit(id);
+            showToast('Kit deleted', 'success');
+            setConfirmingDeleteId(null);
+            loadKits();
+        } catch (error) {
+            showToast('Failed to delete kit', 'error');
         }
     };
 
@@ -172,27 +172,47 @@ export const AdminKits: React.FC = () => {
                         </div>
 
                         <div className="flex items-center gap-2">
-                            <button
-                                onClick={() => toggleVisibility(kit)}
-                                className={`p-2 rounded-lg transition-colors ${kit.isVisible ? 'text-green-400 hover:bg-green-500/10' : 'text-gray-500 hover:bg-white/10'}`}
-                                title="Toggle Visibility"
-                            >
-                                {kit.isVisible ? <Eye size={20} /> : <EyeOff size={20} />}
-                            </button>
-                            <button
-                                onClick={() => handleOpenModal(kit)}
-                                className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
-                                title="Edit"
-                            >
-                                <Edit2 size={20} />
-                            </button>
-                            <button
-                                onClick={() => handleDelete(kit.id)}
-                                className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                                title="Delete"
-                            >
-                                <Trash2 size={20} />
-                            </button>
+                            {confirmingDeleteId === kit.id ? (
+                                <div className="flex items-center gap-2 animate-in slide-in-from-right-2">
+                                    <span className="text-[10px] font-bold text-red-500 uppercase">Sure?</span>
+                                    <button
+                                        onClick={() => handleDelete(kit.id)}
+                                        className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+                                    >
+                                        <Check size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => setConfirmingDeleteId(null)}
+                                        className="p-2 bg-white/10 text-gray-400 rounded-lg hover:bg-white/20 transition-colors"
+                                    >
+                                        <X size={16} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <>
+                                    <button
+                                        onClick={() => toggleVisibility(kit)}
+                                        className={`p-2 rounded-lg transition-colors ${kit.isVisible ? 'text-green-400 hover:bg-green-500/10' : 'text-gray-500 hover:bg-white/10'}`}
+                                        title="Toggle Visibility"
+                                    >
+                                        {kit.isVisible ? <Eye size={20} /> : <EyeOff size={20} />}
+                                    </button>
+                                    <button
+                                        onClick={() => handleOpenModal(kit)}
+                                        className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                                        title="Edit"
+                                    >
+                                        <Edit2 size={20} />
+                                    </button>
+                                    <button
+                                        onClick={() => setConfirmingDeleteId(kit.id)}
+                                        className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                        title="Delete"
+                                    >
+                                        <Trash2 size={20} />
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 ))}
