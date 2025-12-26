@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAllMatches, getMatchesByStatus, saveMatch, getAllTeams, getPlayersByTeamId, subscribeToChanges, getAllMatchRequests, updateMatchRequestStatus, deleteMatch } from '../utils/db';
@@ -447,7 +448,7 @@ const MatchCard: React.FC<{ match: Match; teams: Team[]; onUpdate: () => void }>
             </div>
 
             {/* Delete Confirmation Dialog */}
-            {showDeleteConfirm && (
+            {showDeleteConfirm && createPortal(
                 <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <div className="bg-elkawera-dark border border-red-500/30 rounded-2xl p-8 max-w-md w-full">
                         <h3 className="text-xl font-bold text-white mb-2">Delete Active Match?</h3>
@@ -470,7 +471,7 @@ const MatchCard: React.FC<{ match: Match; teams: Team[]; onUpdate: () => void }>
                         </div>
                     </div>
                 </div>
-            )}
+                , document.body)}
         </div>
     );
 };
@@ -547,7 +548,7 @@ const CreateMatchModal: React.FC<{
         }
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-elkawera-dark border border-white/20 rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
                 <div className="p-8">
@@ -673,6 +674,7 @@ const CreateMatchModal: React.FC<{
                     </div>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };

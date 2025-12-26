@@ -9,6 +9,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Teams } from './pages/Teams';
 import { Leaderboard } from './pages/Leaderboard';
 import { Compare } from './pages/Compare';
+import { Matches } from './pages/Matches';
 
 import { SignIn } from './pages/SignIn';
 import { SignUp } from './pages/SignUp';
@@ -60,6 +61,7 @@ const App: React.FC = () => {
                 <Route path="/create" element={<CreatePlayer />} />
                 <Route path="/stats" element={<PostMatchStats />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/matches" element={<Matches />} />
                 <Route path="/leaderboard" element={<Leaderboard />} /> {/* Added Route */}
                 <Route path="/teams" element={<Teams />} />
 

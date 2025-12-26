@@ -117,6 +117,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         {user.role !== 'captain' && user.role !== 'scout' && (
                           <Link to="/dashboard" className={`${isActive('/dashboard')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300`}>{t('nav.dashboard')}</Link>
                         )}
+                        <Link to="/matches" className={`${isActive('/matches')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300`}>Matches</Link>
                         <Link to="/leaderboard" className={`${isActive('/leaderboard')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1`}><Trophy size={14} /> <span className="hidden lg:inline">{t('nav.leaderboard')}</span><span className="lg:hidden">Board</span></Link>
                         <Link to="/events" className={`${isActive('/events')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1`}><Calendar size={14} /> <span className="hidden lg:inline">Events</span><span className="lg:hidden">Events</span></Link>
                         <Link to="/teams" className={`${isActive('/teams')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300`}>{t('nav.teams')}</Link>
@@ -275,9 +276,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                   <>
                     {user.role !== 'captain' && user.role !== 'scout' && (
                       <Link to="/dashboard" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all">
+
                         {t('nav.dashboard')}
                       </Link>
                     )}
+                    <Link to="/matches" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                      <Target size={18} /> Matches
+                    </Link>
                     <Link to="/leaderboard" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
                       <Trophy size={18} /> {t('nav.leaderboard')}
                     </Link>
