@@ -25,13 +25,13 @@ const data = [
 
 export const StatProgression: React.FC = () => {
   return (
-    <div className="w-full h-[500px] bg-gradient-to-br from-[#050505] to-[#001a15] border border-elkawera-green/50 rounded-3xl p-6 md:p-8 backdrop-blur-md shadow-[0_0_40px_rgba(0,0,0,0.6)] relative overflow-hidden group">
+    <div className="w-full h-[500px] bg-black/40 border border-white/5 rounded-3xl p-6 md:p-8 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
 
       {/* Decorative Glows */}
       <div className="absolute top-0 right-0 w-64 h-64 bg-elkawera-accent/5 rounded-full blur-[100px] -z-10 group-hover:bg-elkawera-accent/10 transition-colors duration-700"></div>
 
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 relative z-10">
+      <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-8 gap-4 relative z-10">
         <div>
           <h3 className="text-3xl font-display font-bold text-white uppercase tracking-tight flex items-center gap-2">
             Evolution Tracker
