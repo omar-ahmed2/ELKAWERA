@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ChevronRight, Zap, Shield, TrendingUp, Users, Target,
   Trophy, Star, Activity, BarChart3, Users2, Calendar,
-  Search, Flag, Award, MousePointer2, ArrowRight
+  Search, Flag, Award, MousePointer2, ArrowRight, X
 } from 'lucide-react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { StatProgression } from '../components/StatProgression';
@@ -83,6 +83,7 @@ export const Landing: React.FC = () => {
   const { t, dir } = useSettings();
   const { user } = useAuth();
   const backgroundRef = useRef(null);
+  const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
 
   const { scrollYProgress } = useScroll();
   const opacityProgress = useTransform(scrollYProgress, [0, 0.2], [1, 0.5]);
@@ -428,32 +429,59 @@ export const Landing: React.FC = () => {
             {/* Analytics */}
             <motion.div
               whileHover={{ scale: 1.01 }}
-              className="bg-gradient-to-br from-purple-900/40 to-black p-8 md:p-12 rounded-[2.5rem] border border-purple-500/20 relative overflow-hidden group"
+              className="bg-gradient-to-br from-purple-900/40 to-black p-8 md:p-12 rounded-[2.5rem] border border-purple-500/20 relative overflow-hidden group min-h-[500px]"
             >
-              <div className="absolute top-0 right-0 p-4 md:p-8 text-purple-500 opacity-10 group-hover:scale-110 transition-transform">
-                <Activity size={80} className="md:w-[120px] md:h-[120px]" />
-              </div>
-              <h3 className="text-2xl md:text-3xl font-display font-bold uppercase mb-4 text-white">
-                {t('landing.analytics.title')}
-              </h3>
-              <p className="text-purple-100/60 mb-8 max-w-md text-sm md:text-base">
-                {t('landing.analytics.desc')}
-              </p>
-              <div className="flex gap-4 mb-8 md:mb-10 overflow-x-auto pb-2 no-scrollbar md:no-scrollbar">
-                {[
-                  { label: 'Growth', val: '+12%', color: 'purple' },
-                  { label: 'Win Rate', val: '68%', color: 'emerald' },
-                  { label: 'Avg Rating', val: '7.4', color: 'blue' }
-                ].map((stat, i) => (
-                  <div key={i} className={`min-w-[100px] p-4 rounded-2xl bg-white/5 border border-white/10 text-center flex-shrink-0`}>
-                    <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1">{stat.label}</div>
-                    <div className={`text-xl font-bold text-${stat.color}-400`}>{stat.val}</div>
+              {!showAnalyticsModal ? (
+                <>
+                  <div className="absolute top-0 right-0 p-4 md:p-8 text-purple-500 opacity-10 group-hover:scale-110 transition-transform">
+                    <Activity size={80} className="md:w-[120px] md:h-[120px]" />
                   </div>
-                ))}
-              </div>
-              <button className="px-6 py-3 md:px-8 md:py-3 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-colors text-sm md:text-base">
-                View Charts
-              </button>
+                  <h3 className="text-2xl md:text-3xl font-display font-bold uppercase mb-4 text-white">
+                    {t('landing.analytics.title')}
+                  </h3>
+                  <p className="text-purple-100/60 mb-8 max-w-md text-sm md:text-base">
+                    {t('landing.analytics.desc')}
+                  </p>
+                  <div className="flex gap-4 mb-8 md:mb-10 overflow-x-auto pb-2 no-scrollbar md:no-scrollbar">
+                    {[
+                      { label: 'Growth', val: '+12%', color: 'purple' },
+                      { label: 'Win Rate', val: '68%', color: 'emerald' },
+                      { label: 'Avg Rating', val: '7.4', color: 'blue' }
+                    ].map((stat, i) => (
+                      <div key={i} className={`min-w-[100px] p-4 rounded-2xl bg-white/5 border border-white/10 text-center flex-shrink-0`}>
+                        <div className="text-[10px] uppercase tracking-wider text-gray-400 mb-1">{stat.label}</div>
+                        <div className={`text-xl font-bold text-${stat.color}-400`}>{stat.val}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <button
+                    onClick={() => setShowAnalyticsModal(true)}
+                    className="px-6 py-3 md:px-8 md:py-3 bg-purple-500 text-white rounded-xl font-bold hover:bg-purple-600 transition-colors text-sm md:text-base cursor-pointer"
+                  >
+                    View Charts
+                  </button>
+                </>
+              ) : (
+                <div className="animate-fade-in-up h-full flex flex-col">
+                  <div className="flex justify-between items-center mb-6">
+                    <div>
+                      <h3 className="text-xl md:text-2xl font-display font-bold uppercase text-white">Live Analytics</h3>
+                      <p className="text-xs text-gray-400">Real-time performance tracking</p>
+                    </div>
+                    <button
+                      onClick={() => setShowAnalyticsModal(false)}
+                      className="p-2 bg-white/10 hover:bg-white/20 rounded-full transition-colors"
+                    >
+                      <X size={20} className="text-white" />
+                    </button>
+                  </div>
+                  <div className="flex-grow">
+                    <div className="scale-90 origin-top -mt-4">
+                      <StatProgression />
+                    </div>
+                  </div>
+                </div>
+              )}
             </motion.div>
           </div>
         </section>
@@ -506,24 +534,26 @@ export const Landing: React.FC = () => {
 
             <motion.div className="relative z-10 space-y-6 md:space-y-8">
               <h2 className="text-3xl md:text-5xl lg:text-7xl font-display font-bold uppercase text-black leading-tight">
-                Ready to become <br /> a street legend?
+                Build Your Legend <br /> Create Your Legacy
               </h2>
               <p className="text-black/70 text-base md:text-xl font-medium max-w-xl mx-auto">
-                Join the fastest growing street football platform in the region. Your journey to the top starts with a single click.
+                Join the ultimate football ecosystem where every match counts, every stat is tracked, and every player has a chance to shine.
               </p>
               <div className="flex flex-wrap justify-center gap-4">
                 <Link to="/signup" className="px-8 py-4 md:px-12 md:py-5 bg-black text-elkawera-accent rounded-full font-black text-lg md:text-2xl hover:scale-105 active:scale-95 transition-all shadow-2xl w-full sm:w-auto">
-                  GET STARTED NOW
+                  Create Your Player Card
                 </Link>
               </div>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-8 pt-4 md:pt-8 text-black/40 font-bold uppercase tracking-tighter text-xs md:text-sm">
-                <span className="flex items-center gap-2"><Trophy size={16} /> Weekly Tournaments</span>
+                <span className="flex items-center gap-2"><Trophy size={16} /> Monthly Tournaments</span>
                 <span className="flex items-center gap-2"><Award size={16} /> Professional Scouting</span>
                 <span className="flex items-center gap-2"><MousePointer2 size={16} /> Instant Stats</span>
               </div>
             </motion.div>
           </motion.div>
         </section>
+
+        {/* Analytics Modal Removed */}
       </div>
     </div>
   );
