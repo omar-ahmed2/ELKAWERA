@@ -8,6 +8,7 @@ import { PlayerCard } from '../components/PlayerCard';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import { showToast } from '../components/Toast';
+import { BackupButton } from '../components/BackupButton';
 
 export const Dashboard: React.FC = () => {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -312,9 +313,8 @@ export const Dashboard: React.FC = () => {
           <p className="text-[var(--text-secondary)] text-sm sm:text-base mt-1">{t('dashboard.subtitle')}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
-          <button onClick={handleExportJSON} className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full hover:border-elkawera-accent text-[10px] sm:text-xs font-bold transition-colors text-[var(--text-primary)]">
-            <Download size={14} /> {t('dashboard.backup_data')}
-          </button>
+          <BackupButton variant="full" className="flex-1 sm:flex-none" />
+          <BackupButton variant="players-only" className="flex-1 sm:flex-none" />
           <Link to="/admin/rankings" className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-full hover:border-elkawera-accent text-[10px] sm:text-xs font-bold transition-colors text-[var(--text-primary)]">
             <TrendingUp size={14} /> Rankings
           </Link>
