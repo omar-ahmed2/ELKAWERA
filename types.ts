@@ -3,17 +3,7 @@ export type CardType = 'Silver' | 'Gold' | 'Elite' | 'Platinum';
 
 export type Position = 'GK' | 'CB' | 'CF';
 
-export interface PhysicalStats {
-  pace: number;
-  dribbling: number;
-  shooting: number;
-  passing: number;
-  defending: number;
-  stamina: number;
-  physical: number;
-  agility: number;
-  acceleration: number;
-}
+// Physical attributes and card stats system has been removed in favor of performance-only tracking.
 
 export type UserRole = 'admin' | 'player' | 'captain' | 'scout';
 
@@ -137,7 +127,6 @@ export interface Player {
   cardType: CardType;
   imageUrl: string | null;
   overallScore: number;
-  stats: PhysicalStats;
   goals: number;
   assists: number;
   defensiveContributions: number; // New stat
@@ -154,17 +143,7 @@ export interface Player {
   likedBy?: string[]; // Array of user IDs who liked the card
 }
 
-export const INITIAL_STATS: PhysicalStats = {
-  pace: 60,
-  dribbling: 60,
-  shooting: 60,
-  passing: 60,
-  defending: 60,
-  stamina: 60,
-  physical: 60,
-  agility: 60,
-  acceleration: 60,
-};
+// INITIAL_STATS removed as the system now uses match performance and manual entry.
 
 // ============================================
 // MATCH SYSTEM TYPES

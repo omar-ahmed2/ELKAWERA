@@ -26,13 +26,13 @@ const getSquadRating = (players: Player[]) => {
 const getAttackRating = (players: Player[]) => {
   const attackers = players.filter(p => ['CF'].includes(p.position));
   if (attackers.length === 0) return getSquadRating(players); // Fallback
-  return attackers.reduce((sum, p) => sum + p.stats.shooting + p.stats.pace, 0) / attackers.length;
+  return attackers.reduce((sum, p) => sum + p.overallScore, 0) / attackers.length;
 };
 
 const getDefenseRating = (players: Player[]) => {
   const defenders = players.filter(p => ['CB','GK'].includes(p.position));
   if (defenders.length === 0) return getSquadRating(players);
-  return defenders.reduce((sum, p) => sum + p.stats.defending + p.stats.physical, 0) / defenders.length;
+  return defenders.reduce((sum, p) => sum + p.overallScore, 0) / defenders.length;
 };
 
 export const simulateMatch = (homeTeam: Team, homeSquad: Player[], awayTeam: Team, awaySquad: Player[]): MatchResult => {

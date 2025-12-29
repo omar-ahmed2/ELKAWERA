@@ -326,7 +326,7 @@ export const Landing: React.FC = () => {
                 <div className="absolute inset-4 bg-elkawera-accent/30 rounded-full animate-pulse opacity-20"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-56 h-56 md:w-72 md:h-72 bg-black border-4 border-elkawera-accent rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(0,255,157,0.5)]">
-                    <img src="/ELKAWERA.jpeg" alt="Logo" className="w-40 h-40 md:w-52 md:h-52 object-cover rounded-full" />
+                    <img src="/elkawera2.png" alt="Logo" className="w-40 h-40 md:w-52 md:h-52 object-cover rounded-full" />
                   </div>
                 </div>
                 {/* Orbital Icons */}

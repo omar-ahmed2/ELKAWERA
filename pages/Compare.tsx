@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { getAllPlayers } from '../utils/db';
 import { Player } from '../types';
 import { PlayerCard } from '../components/PlayerCard';
-import { StatRadar } from '../components/StatRadar';
 import { ArrowLeftRight, Search } from 'lucide-react';
 import { PlayerSearchDropdown } from '../components/PlayerSearchDropdown';
 
@@ -69,21 +68,10 @@ export const Compare: React.FC = () => {
             <PlayerCard player={player1} allowFlipClick={true} />
           </div>
 
-          {/* Comparison Data */}
-          <div className="space-y-6">
-            <div className="bg-white/5 rounded-3xl border border-white/10 overflow-hidden p-4 shadow-xl">
-              <StatRadar player1={player1} player2={player2} />
-            </div>
+            <div className="bg-white/5 rounded-2xl border border-white/10 p-6 shadow-xl">
+              <h3 className="text-center font-display font-bold uppercase text-lg mb-4 text-white">Performance breakdown</h3>
+              <StatRow label="Overall Rating" v1={player1.overallScore} v2={player2.overallScore} />
 
-            <div className="bg-white/5 rounded-2xl border border-white/10 p-6">
-              <h3 className="text-center font-display font-bold uppercase text-lg mb-4 text-white">Stat Breakdown</h3>
-              <StatRow label="Overall" v1={player1.overallScore} v2={player2.overallScore} />
-              <StatRow label="Pace" v1={player1.stats.pace} v2={player2.stats.pace} />
-              <StatRow label="Shooting" v1={player1.stats.shooting} v2={player2.stats.shooting} />
-              <StatRow label="Passing" v1={player1.stats.passing} v2={player2.stats.passing} />
-              <StatRow label="Dribbling" v1={player1.stats.dribbling} v2={player2.stats.dribbling} />
-              <StatRow label="Defending" v1={player1.stats.defending} v2={player2.stats.defending} />
-              <StatRow label="Physical" v1={player1.stats.physical} v2={player2.stats.physical} />
               <div className="h-px bg-white/10 my-2"></div>
               <StatRow label="Goals" v1={player1.goals} v2={player2.goals} />
               <StatRow label="Assists" v1={player1.assists} v2={player2.assists} />
@@ -92,13 +80,12 @@ export const Compare: React.FC = () => {
               <StatRow label="Saves" v1={player1.saves || 0} v2={player2.saves || 0} />
               <StatRow label="Goals Conceded" v1={player1.goalsConceded || 0} v2={player2.goalsConceded || 0} />
             </div>
-          </div>
 
-          {/* Player 2 Card */}
-          <div className="flex justify-center scale-90 origin-top">
-            <PlayerCard player={player2} allowFlipClick={true} />
+            {/* Player 2 Card */}
+            <div className="flex justify-center scale-90 origin-top">
+              <PlayerCard player={player2} allowFlipClick={true} />
+            </div>
           </div>
-        </div>
       ) : (
         <div className="text-center py-20 text-gray-500 border-2 border-dashed border-white/10 rounded-3xl">
           Select two players above to view detailed comparison.

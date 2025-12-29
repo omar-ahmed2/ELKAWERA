@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { getPlayerById, savePlayer, getAllTeams, getPlayerRegistrationRequestById, updatePlayerRegistrationRequest, getUserById, updateUser, getUserByPlayerCardId } from '../utils/db';
 import { getCardTypeFromScore } from '../utils/matchCalculations';
-import { Player, INITIAL_STATS, Position, CardType, Team } from '../types';
+import { Player, Position, CardType, Team } from '../types';
 import { PlayerCard } from '../components/PlayerCard';
 import { Upload, Save, ArrowLeft, Download, RotateCcw, CheckCircle, AlertCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
@@ -38,9 +38,9 @@ export const CreatePlayer: React.FC = () => {
     teamId: '',
     imageUrl: null,
     overallScore: 60,
-    stats: { ...INITIAL_STATS },
     goals: 0,
     assists: 0,
+
     defensiveContributions: 0,
     cleanSheets: 0,
     penaltySaves: 0,
@@ -94,7 +94,6 @@ export const CreatePlayer: React.FC = () => {
             createdAt: Date.now(),
             updatedAt: Date.now(),
             // Ensure all required fields are set
-            stats: { ...INITIAL_STATS },
             goals: 0,
             assists: 0,
             defensiveContributions: 0,
@@ -170,8 +169,8 @@ export const CreatePlayer: React.FC = () => {
         cardType: formData.cardType || 'Silver',
         imageUrl: formData.imageUrl || null,
         overallScore: score,
-        stats: formData.stats || { ...INITIAL_STATS },
         goals: formData.goals || 0,
+
         assists: formData.assists || 0,
         defensiveContributions: formData.defensiveContributions || 0,
         cleanSheets: formData.cleanSheets || 0,

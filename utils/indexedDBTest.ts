@@ -98,19 +98,9 @@ export const testCreatePlayer = async () => {
         cardType: 'Silver',
         imageUrl: null,
         overallScore: 75,
-        stats: {
-            pace: 75,
-            dribbling: 75,
-            shooting: 75,
-            passing: 75,
-            defending: 75,
-            stamina: 75,
-            physical: 75,
-            agility: 75,
-            acceleration: 75
-        },
         goals: 0,
         assists: 0,
+
         defensiveContributions: 0,
         cleanSheets: 0,
         penaltySaves: 0,

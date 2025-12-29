@@ -1,42 +1,7 @@
-import { Player, Position, PhysicalStats } from '../types';
+import { Player, Position } from '../types';
 
-export const computeOverall = (stats: PhysicalStats, position: Position): number => {
-  // Weights based on position
-  let weights: Partial<Record<keyof PhysicalStats, number>> = {};
-
-  switch (position) {
-    case 'CF':
-      // Forward: Shooting, Pace, Dribbling, Physical, Acceleration
-      weights = { shooting: 0.25, pace: 0.15, dribbling: 0.15, physical: 0.15, passing: 0.05, acceleration: 0.1, agility: 0.1, stamina: 0.05 };
-      break;
-
-    case 'CB':
-      // Defender: Defending, Physical, Pace, Stamina
-      weights = { defending: 0.35, physical: 0.3, pace: 0.1, passing: 0.1, stamina: 0.1, acceleration: 0.05 };
-      break;
-
-    case 'GK':
-      // Goalkeeper: Agility (Reflexes), Physical (Strength), Defending (Positioning), Passing
-      weights = { agility: 0.3, physical: 0.2, defending: 0.25, passing: 0.15, stamina: 0.1 };
-      break;
-
-    default:
-      // Fallback for any legacy positions (should not happen)
-      weights = { passing: 0.2, dribbling: 0.2, shooting: 0.2, defending: 0.2, physical: 0.2 };
-  }
-
-  let totalScore = 0;
-  let totalWeight = 0;
-
-  (Object.keys(stats) as Array<keyof PhysicalStats>).forEach((key) => {
-    const weight = weights[key] || 0.01; // default low weight if not specified
-    totalScore += stats[key] * weight;
-    totalWeight += weight;
-  });
-
-  // Normalize if weights don't add exactly to 1 (though they should)
-  return Math.round(totalScore / totalWeight);
-};
+// computeOverall removed as attribute-based weightings are no longer used.
+// Players now start with a manual base score which is enhanced by match performance.
 
 export const getCardType = (overall: number): 'Silver' | 'Gold' | 'Elite' | 'Platinum' => {
   if (overall >= 90) return 'Platinum';

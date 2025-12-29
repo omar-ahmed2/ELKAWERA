@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { getPlayerById, savePlayer } from '../utils/db';
-import { computeOverall, getCardType, computeOverallWithPerformance } from '../utils/calculation';
-import { Player, PhysicalStats } from '../types';
+import { computeOverallWithPerformance, getCardType } from '../utils/calculation';
+import { Player } from '../types';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -29,7 +29,7 @@ export const PostMatchStats: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [player, setPlayer] = useState<Player | null>(null);
-  const [stats, setStats] = useState<PhysicalStats | null>(null);
+
   const [matchPerformance, setMatchPerformance] = useState({
     goals: 0,
     assists: 0,
@@ -53,7 +53,7 @@ export const PostMatchStats: React.FC = () => {
       getPlayerById(id).then(p => {
         if (p) {
           setPlayer(p);
-          setStats(p.stats);
+
           setMatchPerformance({
             goals: p.goals || 0,
             assists: p.assists || 0,
@@ -79,11 +79,9 @@ export const PostMatchStats: React.FC = () => {
   };
 
   const saveStats = async () => {
-    if (player && stats) {
-      const baseScore = computeOverall(stats, player.position);
-
+    if (player) {
       const newScore = computeOverallWithPerformance(
-        baseScore,
+        player.overallScore,
         player.position,
         {
           goals: matchPerformance.goals,
@@ -101,10 +99,11 @@ export const PostMatchStats: React.FC = () => {
 
       const newType = getCardType(newScore);
 
+
       const updatedPlayer: Player = {
         ...player,
-        stats,
         goals: matchPerformance.goals,
+
         assists: matchPerformance.assists,
         matchesPlayed: matchPerformance.matches,
         defensiveContributions: matchPerformance.defensiveContributions,
@@ -124,7 +123,8 @@ export const PostMatchStats: React.FC = () => {
     }
   };
 
-  if (!player || !stats) return <div>Loading...</div>;
+  if (!player) return <div>Loading...</div>;
+
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -168,7 +168,7 @@ export const PostMatchStats: React.FC = () => {
           <span className="text-gray-400 text-sm uppercase block">Projected Overall</span>
           <span className="text-3xl font-display font-bold text-white">
             {computeOverallWithPerformance(
-              computeOverall(stats, player.position),
+              player.overallScore,
               player.position,
               {
                 goals: matchPerformance.goals,
