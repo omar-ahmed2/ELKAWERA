@@ -37,7 +37,7 @@ import { ScoutSignUp } from './pages/ScoutSignUp';
 import { ScoutDashboard } from './pages/ScoutDashboard';
 import { AdminScoutControl } from './pages/AdminScoutControl';
 import { AdminTeamRankings } from './pages/AdminTeamRankings';
-import { UserDatabase } from './pages/UserDatabase';
+import { UserDatabase as UserDatabaseComponent } from './pages/UserDatabase';
 import { AuthProvider } from './context/AuthContext';
 import { SettingsProvider } from './context/SettingsContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -92,7 +92,7 @@ const App: React.FC = () => {
                 {/* Admin Scout Control */}
                 <Route path="/admin/scouts" element={<AdminScoutControl />} />
                 <Route path="/admin/rankings" element={<AdminTeamRankings />} />
-                <Route path="/admin/users" element={<UserDatabase />} />
+                <Route path="/admin/users" element={<UserDatabaseComponent />} />
 
                 {/* Kit System */}
                 <Route path="/kits" element={<Kits />} />

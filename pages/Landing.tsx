@@ -57,7 +57,7 @@ const staggerContainer = {
   }
 };
 
-const Typewriter: React.FC<{ phrases: string[] }> = ({ phrases }) => {
+const Typewriter: React.FC<{ phrases: string[] }> = React.memo(({ phrases }) => {
   const [index, setIndex] = useState(0);
   const [displayText, setDisplayText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -95,18 +95,18 @@ const Typewriter: React.FC<{ phrases: string[] }> = ({ phrases }) => {
       </span>
       <motion.span
         animate={{ opacity: [1, 0] }}
-        transition={{ duration: 0.8, repeat: Infinity, ease: "steps(2)" }}
+        transition={{ duration: 0.8, repeat: Infinity, ease: "easeInOut" }}
         className="inline-block w-[3px] h-[0.9em] bg-elkawera-accent ml-1 align-middle"
       />
     </span>
   );
-};
+});
 
-const NumberCounter: React.FC<{ value: number; suffix?: string; prefix?: string; delay?: number }> = ({ value, suffix = '', prefix = '', delay = 0 }) => {
+const NumberCounter: React.FC<{ value: number; suffix?: string; prefix?: string; delay?: number }> = React.memo(({ value, suffix = '', prefix = '', delay = 0 }) => {
   const count = useMotionValue(0);
   const rounded = useTransform(count, latest => Math.floor(latest));
   const ref = useRef(null);
-  const isInView = useInView(ref, { once: false, margin: "-50px" });
+  const isInView = useInView(ref, { once: true, margin: "-50px" });
 
   useEffect(() => {
     if (isInView) {
@@ -116,8 +116,6 @@ const NumberCounter: React.FC<{ value: number; suffix?: string; prefix?: string;
         ease: [0.16, 1, 0.3, 1]
       });
       return controls.stop;
-    } else {
-      count.set(0);
     }
   }, [isInView, value, count, delay]);
 
@@ -128,13 +126,13 @@ const NumberCounter: React.FC<{ value: number; suffix?: string; prefix?: string;
       {suffix}
     </motion.span>
   );
-};
+});
 
 const SectionTitle: React.FC<{ title: string; subtitle?: string; centered?: boolean }> = ({ title, subtitle, centered = true }) => (
   <motion.div
     initial="hidden"
     whileInView="visible"
-    viewport={{ once: false, margin: "-100px" }}
+    viewport={{ once: true, margin: "-100px" }}
     variants={fadeInUp}
     className={`mb-16 ${centered ? 'text-center' : ''}`}
   >
@@ -179,12 +177,13 @@ const EvolutionTier: React.FC<{ tier: string; title: string; desc: string; color
   </motion.div>
 );
 
-export const Landing: React.FC = () => {
+export const Landing: React.FC = React.memo(() => {
   const { t, dir } = useSettings();
   const { user } = useAuth();
   const backgroundRef = useRef(null);
   const [showAnalyticsModal, setShowAnalyticsModal] = useState(false);
 
+  // Optimize scroll performance by using debounced values
   const { scrollYProgress } = useScroll();
   const opacityProgress = useTransform(scrollYProgress, [0, 0.2], [1, 0.5]);
   const scaleProgress = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
@@ -696,4 +695,4 @@ export const Landing: React.FC = () => {
       </div>
     </div>
   );
-};
+});

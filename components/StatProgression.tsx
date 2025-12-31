@@ -23,7 +23,7 @@ const data = [
   { match: 'Week 7', overall: 86, pace: 88, shooting: 89, passing: 85 }, // Breaks Platinum
 ];
 
-export const StatProgression: React.FC = () => {
+export const StatProgression: React.FC = React.memo(() => {
   return (
     <div className="w-full min-h-[400px] md:h-[500px] bg-black/40 border border-white/5 rounded-3xl p-4 md:p-8 backdrop-blur-xl shadow-2xl relative overflow-hidden group">
 
@@ -61,8 +61,8 @@ export const StatProgression: React.FC = () => {
       </div>
 
       {/* Chart Area */}
-      <div className="h-[250px] md:h-[320px] w-full relative z-10">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="w-full relative z-10" style={{ minHeight: '300px' }}>
+        <ResponsiveContainer width="100%" aspect={2}>
           <ComposedChart data={data} margin={{ top: 20, right: 30, left: -10, bottom: 20 }}>
             <defs>
               <linearGradient id="colorOverall" x1="0" y1="0" x2="0" y2="1">
@@ -172,4 +172,4 @@ export const StatProgression: React.FC = () => {
       </div>
     </div>
   );
-};
+});
