@@ -136,7 +136,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ pendingRequestsCount
                     Menu
                 </div>
 
-                <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
+                <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard CC" />
                 <NavItem to="/leaderboard" icon={Trophy} label="Leaderboard" />
                 <NavItem to="/events" icon={Calendar} label="Events" />
                 <NavItem to="/new-players" icon={UserPlus} label="New Players" count={pendingRequestsCount} />

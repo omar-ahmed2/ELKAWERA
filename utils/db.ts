@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { getCardTypeFromScore } from './matchCalculations';
 
 const DB_NAME = 'ElkaweraDB';
-const DB_VERSION = 22; // Bumped for Kits system
+const DB_VERSION = 24; // Bumped for Kits system
 const PLAYER_STORE = 'players';
 const TEAM_STORE = 'teams';
 const USER_STORE = 'users';

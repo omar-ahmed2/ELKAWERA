@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { getAllPlayers, getAllTeams } from '../utils/db';
 import { Player, Team, Position } from '../types';
 import { PlayerCard } from '../components/PlayerCard';
-import { Search, Trophy, TrendingUp, Shield, Activity, X, User as UserIcon, Users, ChevronDown, Filter } from 'lucide-react';
+import { Search, Trophy, TrendingUp, Shield, Activity, X, User as UserIcon, Users, ChevronDown, Filter, Edit } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
+import { useAuth } from '../context/AuthContext';
 
 type PlayerSortMetric = 'OVERALL' | 'GOALS' | 'ASSISTS' | 'DEFENSE' | 'SAVES';
 type TeamSortMetric = 'OVERALL' | 'WINS' | 'LOSSES' | 'DRAWS';
@@ -12,6 +13,7 @@ type TeamSortMetric = 'OVERALL' | 'WINS' | 'LOSSES' | 'DRAWS';
 export const Leaderboard: React.FC = () => {
     const navigate = useNavigate();
     const { t, dir } = useSettings();
+    const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'players' | 'teams'>('players');
     const [players, setPlayers] = useState<Player[]>([]);
     const [teams, setTeams] = useState<Team[]>([]);
@@ -220,6 +222,14 @@ export const Leaderboard: React.FC = () => {
                                     >
                                         <TrendingUp size={16} /> {t('common.view_details')}
                                     </button>
+                                    {user?.role === 'admin' && (
+                                        <button
+                                            onClick={(e) => { e.stopPropagation(); navigate(`/create?id=${player.id}`); }}
+                                            className="flex-1 min-w-[150px] py-3 bg-blue-600 text-white font-bold uppercase rounded-xl hover:bg-blue-500 transition-colors flex items-center justify-center gap-2 text-sm shadow-lg shadow-blue-600/20"
+                                        >
+                                            <Edit size={16} /> Quick Edit
+                                        </button>
+                                    )}
                                     <button
                                         onClick={(e) => { e.stopPropagation(); setSelectedPlayerId(null); }}
                                         className="py-3 px-6 bg-[var(--bg-secondary)] border border-[var(--border-color)] text-[var(--text-primary)] font-bold uppercase rounded-xl hover:bg-[var(--border-color)] transition-colors text-sm"

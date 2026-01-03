@@ -4,6 +4,7 @@ import { getPlayerById, savePlayer, getAllTeams, getPlayerRegistrationRequestByI
 import { getCardTypeFromScore } from '../utils/matchCalculations';
 import { Player, Position, CardType, Team } from '../types';
 import { PlayerCard } from '../components/PlayerCard';
+import { computeOverallWithPerformance, getCardType } from '../utils/calculation';
 import { Upload, Save, ArrowLeft, Download, RotateCcw, CheckCircle, AlertCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import { COUNTRIES } from '../utils/countries';
@@ -26,6 +27,7 @@ export const CreatePlayer: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [baseManualScore, setBaseManualScore] = useState(60);
   const [formData, setFormData] = useState<Player>({
     id: '',
     name: '',
@@ -54,11 +56,42 @@ export const CreatePlayer: React.FC = () => {
   });
 
   useEffect(() => {
+    const calculatedOverall = computeOverallWithPerformance(
+      baseManualScore,
+      formData.position,
+      {
+        goals: formData.goals,
+        assists: formData.assists,
+        defensiveContributions: formData.defensiveContributions,
+        cleanSheets: formData.cleanSheets,
+        saves: formData.saves,
+        penaltySaves: formData.penaltySaves,
+        ownGoals: formData.ownGoals,
+        goalsConceded: formData.goalsConceded,
+        penaltyMissed: formData.penaltyMissed,
+        matchesPlayed: formData.matchesPlayed
+      }
+    );
+
     setFormData(prev => ({
       ...prev,
-      cardType: getCardTypeFromScore(prev.overallScore)
+      overallScore: calculatedOverall,
+      cardType: getCardType(calculatedOverall)
     }));
-  }, [formData.overallScore]);
+  }, [
+    baseManualScore,
+    formData.position,
+    formData.goals,
+    formData.assists,
+    formData.defensiveContributions,
+    formData.cleanSheets,
+    formData.saves,
+    formData.penaltySaves,
+    formData.ownGoals,
+    formData.goalsConceded,
+    formData.penaltyMissed,
+    formData.matchesPlayed
+  ]);
 
   useEffect(() => {
     // Only admins can create/edit players
@@ -73,7 +106,12 @@ export const CreatePlayer: React.FC = () => {
     if (editId) {
       setLoading(true);
       getPlayerById(editId).then(player => {
-        if (player) setFormData(player);
+        if (player) {
+          setFormData(player);
+          // For editing, we try to estimate the base score by reversing the calculation 
+          // or just default to their current score as the starting point for new edits.
+          setBaseManualScore(player.overallScore); 
+        }
         setLoading(false);
       });
     } else if (requestId) {
@@ -529,90 +567,130 @@ export const CreatePlayer: React.FC = () => {
           )}
 
           {/* Season Stats Section - Show for Card Builder and Edit modes */}
+            {/* Season Stats Section - Show for Card Builder and Edit modes */}
           {(requestId || editId) && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold text-elkawera-accent border-b border-white/10 pb-2">Season Stats</h3>
-              <div className="grid grid-cols-3 gap-4">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between border-b border-white/10 pb-2">
+                <h3 className="text-xl font-bold text-elkawera-accent">Performance Records</h3>
+                <span className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Manual Calculating OVR</span>
+              </div>
+              
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs uppercase text-gray-400 mb-2">Goals</label>
+                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Goals</label>
                   <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    lang="en"
+                    type="number"
                     value={formData.goals || 0}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/[^0-9]/g, '');
-                      setFormData(prev => ({ ...prev, goals: parseInt(val) || 0 }));
-                    }}
-                    className="w-full bg-black/50 border border-white/20 rounded p-3 text-white text-center text-lg font-bold focus:border-elkawera-accent focus:outline-none"
+                    onChange={(e) => setFormData(prev => ({ ...prev, goals: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono focus:border-[#00ff9d] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase text-gray-400 mb-2">Assists</label>
+                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Assists</label>
                   <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    lang="en"
+                    type="number"
                     value={formData.assists || 0}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/[^0-9]/g, '');
-                      setFormData(prev => ({ ...prev, assists: parseInt(val) || 0 }));
-                    }}
-                    className="w-full bg-black/50 border border-white/20 rounded p-3 text-white text-center text-lg font-bold focus:border-elkawera-accent focus:outline-none"
+                    onChange={(e) => setFormData(prev => ({ ...prev, assists: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono focus:border-[#00ff9d] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs uppercase text-gray-400 mb-2">Matches</label>
+                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Def. Contrib</label>
                   <input
-                    type="text"
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    lang="en"
+                    type="number"
+                    value={formData.defensiveContributions || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, defensiveContributions: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono focus:border-[#00ff9d] outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Matches</label>
+                  <input
+                    type="number"
                     value={formData.matchesPlayed || 0}
-                    onChange={(e) => {
-                      const val = e.target.value.replace(/[^0-9]/g, '');
-                      setFormData(prev => ({ ...prev, matchesPlayed: parseInt(val) || 0 }));
-                    }}
-                    className="w-full bg-black/50 border border-white/20 rounded p-3 text-white text-center text-lg font-bold focus:border-elkawera-accent focus:outline-none"
+                    onChange={(e) => setFormData(prev => ({ ...prev, matchesPlayed: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono focus:border-[#00ff9d] outline-none"
                   />
                 </div>
               </div>
-              <p className="text-xs text-gray-500 italic">These stats contribute to the overall card rating</p>
-            </div>
-          )}
 
-          {/* Overall Rating Section - Now manual as physical stats are removed */}
-          {(requestId || editId) && (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-white/10 pb-2">
-                <h3 className="text-xl font-bold text-elkawera-accent">Card Rating</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Clean Sheets</label>
+                  <input
+                    type="number"
+                    value={formData.cleanSheets || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, cleanSheets: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Saves</label>
+                  <input
+                    type="number"
+                    value={formData.saves || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, saves: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Penalty Saves</label>
+                  <input
+                    type="number"
+                    value={formData.penaltySaves || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, penaltySaves: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase text-red-400/70 mb-1 font-bold">Own Goals</label>
+                  <input
+                    type="number"
+                    value={formData.ownGoals || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, ownGoals: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-red-500/10 rounded p-2 text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase text-red-400/70 mb-1 font-bold">Goals Conceded</label>
+                  <input
+                    type="number"
+                    value={formData.goalsConceded || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, goalsConceded: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-red-500/10 rounded p-2 text-white font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] uppercase text-red-400/70 mb-1 font-bold">Penalty Missed</label>
+                  <input
+                    type="number"
+                    value={formData.penaltyMissed || 0}
+                    onChange={(e) => setFormData(prev => ({ ...prev, penaltyMissed: parseInt(e.target.value) || 0 }))}
+                    className="w-full bg-black/50 border border-red-500/10 rounded p-2 text-white font-mono"
+                  />
+                </div>
               </div>
 
-              <div className="bg-black/40 p-6 rounded-xl border border-white/10">
+              <div className="bg-gradient-to-br from-[#00ff9d]/10 to-transparent p-6 rounded-xl border border-[#00ff9d]/30">
                 <div className="flex items-center justify-between mb-4">
-                  <label className="text-sm font-bold text-gray-400 uppercase">Overall Rating</label>
-                  <span className="text-3xl font-display font-black text-elkawera-accent">{formData.overallScore}</span>
+                  <div>
+                    <label className="text-xs font-bold text-[#00ff9d] uppercase tracking-tighter">Final Card Rating</label>
+                    <p className="text-[10px] text-gray-500">performance bonuses</p>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-4xl font-display font-black text-white">{formData.overallScore}</span>
+                    <div className="text-[10px] text-[#00ff9d] font-bold uppercase tracking-widest">{formData.cardType}</div>
+                  </div>
                 </div>
                 <input
                   type="range"
-                  min="1"
-                  max="99"
-                  value={formData.overallScore}
-                  onChange={(e) => setFormData(prev => ({ ...prev, overallScore: parseInt(e.target.value) }))}
-                  className="w-full h-3 bg-white/10 rounded-lg appearance-none cursor-pointer accent-elkawera-accent"
+                  min="30"
+                  max="95"
+                  value={baseManualScore}
+                  onChange={(e) => setBaseManualScore(parseInt(e.target.value))}
+                  className="w-full h-2 bg-black/50 rounded-lg appearance-none cursor-pointer accent-[#00ff9d]"
                 />
-                <div className="flex justify-between mt-2 text-[10px] text-gray-500 font-bold uppercase">
-                  <span>Beginner (1)</span>
-                  <span>Professional (50)</span>
-                  <span>Legendary (99)</span>
-                </div>
               </div>
-
-              <p className="text-xs text-gray-500 italic">
-                The overall rating now reflects the player's performance, rarity, and match contributions.
-              </p>
             </div>
           )}
 
