@@ -44,6 +44,7 @@ export const StatProgression: React.FC = React.memo(() => {
             Visualize your path to greatness. Track how match performance upgrades your card from
             <span className="text-gray-400 font-bold mx-1">Silver</span> ➜
             <span className="text-[#fbbf24] font-bold mx-1">Gold</span> ➜
+            <span className="text-[#af0000] font-bold mx-1">Elite</span> ➜
             <span className="text-[#22d3ee] font-bold mx-1">Platinum</span>.
           </p>
         </div>
@@ -143,6 +144,7 @@ export const StatProgression: React.FC = React.memo(() => {
               strokeOpacity={0.4}
               name="Pace"
               activeDot={{ r: 4, strokeWidth: 0 }}
+              animationDuration={7000}
             />
             <Line
               type="monotone"
@@ -153,6 +155,7 @@ export const StatProgression: React.FC = React.memo(() => {
               strokeOpacity={0.4}
               name="Shooting"
               activeDot={{ r: 4, strokeWidth: 0 }}
+              animationDuration={6000}
             />
 
             {/* Main Overall Rating (Area/Thick Line) */}
@@ -165,6 +168,7 @@ export const StatProgression: React.FC = React.memo(() => {
               fill="url(#colorOverall)"
               name="Overall Rating"
               activeDot={{ r: 6, fill: '#fff', stroke: '#00ff9d', strokeWidth: 4 }}
+              animationDuration={9000}
             />
 
           </ComposedChart>

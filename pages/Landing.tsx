@@ -193,7 +193,6 @@ export const Landing: React.FC = React.memo(() => {
       <div className="pb-32">
         {/* Hero Section */}
         <motion.section
-          style={{ opacity: opacityProgress, scale: scaleProgress }}
           className="relative min-h-[auto] lg:min-h-[90vh] flex items-center pb-12 pt-8 md:pt-0 md:pb-20 overflow-hidden"
         >
           <div className="grid lg:grid-cols-2 gap-12 md:gap-16 items-center container mx-auto px-4 md:px-6">

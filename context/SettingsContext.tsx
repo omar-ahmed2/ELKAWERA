@@ -102,7 +102,7 @@ const translations: Record<Language, Record<string, string>> = {
         'landing.analytics.desc': 'Beautiful visualizations of your performance over time. Heatmaps, progress charts, and performance ratios.',
         // Typewriter phrases
         'landing.hero.typewriter.1': 'Your Legacy',
-        'landing.hero.typewriter.2': 'The Future',
+        'landing.hero.typewriter.2': 'Your Future',
         'landing.hero.typewriter.3': 'Your Legend',
         'landing.hero.typewriter.4': 'Your Destiny',
         // Community
