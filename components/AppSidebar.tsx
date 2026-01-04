@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     Home,
@@ -22,24 +22,30 @@ import {
     Package,
     TrendingUp,
     Info,
-    MessageSquare
+    MessageSquare,
+    Gamepad2,
+    Activity
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
-interface AdminSidebarProps {
-    pendingRequestsCount: number;
-    unreadNotifications: number;
-    kitRequestsCount: number;
+interface AppSidebarProps {
+    pendingRequestsCount?: number;
+    unreadNotifications?: number;
+    kitRequestsCount?: number;
 }
 
-export const AdminSidebar: React.FC<AdminSidebarProps> = ({ pendingRequestsCount, unreadNotifications, kitRequestsCount }) => {
+export const AppSidebar: React.FC<AppSidebarProps> = ({ 
+    pendingRequestsCount = 0, 
+    unreadNotifications = 0, 
+    kitRequestsCount = 0 
+}) => {
     const { user, signOut } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(window.innerWidth < 1280);
     const [isHovered, setIsHovered] = useState(false);
 
-    React.useEffect(() => {
+    useEffect(() => {
         const handleResize = () => {
             if (window.innerWidth < 1280) {
                 setCollapsed(true);
@@ -100,6 +106,18 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ pendingRequestsCount
         </Link>
     );
 
+    const SectionHeader = ({ title }: { title: string }) => (
+        <div className={`px-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 mt-6 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
+            {title}
+        </div>
+    );
+
+    const Divider = () => (
+        !isExpanded ? <div className="h-px bg-white/5 my-4 mx-4 transition-all duration-300"></div> : null
+    );
+
+    const role = user?.role;
+
     return (
         <aside
             onMouseEnter={() => collapsed && setIsHovered(true)}
@@ -134,37 +152,68 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ pendingRequestsCount
 
             {/* Navigation Items */}
             <div className="flex-1 overflow-y-auto overflow-x-hidden py-6 px-3 space-y-1 custom-scrollbar scroll-smooth">
-                {/* Main Section */}
+                
+                {/* --- Common Main Section --- */}
                 <div className={`px-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 mt-2 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
                     Menu
                 </div>
 
-                <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard CC" />
-                <NavItem to="/leaderboard" icon={Trophy} label="Leadboard" />
-                <NavItem to="/events" icon={Calendar} label="Events" />
-                <NavItem to="/new-players" icon={UserPlus} label="New Players" count={pendingRequestsCount} />
-                <NavItem to="/teams" icon={Users} label="Teams" />
+                {/* Admin Specific */}
+                {role === 'admin' && (
+                    <>
+                        <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard CC" />
+                        <NavItem to="/leaderboard" icon={Trophy} label="Leaderboard" />
+                        <NavItem to="/events" icon={Calendar} label="Events" />
+                        <NavItem to="/new-players" icon={UserPlus} label="New Players" count={pendingRequestsCount} />
+                        <NavItem to="/teams" icon={Users} label="Teams" />
+                    </>
+                )}
 
-                {/* Admin Section */}
-                <div className={`px-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 mt-6 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
-                    Admin
-                </div>
-                {!isExpanded && <div className="h-px bg-white/5 my-4 mx-4 transition-all duration-300"></div>}
+                {/* Player Specific */}
+                {role === 'player' && (
+                    <>
+                        <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
+                        <NavItem to="/performance-hub" icon={BarChart2} label="Performance Hub" />
+                        <NavItem to="/leaderboard" icon={Trophy} label="Leaderboard" />
+                         <NavItem to="/events" icon={Calendar} label="Events" />
+                        <NavItem to="/teams" icon={Users} label="Teams" />
+                        <NavItem to="/kits" icon={Shirt} label="Official Kits" />
+                    </>
+                )}
 
-                <NavItem to="/admin/performance" icon={TrendingUp} label="Performance" />
-                <NavItem to="/admin/matches" icon={Target} label="Matches" />
-                <NavItem to="/admin/scouts" icon={Shield} label="Scouts" />
-                <NavItem to="/admin/users" icon={Users} label="Users" />
-                <NavItem to="/admin/kits" icon={Shirt} label="Kit Management" />
-                <NavItem to="/admin/kit-requests" icon={Package} label="Kit Requests" count={kitRequestsCount} />
-                <NavItem to="/compare" icon={BarChart2} label="Compare" />
-                <NavItem to="/create" icon={Plus} label="New Card" />
+                 {/* Captain Specific */}
+                {(role === 'captain' || role === 'scout') && (
+                    <>
+                         {role === 'captain' && <NavItem to="/captain/dashboard" icon={Shield} label="Captain Dashboard" />}
+                         {role === 'scout' && <NavItem to="/scout/dashboard" icon={Shield} label="Scout Dashboard" />}
+                         
+                         <NavItem to="/leaderboard" icon={Trophy} label="Leaderboard" />
+                         <NavItem to="/events" icon={Calendar} label="Events" />
+                         <NavItem to="/teams" icon={Users} label="Teams" />
+                         <NavItem to="/kits" icon={Shirt} label="Official Kits" />
+                    </>
+                )}
 
-                {/* Utils */}
-                <div className={`px-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 mt-6 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
-                    General
-                </div>
-                {!isExpanded && <div className="h-px bg-white/5 my-4 mx-4 transition-all duration-300"></div>}
+
+                {/* --- Admin Management Section --- */}
+                {role === 'admin' && (
+                    <>
+                        <SectionHeader title="Admin" />
+                        <Divider />
+                        <NavItem to="/admin/performance" icon={TrendingUp} label="Performance" />
+                        <NavItem to="/admin/matches" icon={Target} label="Matches" />
+                        <NavItem to="/admin/scouts" icon={Shield} label="Scouts" />
+                        <NavItem to="/admin/users" icon={Users} label="Users" />
+                        <NavItem to="/admin/kits" icon={Shirt} label="Kit Management" />
+                        <NavItem to="/admin/kit-requests" icon={Package} label="Kit Requests" count={kitRequestsCount} />
+                        <NavItem to="/compare" icon={BarChart2} label="Compare" />
+                        <NavItem to="/create" icon={Plus} label="New Card" />
+                    </>
+                )}
+
+                {/* --- General Section --- */}
+                <SectionHeader title="General" />
+                <Divider />
 
                 <NavItem to="/" icon={Home} label="Home Page" />
                 <NavItem to="/about" icon={Info} label="About ELKAWERA" />

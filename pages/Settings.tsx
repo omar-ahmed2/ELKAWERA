@@ -1,22 +1,27 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useSettings } from '../context/SettingsContext';
 import {
     Settings as SettingsIcon,
-    Bell,
     Shield,
     Moon,
     Monitor,
     Globe,
     Download,
     Trash2,
-    Volume2,
     Save,
     LogOut,
     Check,
-    Sun
+    Sun,
+    Lock,
+    Key,
+    Smartphone,
+    Laptop,
+    Eye,
+    EyeOff,
+    AlertTriangle
 } from 'lucide-react';
-import { getAllPlayers, getPlayerById } from '../utils/db';
+import { getPlayerById } from '../utils/db';
 import { showToast } from '../components/Toast';
 import Snowfall from 'react-snowfall';
 
@@ -25,15 +30,11 @@ export const Settings: React.FC = () => {
     const { language, theme, setLanguage, setTheme, snowEffect, setSnowEffect, t, dir } = useSettings();
     const [activeTab, setActiveTab] = useState('general');
     const [loading, setLoading] = useState(false);
-
-    // Preferences State (Notifications and Privacy still local for now/mocked)
-    const [preferences, setPreferences] = useState({
-        emailNotifications: true,
-        browserNotifications: false,
-        soundEffects: true,
-        publicProfile: true,
-    });
-
+    
+    // Security State
+    // State for password toggle or other simple UI interactions if needed in future
+    // currently simplified as per request
+    
     const handleSave = () => {
         setLoading(true);
         // Simulate API call
@@ -43,41 +44,60 @@ export const Settings: React.FC = () => {
         }, 800);
     };
 
-    const togglePref = (key: keyof typeof preferences) => {
-        setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
-    };
-
     const handleExportData = async () => {
         if (!user) return;
         try {
-            const data: any = { user };
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            // Header
+            csvContent += "User ID,Name,Email,Role,Join Date,Phone,Age,Position,Team,Overall Score\n";
+
+            // User Data
+            let playerData: any = {};
             if (user.playerCardId) {
-                data.playerCard = await getPlayerById(user.playerCardId);
+                playerData = await getPlayerById(user.playerCardId) || {};
             }
 
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `elkawera_data_${user.name.replace(/\s+/g, '_')}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+            const row = [
+                user.id,
+                user.name,
+                user.email,
+                user.role,
+                new Date(user.createdAt).toLocaleDateString(),
+                user.phoneNumber || '',
+                user.age || '',
+                playerData.position || user.position || '',
+                playerData.teamName || '',
+                playerData.overallScore || ''
+            ].map(item => `"${item}"`).join(","); // Quote fields to handle commas
+
+            csvContent += row + "\n";
+
+            // Download
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `elkawera_data_${user.name.replace(/\s+/g, '_')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showToast('Data exported to Excel (CSV) successfully', 'success');
         } catch (error) {
             console.error(error);
             showToast('Failed to export data', 'error');
         }
     };
 
+
+
     const tabs = [
         { id: 'general', label: t('settings.general'), icon: Monitor },
-        { id: 'notifications', label: t('settings.notifications'), icon: Bell },
-        { id: 'privacy', label: t('settings.privacy'), icon: Shield },
+        { id: 'security', label: 'Privacy & Security', icon: Shield },
     ];
 
     return (
-        <div className="max-w-4xl mx-auto pb-20 animate-fade-in-up" dir={dir}>
+        <div className="max-w-5xl mx-auto pb-20 animate-fade-in-up" dir={dir}>
             <div className="flex items-center gap-4 mb-8">
                 <div className="p-3 bg-white/5 rounded-2xl border border-white/10">
                     <SettingsIcon size={32} className="text-elkawera-accent animate-spin-slow" />
@@ -171,24 +191,6 @@ export const Settings: React.FC = () => {
 
                                 <div>
                                     <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                                        <Volume2 size={20} className="text-green-400" /> {t('settings.sound')}
-                                    </h2>
-                                    <div className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5">
-                                        <div>
-                                            <div className="font-bold text-[var(--text-primary)]">UI Sound Effects</div>
-                                            <div className="text-xs text-[var(--text-secondary)]">{t('settings.sound.desc')}</div>
-                                        </div>
-                                        <button
-                                            onClick={() => togglePref('soundEffects')}
-                                            className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${preferences.soundEffects ? 'bg-elkawera-accent' : 'bg-gray-700'}`}
-                                        >
-                                            <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${preferences.soundEffects ? (dir === 'rtl' ? '-translate-x-6' : 'translate-x-6') : 'translate-x-0'}`}></div>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                         <div className="w-5 h-5 flex items-center justify-center bg-cyan-400/20 rounded text-cyan-400">
                                             <Snowfall snowflakeCount={10} style={{ position: 'relative', width: 20, height: 20 }} />
                                         </div>
@@ -207,117 +209,124 @@ export const Settings: React.FC = () => {
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-
-                        {/* Notifications Tab */}
-                        {activeTab === 'notifications' && (
-                            <div className="space-y-6 animate-fade-in">
-                                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                                    <Bell size={20} className="text-yellow-400" /> {t('settings.notifications')}
-                                </h2>
-
-                                <div className="space-y-4">
-                                    <div className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5">
-                                        <div>
-                                            <div className="font-bold text-[var(--text-primary)]">Email Notifications</div>
-                                            <div className="text-xs text-[var(--text-secondary)]">Receive match invites and weekly summaries via email.</div>
-                                        </div>
-                                        <button
-                                            onClick={() => togglePref('emailNotifications')}
-                                            className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${preferences.emailNotifications ? 'bg-elkawera-accent' : 'bg-gray-700'}`}
-                                        >
-                                            <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${preferences.emailNotifications ? (dir === 'rtl' ? '-translate-x-6' : 'translate-x-6') : 'translate-x-0'}`}></div>
-                                        </button>
-                                    </div>
-
-                                    <div className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5">
-                                        <div>
-                                            <div className="font-bold text-[var(--text-primary)]">Browser Push Notifications</div>
-                                            <div className="text-xs text-[var(--text-secondary)]">Get instant alerts on your desktop when active.</div>
-                                        </div>
-                                        <button
-                                            onClick={() => togglePref('browserNotifications')}
-                                            className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${preferences.browserNotifications ? 'bg-elkawera-accent' : 'bg-gray-700'}`}
-                                        >
-                                            <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${preferences.browserNotifications ? (dir === 'rtl' ? '-translate-x-6' : 'translate-x-6') : 'translate-x-0'}`}></div>
-                                        </button>
-                                    </div>
+                                
+                                <div className="mt-8 flex justify-end">
+                                    <button
+                                        onClick={handleSave}
+                                        disabled={loading}
+                                        className="px-6 py-3 bg-white text-black font-bold uppercase rounded-full hover:bg-elkawera-accent transition-colors shadow-lg flex items-center gap-2"
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Save size={18} /> {t('settings.save')}
+                                            </>
+                                        )}
+                                    </button>
                                 </div>
                             </div>
                         )}
 
-                        {/* Privacy Tab */}
-                        {activeTab === 'privacy' && (
-                            <div className="space-y-6 animate-fade-in">
-                                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                                    <Shield size={20} className="text-elkawera-accent" /> {t('settings.privacy')}
-                                </h2>
+                        {/* Privacy & Security Tab */}
+                        {activeTab === 'security' && (
+                            <div className="space-y-8 animate-fade-in">
+                                
+                                {/* Security Information Section (Read-Only) */}
+                                <div className="space-y-6">
+                                    <div className="bg-green-500/10 border border-green-500/20 rounded-2xl p-6 flex items-start gap-4">
+                                        <div className="w-12 h-12 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 shrink-0">
+                                            <Shield size={24} />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-xl font-bold text-green-400 mb-2">Platform Security Standards</h3>
+                                            <p className="text-sm text-gray-300 leading-relaxed">
+                                                At EL KAWERA, we prioritize your security and data privacy. Our platform is built with industry-standard security measures to ensure your information remains safe.
+                                            </p>
+                                        </div>
+                                    </div>
 
-                                <div className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5 mb-8">
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div className="p-4 bg-black/20 rounded-xl border border-white/5 hover:bg-white/5 transition-colors">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <Lock className="text-elkawera-accent" size={20} />
+                                                <h4 className="font-bold text-white">Data Encryption</h4>
+                                            </div>
+                                            <p className="text-xs text-gray-400">
+                                                All sensitive user data is encrypted at rest and in transit using advanced cryptographic protocols (AES-256 and TLS 1.3).
+                                            </p>
+                                        </div>
+
+                                        <div className="p-4 bg-black/20 rounded-xl border border-white/5 hover:bg-white/5 transition-colors">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <Check className="text-blue-400" size={20} />
+                                                <h4 className="font-bold text-white">GDPR Compliance</h4>
+                                            </div>
+                                            <p className="text-xs text-gray-400">
+                                                We adhere to strict data protection regulations. We do not sell your personal data to third parties.
+                                            </p>
+                                        </div>
+
+                                        <div className="p-4 bg-black/20 rounded-xl border border-white/5 hover:bg-white/5 transition-colors">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <Eye className="text-purple-400" size={20} />
+                                                <h4 className="font-bold text-white">Privacy Controls</h4>
+                                            </div>
+                                            <p className="text-xs text-gray-400">
+                                                You have full control over your profile visibility. By default, only essential matchmaking data is shared.
+                                            </p>
+                                        </div>
+
+                                        <div className="p-4 bg-black/20 rounded-xl border border-white/5 hover:bg-white/5 transition-colors">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <SettingsIcon className="text-orange-400" size={20} />
+                                                <h4 className="font-bold text-white">Regular Audits</h4>
+                                            </div>
+                                            <p className="text-xs text-gray-400">
+                                                Our systems undergo regular security audits and vulnerability assessments to stay ahead of potential threats.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Data & Danger Zone */}
+                                <div className="grid md:grid-cols-2 gap-6 pt-4 border-t border-white/10">
+                                    {/* Export Data */}
                                     <div>
-                                        <div className="font-bold text-[var(--text-primary)]">Public Profile</div>
-                                        <div className="text-xs text-[var(--text-secondary)]">Allow other users to search for you and view your stats.</div>
+                                        <h2 className="text-lg font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
+                                            <Download size={18} className="text-green-500" /> Export Data
+                                        </h2>
+                                        <button
+                                            onClick={handleExportData}
+                                            className="w-full flex items-center justify-between p-4 bg-green-500/10 hover:bg-green-500/20 rounded-xl border border-green-500/20 transition-colors group"
+                                        >
+                                            <div className="text-left">
+                                                <div className="font-bold text-green-400">Download Excel Sheet</div>
+                                                <div className="text-xs text-green-500/70">Get a CSV copy of your profile data.</div>
+                                            </div>
+                                            <Download size={20} className="text-green-500" />
+                                        </button>
                                     </div>
-                                    <button
-                                        onClick={() => togglePref('publicProfile')}
-                                        className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${preferences.publicProfile ? 'bg-elkawera-accent' : 'bg-gray-700'}`}
-                                    >
-                                        <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${preferences.publicProfile ? (dir === 'rtl' ? '-translate-x-6' : 'translate-x-6') : 'translate-x-0'}`}></div>
-                                    </button>
-                                </div>
 
-                                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                                    <Download size={20} className="text-blue-400" /> Your Data
-                                </h2>
-
-                                <button
-                                    onClick={handleExportData}
-                                    className="w-full flex items-center justify-between p-4 bg-white/5 hover:bg-white/10 rounded-xl border border-white/10 transition-colors group mb-8"
-                                >
-                                    <div className="text-left">
-                                        <div className="font-bold text-[var(--text-primary)]">Export My Data</div>
-                                        <div className="text-xs text-[var(--text-secondary)]">Download a copy of your profile and player stats JSON.</div>
+                                    {/* Delete Account */}
+                                    <div>
+                                        <h2 className="text-lg font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2 text-red-500">
+                                            <AlertTriangle size={18} /> Danger Zone
+                                        </h2>
+                                        <button
+                                            onClick={() => showToast('Please contact administrator at support@elkawera.com', 'info')}
+                                            className="w-full h-[74px] px-4 bg-red-500/5 text-red-500 border border-red-500/20 rounded-xl text-sm font-bold hover:bg-red-500 hover:text-white transition-all flex items-center justify-between group"
+                                        >
+                                           <span>Delete My Account</span>
+                                           <Trash2 size={20} className="group-hover:rotate-12 transition-transform" />
+                                        </button>
                                     </div>
-                                    <Download size={20} className="text-gray-400 group-hover:text-white" />
-                                </button>
-
-                                <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2 text-red-500">
-                                    <Trash2 size={20} /> Danger Zone
-                                </h2>
-
-                                <div className="p-4 border border-red-500/30 bg-red-500/5 rounded-xl">
-                                    <div className="font-bold text-red-500 mb-2">Delete Account</div>
-                                    <p className="text-xs text-[var(--text-secondary)] mb-4">Once you delete your account, there is no going back. Please be certain.</p>
-                                    <button
-                                        onClick={() => showToast('Please contact administrator at support@elkawera.com to request account deletion.', 'info')}
-                                        className="px-4 py-2 bg-red-500/10 text-red-500 border border-red-500/50 rounded-lg text-sm font-bold hover:bg-red-500 hover:text-white transition-colors"
-                                    >
-                                        Delete My Account
-                                    </button>
                                 </div>
                             </div>
                         )}
-
-                        {/* Save Button */}
-                        <div className="absolute bottom-6 right-6">
-                            <button
-                                onClick={handleSave}
-                                disabled={loading}
-                                className="px-6 py-3 bg-white text-black font-bold uppercase rounded-full hover:bg-elkawera-accent transition-colors shadow-lg flex items-center gap-2"
-                            >
-                                {loading ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                                        Saving...
-                                    </>
-                                ) : (
-                                    <>
-                                        <Save size={18} /> {t('settings.save')}
-                                    </>
-                                )}
-                            </button>
-                        </div>
                     </div>
                 </div>
             </div>

@@ -1,11 +1,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, Settings, ChevronDown, BarChart2, Gamepad2, User, Bell, Trophy, Shield, Calendar, Shirt, Package, Target, TrendingUp } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, Settings, ChevronDown, BarChart2, Gamepad2, User, Bell, Trophy, Shield, Calendar, Shirt, Package, Target, TrendingUp, Info, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { getAllPlayerRegistrationRequests, getAllKitRequests, subscribeToChanges, getUnreadCount } from '../utils/db';
 import { useSettings } from '../context/SettingsContext';
-import { AdminSidebar } from './AdminSidebar';
+import { AppSidebar } from './AppSidebar';
 
 export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -72,14 +72,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const isAdmin = user?.role === 'admin';
+  const showSidebar = user && ['admin', 'captain', 'player', 'scout'].includes(user.role);
 
   return (
-    <div className={`${isAdmin ? 'h-screen overflow-hidden md:flex-row' : 'min-h-screen flex-col overflow-x-hidden'} flex font-sans bg-[var(--bg-primary)] bg-mesh bg-no-repeat bg-fixed bg-cover transition-colors duration-300 text-[var(--text-primary)]`} dir={dir}>
+    <div className={`${showSidebar ? 'h-screen overflow-hidden md:flex-row' : 'min-h-screen flex-col overflow-x-hidden'} flex font-sans bg-[var(--bg-primary)] bg-mesh bg-no-repeat bg-fixed bg-cover transition-colors duration-300 text-[var(--text-primary)]`} dir={dir}>
 
-      {/* Admin Sidebar - Desktop Only */}
-      {isAdmin && (
-        <AdminSidebar
+      {/* App Sidebar - Desktop Only for authenticated users */}
+      {showSidebar && (
+        <AppSidebar
           pendingRequestsCount={pendingRequestsCount}
           unreadNotifications={unreadNotifications}
           kitRequestsCount={pendingKitRequestsCount}
@@ -87,9 +87,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       )}
 
       {/* Main Content Wrapper */}
-      <div className={`flex flex-col flex-1 min-w-0 ${isAdmin ? 'h-full overflow-y-auto relative scroll-smooth' : ''}`}>
-        {/* Navbar - hidden on desktop for admin, visible otherwise */}
-        <nav className={`sticky top-0 z-50 backdrop-blur-xl bg-[var(--bg-primary)]/70 border-b border-[var(--border-color)] supports-[backdrop-filter]:bg-[var(--bg-primary)]/60 ${isAdmin ? 'md:hidden' : ''}`}>
+      <div className={`flex flex-col flex-1 min-w-0 ${showSidebar ? 'h-full overflow-y-auto relative scroll-smooth' : ''}`}>
+        {/* Navbar - hidden on desktop for sidebar users, visible otherwise */}
+        <nav className={`sticky top-0 z-50 backdrop-blur-xl bg-[var(--bg-primary)]/70 border-b border-[var(--border-color)] supports-[backdrop-filter]:bg-[var(--bg-primary)]/60 ${showSidebar ? 'md:hidden' : ''}`}>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
               {/* Logo */}
@@ -107,7 +107,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               </div>
 
               {/* Desktop Menu - Hide for Admins as they use Sidebar */}
-              {!isAdmin && (
+              {!showSidebar && (
                 <div className="hidden md:block">
                   <div className="ml-10 flex items-center space-x-1 lg:space-x-2 rtl:space-x-reverse rtl:ml-0 rtl:mr-10">
                     <Link to="/" className={`${isActive('/')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300`}>Home</Link>
@@ -153,12 +153,19 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         )}
                       </>
                     )}
+                    
+                    <Link to="/about" className={`${isActive('/about')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1`}>
+                      <Info size={14} /> <span className="hidden lg:inline">{t('nav.about')}</span><span className="lg:hidden">About</span>
+                    </Link>
+                    <Link to="/contact" className={`${isActive('/contact')} px-3 lg:px-4 py-2 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-1`}>
+                      <MessageSquare size={14} /> <span className="hidden lg:inline">{t('nav.contact')}</span><span className="lg:hidden">Contact</span>
+                    </Link>
                   </div>
                 </div>
               )}
 
               {/* Auth Buttons (Desktop) - Hide for Admins if in Sidebar? Yes, Sidebar has profile. */}
-              {!isAdmin && (
+              {!showSidebar && (
                 <div className="hidden md:flex items-center gap-2 lg:gap-4">
                   {user ? (
                     <div className="relative" ref={dropdownRef}>
@@ -369,6 +376,12 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/settings" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
                       <Settings size={18} /> {t('nav.settings')}
                     </Link>
+                    <Link to="/about" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                      <Info size={18} /> {t('nav.about')}
+                    </Link>
+                    <Link to="/contact" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                      <MessageSquare size={18} /> {t('nav.contact')}
+                    </Link>
 
                     <button
                       onClick={handleSignOut}
@@ -385,6 +398,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <Link to="/signup" className="block px-4 py-3 rounded-xl text-base font-bold bg-elkawera-accent/20 text-elkawera-accent hover:bg-elkawera-accent hover:text-black transition-all">
                       Sign Up
                     </Link>
+                    <div className="h-px bg-white/10 my-2"></div>
+                    <Link to="/about" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                      <Info size={18} /> {t('nav.about')}
+                    </Link>
+                    <Link to="/contact" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                      <MessageSquare size={18} /> {t('nav.contact')}
+                    </Link>
                   </>
                 )}
               </div>
@@ -392,7 +412,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           )}
         </nav>
 
-        <main className={`flex-grow w-full mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in-up ${isAdmin ? 'max-w-full' : 'max-w-7xl'}`}>
+        <main className={`flex-grow w-full mx-auto p-4 sm:p-6 lg:p-8 animate-fade-in-up ${showSidebar ? 'max-w-full' : 'max-w-7xl'}`}>
           {children}
         </main>
 

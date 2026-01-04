@@ -40,6 +40,8 @@ const translations: Record<Language, Record<string, string>> = {
         'nav.leaderboard': 'Leaderboard',
         'nav.profile': 'Profile',
         'nav.settings': 'Settings',
+        'nav.about': 'About Us',
+        'nav.contact': 'Contact Us',
         // Common
         'common.loading': 'Loading...',
         'common.search': 'Search...',
@@ -261,6 +263,8 @@ const translations: Record<Language, Record<string, string>> = {
         'nav.leaderboard': 'لوحة المتصدرين',
         'nav.profile': 'الملف الشخصي',
         'nav.settings': 'الإعدادات',
+        'nav.about': 'عن المنصة',
+        'nav.contact': 'اتصل بنا',
         // Common
         'common.loading': 'جاري التحميل...',
         'common.search': 'بحث...',

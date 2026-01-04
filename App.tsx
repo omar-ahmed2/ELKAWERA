@@ -40,6 +40,8 @@ import { AdminScoutControl } from './pages/AdminScoutControl';
 import { AdminTeamRankings } from './pages/AdminTeamRankings';
 import { UserDatabase as UserDatabaseComponent } from './pages/UserDatabase';
 import { AdminPerformanceCenter } from './pages/AdminPerformanceCenter';
+import { About } from './pages/About';
+import { Contact } from './pages/Contact';
 import { AuthProvider } from './context/AuthContext';
 import { SettingsProvider, useSettings } from './context/SettingsContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -75,6 +77,8 @@ const AppInner: React.FC = () => {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/signup/captain" element={<CaptainSignUp />} />
           <Route path="/signup/scout" element={<ScoutSignUp />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
