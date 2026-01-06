@@ -3,19 +3,19 @@
     "name": "ELKAWERA | Player Card Manager",
     "icons": [
         {
-            "src": "elkawera.jpg",
+            "src": "elkawera2.png",
             "sizes": "64x64 32x32 24x24 16x16",
-            "type": "image/jpeg"
+            "type": "image/png"
         },
         {
-            "src": "elkawera.jpg",
-            "type": "image/jpeg",
+            "src": "elkawera2.png",
+            "type": "image/png",
             "sizes": "192x192",
             "purpose": "any maskable"
         },
         {
-            "src": "elkawera.jpg",
-            "type": "image/jpeg",
+            "src": "elkawera2.png",
+            "type": "image/png",
             "sizes": "512x512"
         }
     ],

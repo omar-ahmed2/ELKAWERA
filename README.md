@@ -2,7 +2,7 @@
 
 **Professional Football Player Card Management Platform**
 
-![ELKAWERA Logo](public/elkawera.jpg)
+![ELKAWERA Logo](public/elkawera2.png)
 
 ## 🏆 Overview
 
@@ -125,7 +125,7 @@ ELKAWERA-main/
 │   ├── robots.txt         # SEO crawling instructions
 │   ├── sitemap.xml        # XML sitemap for search engines
 │   ├── manifest.json      # PWA manifest
-│   └── elkawera.jpg      # Logo and favicon
+│   └── elkawera2.png      # Logo and favicon
 ├── components/            # React components
 ├── pages/                # Page components
 ├── context/              # React context providers

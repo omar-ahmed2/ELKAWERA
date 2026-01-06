@@ -244,7 +244,7 @@ export const About: React.FC = () => {
         </div>
         <div className="relative">
           <div className="aspect-square rounded-[3rem] overflow-hidden border border-[var(--border-color)] shadow-2xl skew-y-3">
-             <img src="/elkawera.jpg" alt="Mission" className="w-full h-full object-cover scale-110" />
+             <img src="/elkawera2.png" alt="Mission" className="w-full h-full object-cover scale-110" />
           </div>
           {/* Stats Overlay */}
           <div className="absolute -bottom-8 -right-8 p-6 rounded-3xl bg-[var(--bg-primary)] border border-elkawera-accent/30 shadow-2xl -skew-y-3">
