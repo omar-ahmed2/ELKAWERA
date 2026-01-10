@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
@@ -1011,7 +1012,7 @@ const InvitePlayerModal: React.FC<{
         }
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-elkawera-dark border border-white/20 rounded-3xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-8">
                 <div className="flex justify-between items-center mb-6">
@@ -1094,7 +1095,8 @@ const InvitePlayerModal: React.FC<{
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
@@ -1171,7 +1173,7 @@ const EditTeamModal: React.FC<{
         }
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-elkawera-dark border border-white/20 rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-8">
                 <div className="flex justify-between items-center mb-6">
@@ -1308,7 +1310,8 @@ const EditTeamModal: React.FC<{
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 
@@ -1363,7 +1366,7 @@ const AcceptMatchModal: React.FC<{
         }
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-elkawera-dark border border-white/20 rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-8">
                 <div className="flex justify-between items-center mb-6">
@@ -1428,6 +1431,7 @@ const AcceptMatchModal: React.FC<{
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
