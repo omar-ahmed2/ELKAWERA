@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
-import { getAllMatches, getMatchesByStatus, saveMatch, getAllTeams, getPlayersByTeamId, subscribeToChanges, getAllMatchRequests, updateMatchRequestStatus, deleteMatch, getEventById } from '@/utils/db';
+import { getAllMatches, getMatchesByStatus, saveMatch, getAllTeams, getPlayersByTeamId, subscribeToChanges, getAllMatchRequests, updateMatchRequestStatus, deleteMatch, getEventById, getAllEvents } from '@/utils/db';
 import { Match, Team, Player, MatchRequest, Event } from '@/types';
 import { v4 as uuidv4 } from 'uuid';
 import { PlusCircle, PlayCircle, StopCircle, Trophy, Users, Clock, CheckCircle, XCircle, Inbox, ThumbsUp, ThumbsDown, Trash2, Eye, X, Check, Calendar, MapPin, Sparkles } from 'lucide-react';
@@ -14,6 +14,7 @@ export const AdminMatches: React.FC = () => {
     const [matches, setMatches] = useState<Match[]>([]);
     const [matchRequests, setMatchRequests] = useState<MatchRequest[]>([]);
     const [teams, setTeams] = useState<Team[]>([]);
+    const [events, setEvents] = useState<Event[]>([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'regular' | 'events'>('regular');
@@ -60,6 +61,9 @@ export const AdminMatches: React.FC = () => {
 
             const requests = await getAllMatchRequests();
             setMatchRequests(requests.filter(r => r.status === 'pending_admin'));
+
+            const allEvents = await getAllEvents();
+            setEvents(allEvents);
 
             setLoading(false);
         } catch (error) {
@@ -171,93 +175,208 @@ export const AdminMatches: React.FC = () => {
                 </div>
             </div>
 
-            {/* Pending Requests */}
-            {matchRequests.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2 text-elkawera-accent">
-                        <Inbox size={24} />
-                        Pending Requests
-                    </h2>
-                    <div className="grid gap-4">
-                        {matchRequests.map(req => (
-                            <MatchRequestCard key={req.id} request={req} onUpdate={loadMatches} />
-                        ))}
-                    </div>
-                </div>
+            {/* Regular Matches View */}
+            {activeTab === 'regular' && (
+                <>
+                    {/* Pending Requests */}
+                    {matchRequests.length > 0 && (
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2 text-elkawera-accent">
+                                <Inbox size={24} />
+                                Pending Requests
+                            </h2>
+                            <div className="grid gap-4">
+                                {matchRequests.map(req => (
+                                    <MatchRequestCard key={req.id} request={req} onUpdate={loadMatches} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {displayMatches.running.length > 0 && (
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2">
+                                <PlayCircle className="text-green-400" size={24} />
+                                Running Matches
+                            </h2>
+                            <div className="grid gap-4">
+                                {displayMatches.running.map(match => (
+                                    <MatchCard key={match.id} match={match} teams={teams} onUpdate={loadMatches} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {displayMatches.scheduled.length > 0 && (
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2">
+                                <Calendar className="text-purple-400" size={24} />
+                                Scheduled Matches
+                            </h2>
+                            <div className="grid gap-4">
+                                {displayMatches.scheduled.map(match => (
+                                    <MatchCard key={match.id} match={match} teams={teams} onUpdate={loadMatches} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {displayMatches.awaiting.length > 0 && (
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2">
+                                <Clock className="text-yellow-400" size={24} />
+                                Awaiting Confirmation
+                            </h2>
+                            <div className="grid gap-4">
+                                {displayMatches.awaiting.map(match => (
+                                    <MatchCard key={match.id} match={match} teams={teams} onUpdate={loadMatches} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {displayMatches.finished.length > 0 && (
+                        <div className="space-y-4">
+                            <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2">
+                                <Trophy className="text-blue-400" size={24} />
+                                Completed Matches
+                            </h2>
+                            <div className="grid gap-4">
+                                {displayMatches.finished.map(match => (
+                                    <MatchCard key={match.id} match={match} teams={teams} onUpdate={loadMatches} />
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {regularMatchesList.length === 0 && (
+                        <div className="text-center py-32 bg-white/5 rounded-3xl border border-dashed border-white/10">
+                            <Trophy size={64} className="mx-auto text-gray-600 mb-4" />
+                            <h3 className="text-2xl font-bold text-white mb-2">No Regular Matches</h3>
+                            <p className="text-gray-400 mb-6">Create a match or check event matches</p>
+                            <button
+                                onClick={() => setShowCreateModal(true)}
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-elkawera-accent text-black font-bold rounded-full hover:bg-white transition-all"
+                            >
+                                <PlusCircle size={20} />
+                                Create Match
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
 
-            {/* Running Matches */}
-            {displayMatches.running.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2">
-                        <PlayCircle className="text-green-400" size={24} />
-                        Running Matches
-                    </h2>
-                    <div className="grid gap-4">
-                        {displayMatches.running.map(match => (
-                            <MatchCard key={match.id} match={match} teams={teams} onUpdate={loadMatches} />
-                        ))}
-                    </div>
-                </div>
-            )}
+            {/* Event Matches View - Grouped by Event */}
+            {activeTab === 'events' && (
+                <div className="space-y-12">
+                    {events.map(event => {
+                        const eventMatches = matches.filter(m => m.eventId === event.id);
+                        if (eventMatches.length === 0) return null;
 
-            {/* Scheduled Matches */}
-            {displayMatches.scheduled.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2">
-                        <Calendar className="text-purple-400" size={24} />
-                        Scheduled Matches
-                    </h2>
-                    <div className="grid gap-4">
-                        {displayMatches.scheduled.map(match => (
-                            <MatchCard key={match.id} match={match} teams={teams} onUpdate={loadMatches} />
-                        ))}
-                    </div>
-                </div>
-            )}
+                        const eventRunning = eventMatches.filter(m => m.status === 'running');
+                        const eventScheduled = eventMatches.filter(m => m.status === 'scheduled');
+                        const eventFinished = eventMatches.filter(m => m.status === 'finished');
+                        const eventOther = eventMatches.filter(m => m.status !== 'running' && m.status !== 'scheduled' && m.status !== 'finished');
 
-            {/* Awaiting Confirmation */}
-            {displayMatches.awaiting.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2">
-                        <Clock className="text-yellow-400" size={24} />
-                        Awaiting Confirmation
-                    </h2>
-                    <div className="grid gap-4">
-                        {displayMatches.awaiting.map(match => (
-                            <MatchCard key={match.id} match={match} teams={teams} onUpdate={loadMatches} />
-                        ))}
-                    </div>
-                </div>
-            )}
+                        return (
+                            <div key={event.id} className="bg-white/5 border border-white/10 rounded-3xl p-6 md:p-8 animate-in fade-in slide-in-from-bottom-4">
+                                {/* Event Header */}
+                                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-white/10 pb-6 gap-4">
+                                    <div>
+                                        <div className="flex items-center gap-3 mb-2">
+                                            <span className="px-3 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs font-bold uppercase rounded-full shadow-lg shadow-purple-500/20">
+                                                {event.category}
+                                            </span>
+                                            <span className="text-gray-400 text-sm flex items-center gap-1">
+                                                <Calendar size={14} />
+                                                {new Date(event.date).toLocaleDateString()}
+                                            </span>
+                                        </div>
+                                        <h2 className="text-3xl font-display font-bold text-white uppercase tracking-tight">{event.title}</h2>
+                                        <div className="flex items-center gap-2 text-gray-400 mt-1">
+                                            <MapPin size={14} />
+                                            {event.location}
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-4">
+                                        <div className="text-center">
+                                            <div className="text-2xl font-bold text-white">{eventMatches.length}</div>
+                                            <div className="text-[10px] uppercase text-gray-500 font-bold tracking-widest">Total Matches</div>
+                                        </div>
+                                        {eventRunning.length > 0 && (
+                                            <div className="text-center">
+                                                <div className="text-2xl font-bold text-elkawera-accent animate-pulse">{eventRunning.length}</div>
+                                                <div className="text-[10px] uppercase text-elkawera-accent font-bold tracking-widest">Live</div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
 
-            {/* Finished Matches */}
-            {displayMatches.finished.length > 0 && (
-                <div className="space-y-4">
-                    <h2 className="text-2xl font-display font-bold uppercase flex items-center gap-2">
-                        <Trophy className="text-blue-400" size={24} />
-                        Completed Matches
-                    </h2>
-                    <div className="grid gap-4">
-                        {displayMatches.finished.map(match => (
-                            <MatchCard key={match.id} match={match} teams={teams} onUpdate={loadMatches} />
-                        ))}
-                    </div>
-                </div>
-            )}
+                                {/* Event Sections */}
+                                <div className="space-y-8">
+                                    {eventRunning.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg font-bold text-green-400 uppercase mb-4 flex items-center gap-2">
+                                                <PlayCircle size={20} /> Handling Now ({eventRunning.length})
+                                            </h3>
+                                            <div className="grid gap-4">
+                                                {eventRunning.map(m => (
+                                                    <MatchCard key={m.id} match={m} teams={teams} onUpdate={loadMatches} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
 
-            {(activeTab === 'regular' ? regularMatchesList : eventMatchesList).length === 0 && (
-                <div className="text-center py-32 bg-white/5 rounded-3xl border border-dashed border-white/10">
-                    <Trophy size={64} className="mx-auto text-gray-600 mb-4" />
-                    <h3 className="text-2xl font-bold text-white mb-2">No Matches Yet</h3>
-                    <p className="text-gray-400 mb-6">Create your first match to get started</p>
-                    <button
-                        onClick={() => setShowCreateModal(true)}
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-elkawera-accent text-black font-bold rounded-full hover:bg-white transition-all"
-                    >
-                        <PlusCircle size={20} />
-                        Create Match
-                    </button>
+                                    {eventScheduled.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg font-bold text-purple-400 uppercase mb-4 flex items-center gap-2">
+                                                <Calendar size={20} /> Upcoming ({eventScheduled.length})
+                                            </h3>
+                                            <div className="grid gap-4">
+                                                {eventScheduled.map(m => (
+                                                    <MatchCard key={m.id} match={m} teams={teams} onUpdate={loadMatches} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {eventFinished.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg font-bold text-blue-400 uppercase mb-4 flex items-center gap-2">
+                                                <Trophy size={20} /> Completed ({eventFinished.length})
+                                            </h3>
+                                            <div className="grid gap-4">
+                                                {eventFinished.map(m => (
+                                                    <MatchCard key={m.id} match={m} teams={teams} onUpdate={loadMatches} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {eventOther.length > 0 && (
+                                        <div>
+                                            <h3 className="text-lg font-bold text-gray-400 uppercase mb-4 flex items-center gap-2">
+                                                <Clock size={20} /> Other ({eventOther.length})
+                                            </h3>
+                                            <div className="grid gap-4">
+                                                {eventOther.map(m => (
+                                                    <MatchCard key={m.id} match={m} teams={teams} onUpdate={loadMatches} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })}
+
+                    {events.every(e => matches.filter(m => m.eventId === e.id).length === 0) && (
+                        <div className="text-center py-32 bg-white/5 rounded-3xl border border-dashed border-white/10">
+                            <Sparkles size={64} className="mx-auto text-gray-600 mb-4" />
+                            <h3 className="text-2xl font-bold text-white mb-2">No Event Matches</h3>
+                            <p className="text-gray-400 mb-6">Create events and generate matches in the Event section.</p>
+                        </div>
+                    )}
                 </div>
             )}
 
@@ -730,6 +849,11 @@ const CreateMatchModal: React.FC<{
         }
     }, [awayTeamId]);
 
+    const [scheduledDate, setScheduledDate] = useState('');
+    const [scheduledTime, setScheduledTime] = useState('');
+
+    // ... items ...
+
     const handleCreate = async () => {
         if (!homeTeamId || !awayTeamId || selectedHomePlayers.length === 0 || selectedAwayPlayers.length === 0) {
             showToast('Please select both teams and at least one player from each team', 'error');
@@ -744,6 +868,10 @@ const CreateMatchModal: React.FC<{
         setCreating(true);
 
         try {
+            const scheduledTimestamp = (scheduledDate && scheduledTime)
+                ? new Date(`${scheduledDate}T${scheduledTime}`).getTime()
+                : undefined;
+
             const newMatch: Match = {
                 id: uuidv4(),
                 homeTeamId,
@@ -755,7 +883,7 @@ const CreateMatchModal: React.FC<{
                 awayPlayerIds: selectedAwayPlayers,
                 events: [],
                 createdAt: Date.now(),
-                // startedAt: undefined, // Not started yet
+                scheduledTime: scheduledTimestamp,
                 isExternal: false,
                 createdBy: user?.id || '',
             };
@@ -867,6 +995,34 @@ const CreateMatchModal: React.FC<{
                                     </div>
                                 </div>
                             )}
+                        </div>
+                    </div>
+
+                    {/* Schedule Section */}
+                    <div className="mt-6 border-t border-white/10 pt-6">
+                        <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                            <Clock size={20} className="text-elkawera-accent" />
+                            Schedule (Optional)
+                        </h3>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-xs uppercase text-gray-500 font-bold mb-1">Date</label>
+                                <input
+                                    type="date"
+                                    value={scheduledDate}
+                                    onChange={(e) => setScheduledDate(e.target.value)}
+                                    className="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white focus:border-elkawera-accent focus:outline-none"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-xs uppercase text-gray-500 font-bold mb-1">Time</label>
+                                <input
+                                    type="time"
+                                    value={scheduledTime}
+                                    onChange={(e) => setScheduledTime(e.target.value)}
+                                    className="w-full bg-black/50 border border-white/20 rounded-lg p-3 text-white focus:border-elkawera-accent focus:outline-none"
+                                />
+                            </div>
                         </div>
                     </div>
 

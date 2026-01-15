@@ -213,7 +213,7 @@ export const EventMatchMaker: React.FC<EventMatchMakerProps> = ({ event, onClose
                     awayTeamId: m.awayTeam.id,
                     homeScore: 0,
                     awayScore: 0,
-                    status: 'running', // Changed to running for admin control
+                    status: 'scheduled', // Start as scheduled
                     homePlayerIds: homePlayers.map(p => p.id),
                     awayPlayerIds: awayPlayers.map(p => p.id),
                     events: [],
