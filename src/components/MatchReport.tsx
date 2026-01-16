@@ -42,7 +42,7 @@ export const MatchReport: React.FC<MatchReportProps> = ({ match, homeTeam, awayT
                 <div className="relative z-10 flex justify-between items-center mb-16 border-b border-white/10 pb-8">
                     <div className="flex items-center gap-4">
                         <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center overflow-hidden border-2 border-elkawera-accent">
-                            <img src="/elkawera2.png" alt="ELKAWERA" className="w-full h-full object-cover" crossOrigin="anonymous" />
+                            <img src="/elkawera.png" alt="ELKAWERA" className="w-full h-full object-cover" crossOrigin="anonymous" />
                         </div>
                         <div>
                             <h1 className="text-4xl font-display font-bold italic tracking-tighter">

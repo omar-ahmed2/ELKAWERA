@@ -96,7 +96,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               <div className="flex-shrink-0 flex items-center gap-2 sm:gap-3 group cursor-pointer" onClick={() => navigate('/')}>
                 <div className="relative w-12 h-12 sm:w-16 sm:h-16 flex items-center justify-center group-hover:scale-110 transition-transform duration-300 rounded-full overflow-hidden border border-white/10">
                   <img
-                    src="/elkawera2.png"
+                    src="/elkawera.png"
                     alt="ELKAWERA"
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
