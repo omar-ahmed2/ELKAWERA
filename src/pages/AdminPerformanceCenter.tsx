@@ -7,6 +7,7 @@ import {
     subscribeToChanges
 } from '@/utils/db';
 import { Player, Team } from '@/types';
+import { computeOverallWithPerformance } from '@/utils/calculation';
 import {
     Search,
     Shield,
@@ -119,7 +120,38 @@ export const AdminPerformanceCenter: React.FC = () => {
 
     const handleUpdateStat = (field: keyof Player, value: any) => {
         if (!editData) return;
-        setEditData(prev => prev ? ({ ...prev, [field]: value }) : null);
+        
+        const updatedData = { ...editData, [field]: value };
+        
+        // Automatically recalculate overall rating when performance stats or base score change
+        const performanceFields = [
+            'goals', 'assists', 'defensiveContributions', 'cleanSheets',
+            'saves', 'penaltySaves', 'ownGoals', 'goalsConceded', 'penaltyMissed',
+            'baseScore'
+        ];
+        
+        if (performanceFields.includes(field)) {
+            // Calculate new overall based on performance using baseScore
+            const baseScore = updatedData.baseScore || 50; // Default to 50 if not set
+            const newOverall = computeOverallWithPerformance(
+                baseScore,
+                updatedData.position,
+                {
+                    goals: updatedData.goals,
+                    assists: updatedData.assists,
+                    defensiveContributions: updatedData.defensiveContributions,
+                    cleanSheets: updatedData.cleanSheets,
+                    saves: updatedData.saves,
+                    penaltySaves: updatedData.penaltySaves,
+                    ownGoals: updatedData.ownGoals,
+                    goalsConceded: updatedData.goalsConceded,
+                    penaltyMissed: updatedData.penaltyMissed
+                }
+            );
+            updatedData.overallScore = newOverall;
+        }
+        
+        setEditData(updatedData);
     };
 
     const handleSave = async () => {
@@ -268,6 +300,7 @@ export const AdminPerformanceCenter: React.FC = () => {
                                         </div>
 
                                         <div className="grid grid-cols-1 gap-3">
+                                            <StatStepper label="Base Score" value={editData.baseScore || 50} onChange={(v: any) => handleUpdateStat('baseScore', v)} min="40" max="85" />
                                             <StatStepper label="Matches" value={editData.matchesPlayed} onChange={(v: any) => handleUpdateStat('matchesPlayed', v)} />
                                             <div className="grid grid-cols-2 gap-3">
                                                 <StatStepper label="Goals" value={editData.goals} onChange={(v: any) => handleUpdateStat('goals', v)} />
@@ -283,26 +316,33 @@ export const AdminPerformanceCenter: React.FC = () => {
                                                     <StatStepper label="Pen. Saves" value={editData.penaltySaves} onChange={(v: any) => handleUpdateStat('penaltySaves', v)} />
                                                 </div>
                                             )}
+                                            {/* Negative Performance Metrics */}
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <StatStepper label="Own Goals" value={editData.ownGoals || 0} onChange={(v: any) => handleUpdateStat('ownGoals', v)} />
+                                                <StatStepper label="Pen. Missed" value={editData.penaltyMissed || 0} onChange={(v: any) => handleUpdateStat('penaltyMissed', v)} />
+                                            </div>
+                                            {editData.position === 'GK' && (
+                                                <StatStepper label="Goals Conceded" value={editData.goalsConceded || 0} onChange={(v: any) => handleUpdateStat('goalsConceded', v)} />
+                                            )}
                                         </div>
 
-                                        {/* Overall Rating Slider */}
+                                        {/* Overall Rating Display */}
                                         <div className="bg-white/5 border border-white/10 rounded-2xl p-6 mt-4">
                                             <div className="flex justify-between items-center mb-4">
-                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Manual Rating Override</span>
+                                                <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Calculated Overall Rating</span>
                                                 <span className={`text-xl font-display font-black ${editData.overallScore > 85 ? 'text-[#00ff9d]' : 'text-white'}`}>{editData.overallScore}</span>
                                             </div>
-                                            <input
-                                                type="range"
-                                                min="40"
-                                                max="99"
-                                                value={editData.overallScore}
-                                                onChange={(e) => handleUpdateStat('overallScore', parseInt(e.target.value))}
-                                                className="w-full h-2 bg-black/50 rounded-lg appearance-none cursor-pointer accent-[#00ff9d]"
-                                            />
+                                            <div className="text-[10px] text-gray-600 mb-2">Automatically calculated based on base score and performance metrics</div>
+                                            <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                                                <div 
+                                                    className="h-full bg-gradient-to-r from-[#00ff9d] to-[#00d1ff] transition-all duration-300"
+                                                    style={{ width: `${(editData.overallScore / 99) * 100}%` }}
+                                                />
+                                            </div>
                                             <div className="flex justify-between mt-2 text-[8px] text-gray-600 font-bold uppercase tracking-tighter">
-                                                <span>Recruit (40)</span>
-                                                <span>Professional (70)</span>
-                                                <span>Legendary (99)</span>
+                                                <span>Min (1)</span>
+                                                <span>Base: {editData.baseScore || 50}</span>
+                                                <span>Max (99)</span>
                                             </div>
                                         </div>
                                     </div>

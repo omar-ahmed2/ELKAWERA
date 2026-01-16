@@ -127,6 +127,7 @@ export interface Player {
   cardType: CardType;
   imageUrl: string | null;
   overallScore: number;
+  baseScore: number; // Base score before performance bonuses
   goals: number;
   assists: number;
   defensiveContributions: number; // New stat
