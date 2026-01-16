@@ -53,6 +53,7 @@ import Snowfall from 'react-snowfall';
 const AppInner: React.FC = () => {
   const { snowEffect } = useSettings();
 
+  
   return (
     <HashRouter>
       {snowEffect && (
