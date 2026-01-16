@@ -18,4 +18,4 @@ Disallow: /
 User-agent: DotBot
 Disallow: /
 
-Sitemap: https://elkawera-main.vercel.app/sitemap.xml
+Sitemap: https://elkawera.vercel.app/sitemap.xml
