@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, User as UserIcon, Settings, ChevronDown, BarChart2, Gamepad2, User, Bell, Trophy, Shield, Calendar, Shirt, Package, Target, TrendingUp, Info, MessageSquare } from 'lucide-react';
+import { Menu, X, LogOut, User as UserIcon, Settings, ChevronDown, BarChart2, Gamepad2, User, Users, Bell, Trophy, Shield, Calendar, Shirt, Package, Target, TrendingUp, Info, MessageSquare, Home, Plus, LayoutDashboard, UserPlus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { getAllPlayerRegistrationRequests, getAllKitRequests, subscribeToChanges, getUnreadCount } from '@/utils/db';
 import { useSettings } from '@/context/SettingsContext';
@@ -282,17 +282,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                 )}
 
                 {/* Navigation Links */}
-                <Link to="/" className="block px-4 py-3 rounded-xl text-base font-bold text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all">
-                  Home
+                <Link to="/" className="block px-4 py-3 rounded-xl text-base font-bold text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                  <Home size={18} /> Home
                 </Link>
 
                 {user ? (
                   <>
                     {user.role !== 'captain' && user.role !== 'scout' && (
                       <>
-                        <Link to="/dashboard" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all">
-
-                          {t('nav.dashboard')}
+                        <Link to="/dashboard" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                          <LayoutDashboard size={18} /> Dashboard CC
                         </Link>
                         {user.role === 'player' && (
                           <Link to="/performance-hub" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
@@ -303,14 +302,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     )}
 
                     <Link to="/leaderboard" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
-                      <Trophy size={18} /> {t('nav.leaderboard')}
+                      <Trophy size={18} /> Leadboard
                     </Link>
                     <Link to="/events" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
                       <Calendar size={18} /> Events
                     </Link>
                     {user.role === 'admin' && (
                       <Link to="/new-players" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center justify-between">
-                        <span className="flex items-center gap-2"><User size={18} /> New Players</span>
+                        <span className="flex items-center gap-2"><UserPlus size={18} /> New Players</span>
                         {pendingRequestsCount > 0 && (
                           <span className="bg-red-500 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
                             {pendingRequestsCount}
@@ -318,8 +317,8 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         )}
                       </Link>
                     )}
-                    <Link to="/teams" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all">
-                      {t('nav.teams')}
+                    <Link to="/teams" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                      <Users size={18} /> Teams
                     </Link>
                     {user.role !== 'admin' && (
                       <Link to="/kits" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
@@ -346,7 +345,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                           <Target size={18} /> Matches
                         </Link>
                         <Link to="/admin/scouts" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
-                          <Shield size={18} /> Scouts Management
+                          <Shield size={18} /> Scouts
+                        </Link>
+                        <Link to="/admin/users" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
+                          <Users size={18} /> Users
                         </Link>
                         <Link to="/admin/kits" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
                           <Shirt size={18} /> Kit Management
@@ -360,10 +362,10 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                           )}
                         </Link>
                         <Link to="/compare" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
-                          <BarChart2 size={18} /> Compare Players
+                          <BarChart2 size={18} /> Compare
                         </Link>
-                        <Link to="/create" className="block px-4 py-3 rounded-xl text-base font-bold bg-elkawera-accent/20 text-elkawera-accent hover:bg-elkawera-accent hover:text-black transition-all">
-                          + Create New Card
+                        <Link to="/create" className="block px-4 py-3 rounded-xl text-base font-bold bg-elkawera-accent/20 text-elkawera-accent hover:bg-elkawera-accent hover:text-black transition-all flex items-center gap-2">
+                          <Plus size={18} /> New Card
                         </Link>
                       </>
                     )}
@@ -371,16 +373,16 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     <div className="h-px bg-white/10 my-2"></div>
 
                     <Link to="/profile" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
-                      <UserIcon size={18} /> {t('nav.profile')}
+                      <User size={18} /> Profile
                     </Link>
                     <Link to="/settings" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
-                      <Settings size={18} /> {t('nav.settings')}
+                      <Settings size={18} /> Settings
                     </Link>
                     <Link to="/about" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
-                      <Info size={18} /> {t('nav.about')}
+                      <Info size={18} /> About ELKAWERA
                     </Link>
                     <Link to="/contact" className="block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition-all flex items-center gap-2">
-                      <MessageSquare size={18} /> {t('nav.contact')}
+                      <MessageSquare size={18} /> Contact Us
                     </Link>
 
                     <button
