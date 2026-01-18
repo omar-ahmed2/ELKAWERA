@@ -28,16 +28,18 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
-interface AppSidebarProps {
+interface SidebarProps {
     pendingRequestsCount?: number;
     unreadNotifications?: number;
     kitRequestsCount?: number;
+    isAdminMode?: boolean;
 }
 
-export const AppSidebar: React.FC<AppSidebarProps> = ({
+export const Sidebar: React.FC<SidebarProps> = ({
     pendingRequestsCount = 0,
     unreadNotifications = 0,
-    kitRequestsCount = 0
+    kitRequestsCount = 0,
+    isAdminMode = false
 }) => {
     const { user, signOut } = useAuth();
     const location = useLocation();
@@ -153,24 +155,24 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
             {/* Navigation Items */}
             <div className="flex-1 overflow-y-auto overflow-x-hidden py-6 px-3 space-y-1 custom-scrollbar scroll-smooth">
 
-                {/* --- Common Main Section --- */}
+                {/* --- Main Section --- */}
                 <div className={`px-4 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-2 mt-2 transition-opacity duration-300 ${isExpanded ? 'opacity-100' : 'opacity-0'}`}>
-                    Menu
+                    {isAdminMode ? 'Menu' : 'Menu'}
                 </div>
 
-                {/* Admin Specific */}
-                {role === 'admin' && (
+                {/* Admin Mode or Admin Role */}
+                {(isAdminMode || role === 'admin') && (
                     <>
                         <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard CC" />
-                        <NavItem to="/leaderboard" icon={Trophy} label="Leaderboard" />
+                        <NavItem to="/leaderboard" icon={Trophy} label={isAdminMode ? "Leadboard" : "Leaderboard"} />
                         <NavItem to="/events" icon={Calendar} label="Events" />
                         <NavItem to="/new-players" icon={UserPlus} label="New Players" count={pendingRequestsCount} />
                         <NavItem to="/teams" icon={Users} label="Teams" />
                     </>
                 )}
 
-                {/* Player Specific */}
-                {role === 'player' && (
+                {/* Player Specific - Only in non-admin mode */}
+                {!isAdminMode && role === 'player' && (
                     <>
                         <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
                         <NavItem to="/performance-hub" icon={BarChart2} label="Performance Hub" />
@@ -181,8 +183,8 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                     </>
                 )}
 
-                {/* Captain Specific */}
-                {(role === 'captain' || role === 'scout') && (
+                {/* Captain/Scout Specific - Only in non-admin mode */}
+                {!isAdminMode && (role === 'captain' || role === 'scout') && (
                     <>
                         {role === 'captain' && <NavItem to="/captain/dashboard" icon={Shield} label="Captain Dashboard" />}
                         {role === 'scout' && <NavItem to="/scout/dashboard" icon={Shield} label="Scout Dashboard" />}
@@ -196,7 +198,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
 
 
                 {/* --- Admin Management Section --- */}
-                {role === 'admin' && (
+                {(isAdminMode || role === 'admin') && (
                     <>
                         <SectionHeader title="Admin" />
                         <Divider />
@@ -212,12 +214,12 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 )}
 
                 {/* --- General Section --- */}
-                <SectionHeader title="General" />
+                <SectionHeader title={isAdminMode ? "General" : "General"} />
                 <Divider />
 
                 <NavItem to="/" icon={Home} label="Home Page" />
-                <NavItem to="/about" icon={Info} label="About US" />
-                <NavItem to="/contact" icon={MessageSquare} label="Contact Us" />
+                <NavItem to="/about" icon={Info} label={isAdminMode ? "About US" : "About US"} />
+                <NavItem to="/contact" icon={MessageSquare} label={isAdminMode ? "Contact Us" : "Contact Us"} />
                 <NavItem to="/notifications" icon={Bell} label="Notifications" count={unreadNotifications} />
             </div>
 
@@ -241,4 +243,16 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
         </aside>
     );
 };
+
+// Backward compatibility exports
+export const AppSidebar = Sidebar;
+export const AdminSidebar: React.FC<{ pendingRequestsCount: number; unreadNotifications: number; kitRequestsCount: number }> = 
+    ({ pendingRequestsCount, unreadNotifications, kitRequestsCount }) => (
+        <Sidebar 
+            pendingRequestsCount={pendingRequestsCount}
+            unreadNotifications={unreadNotifications}
+            kitRequestsCount={kitRequestsCount}
+            isAdminMode={true}
+        />
+    );
 
