@@ -216,7 +216,7 @@ export const AppSidebar: React.FC<AppSidebarProps> = ({
                 <Divider />
 
                 <NavItem to="/" icon={Home} label="Home Page" />
-                <NavItem to="/about" icon={Info} label="About ELKAWERA" />
+                <NavItem to="/about" icon={Info} label="About US" />
                 <NavItem to="/contact" icon={MessageSquare} label="Contact Us" />
                 <NavItem to="/notifications" icon={Bell} label="Notifications" count={unreadNotifications} />
             </div>

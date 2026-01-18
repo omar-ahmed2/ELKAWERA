@@ -167,7 +167,7 @@ export const AdminSidebar: React.FC<AdminSidebarProps> = ({ pendingRequestsCount
                 {!isExpanded && <div className="h-px bg-white/5 my-4 mx-4 transition-all duration-300"></div>}
 
                 <NavItem to="/" icon={Home} label="Home Page" />
-                <NavItem to="/about" icon={Info} label="About ELKAWERA" />
+                <NavItem to="/about" icon={Info} label="About US" />
                 <NavItem to="/contact" icon={MessageSquare} label="Contact Us" />
                 <NavItem to="/notifications" icon={Bell} label="Notifications" count={unreadNotifications} />
             </div>

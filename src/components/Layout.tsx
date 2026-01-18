@@ -475,7 +475,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <Info size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
-                        <span>About ELKAWERA</span>
+                        <span>About US</span>
                       </Link>
                       <Link to="/contact" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
@@ -524,7 +524,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <Info size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
-                        <span>About ELKAWERA</span>
+                        <span>About US</span>
                       </Link>
                       <Link to="/contact" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">

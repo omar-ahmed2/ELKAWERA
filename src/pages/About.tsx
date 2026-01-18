@@ -63,7 +63,7 @@ export const About: React.FC = () => {
       {/* Hero Section */}
       <section className="text-center space-y-6 animate-in fade-in slide-in-from-top-10 duration-700">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-elkawera-accent/10 border border-elkawera-accent/20 text-elkawera-accent text-sm font-bold tracking-wider uppercase">
-          <Info size={16} /> About ELKAWERA
+          <Info size={16} /> About US
         </div>
         <h1 className="text-4xl md:text-6xl font-display font-black tracking-tighter leading-tight italic">
           REVOLUTIONIZING <br />
