@@ -289,7 +289,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         Menu
                       </div>
                       
-                      <Link to="/" className="group block px-4 py-3 rounded-xl text-base font-bold text-[var(--text-primary)] hover:bg-white/5 hover:text-elkawera-accent transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/" className="group px-4 py-3 rounded-xl text-base font-bold text-[var(--text-primary)] hover:bg-white/5 hover:text-elkawera-accent transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <Home size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
@@ -298,14 +298,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
                       {user.role !== 'captain' && user.role !== 'scout' && (
                         <>
-                          <Link to="/dashboard" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                          <Link to="/dashboard" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                             <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                               <LayoutDashboard size={18} className="group-hover:scale-110 transition-transform" />
                             </div>
                             <span>Dashboard CC</span>
                           </Link>
                           {user.role === 'player' && (
-                            <Link to="/performance-hub" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                             <Link to="/performance-hub" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                               <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                                 <BarChart2 size={18} className="group-hover:scale-110 transition-transform" />
                               </div>
@@ -315,14 +315,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         </>
                       )}
 
-                      <Link to="/leaderboard" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/leaderboard" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <Trophy size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
                         <span>Leaderboard</span>
                       </Link>
                       
-                      <Link to="/events" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/events" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <Calendar size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
@@ -330,7 +330,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       </Link>
 
                       {user.role === 'admin' && (
-                        <Link to="/new-players" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center justify-between border border-transparent hover:border-white/10">
+                        <Link to="/new-players" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center justify-between border border-transparent hover:border-white/10">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                               <UserPlus size={18} className="group-hover:scale-110 transition-transform" />
@@ -345,21 +345,21 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         </Link>
                       )}
                       
-                      <Link to="/teams" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/teams" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <Users size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
                         <span>Teams</span>
                       </Link>
 
-                      {user.role !== 'admin' && (
+                      {/* {user.role !== 'admin' && (
                         <Link to="/kits" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                           <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                             <Shirt size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
                           <span>Official Kits</span>
                         </Link>
-                      )}
+                      )} */}
                     </div>
 
                     {/* Role-specific Sections */}
@@ -368,7 +368,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         <div className="px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">
                           Captain
                         </div>
-                        <Link to="/captain/dashboard" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                        <Link to="/captain/dashboard" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                           <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                             <Shield size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
@@ -382,7 +382,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         <div className="px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">
                           Scout
                         </div>
-                        <Link to="/scout/dashboard" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                        <Link to="/scout/dashboard" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                           <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                             <Shield size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
@@ -396,37 +396,37 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                         <div className="px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">
                           Admin
                         </div>
-                        <Link to="/admin/performance" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                        <Link to="/admin/performance" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                           <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                             <TrendingUp size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
                           <span>Performance Center</span>
                         </Link>
-                        <Link to="/admin/matches" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                        <Link to="/admin/matches" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                           <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                             <Target size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
                           <span>Matches</span>
                         </Link>
-                        <Link to="/admin/scouts" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                        {/* <Link to="/admin/scouts" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                           <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                             <Shield size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
                           <span>Scouts</span>
-                        </Link>
-                        <Link to="/admin/users" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                        </Link> */}
+                        <Link to="/admin/users" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                           <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                             <Users size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
                           <span>Users</span>
                         </Link>
-                        <Link to="/admin/kits" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                        {/* <Link to="/admin/kits" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                           <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                             <Shirt size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
                           <span>Kit Management</span>
-                        </Link>
-                        <Link to="/admin/kit-requests" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center justify-between border border-transparent hover:border-white/10">
+                        </Link> */}
+                        {/* <Link to="/admin/kit-requests" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center justify-between border border-transparent hover:border-white/10">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                               <Package size={18} className="group-hover:scale-110 transition-transform" />
@@ -438,14 +438,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                               {pendingKitRequestsCount}
                             </span>
                           )}
-                        </Link>
-                        <Link to="/compare" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                        </Link> */}
+                        <Link to="/compare" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                           <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                             <BarChart2 size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
                           <span>Compare</span>
                         </Link>
-                        <Link to="/create" className="group block px-4 py-3 rounded-xl text-base font-bold bg-elkawera-accent/20 text-elkawera-accent hover:bg-elkawera-accent hover:text-black transition-all duration-300 flex items-center gap-3 border border-elkawera-accent/30 hover:border-elkawera-accent shadow-lg hover:shadow-elkawera-accent/25">
+                        <Link to="/create" className="group px-4 py-3 rounded-xl text-base font-bold bg-elkawera-accent/20 text-elkawera-accent hover:bg-elkawera-accent hover:text-black transition-all duration-300 flex items-center gap-3 border border-elkawera-accent/30 hover:border-elkawera-accent shadow-lg hover:shadow-elkawera-accent/25">
                           <div className="w-8 h-8 rounded-lg bg-elkawera-accent/30 group-hover:bg-black/20 flex items-center justify-center transition-all duration-300">
                             <Plus size={18} className="group-hover:scale-110 transition-transform" />
                           </div>
@@ -459,25 +459,25 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       <div className="px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">
                         General
                       </div>
-                      <Link to="/profile" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/profile" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <User size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
                         <span>Profile</span>
                       </Link>
-                      <Link to="/settings" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/settings" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <Settings size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
                         <span>Settings</span>
                       </Link>
-                      <Link to="/about" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/about" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <Info size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
                         <span>About US</span>
                       </Link>
-                      <Link to="/contact" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/contact" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <MessageSquare size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
@@ -486,7 +486,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       
                       <button
                         onClick={handleSignOut}
-                        className="group block w-full text-left px-4 py-3 rounded-xl text-base font-bold text-red-400/80 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-red-500/20"
+                        className="group w-full text-left px-4 py-3 rounded-xl text-base font-bold text-red-400/80 hover:text-red-300 hover:bg-red-500/10 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-red-500/20"
                       >
                         <div className="w-8 h-8 rounded-lg bg-red-500/10 group-hover:bg-red-500/20 flex items-center justify-center transition-all duration-300">
                           <LogOut size={18} className="group-hover:scale-110 transition-transform" />
@@ -502,13 +502,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       <div className="px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">
                         Get Started
                       </div>
-                      <Link to="/login" className="group block px-4 py-3 rounded-xl text-base font-bold text-white hover:bg-white/10 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/20">
+                      <Link to="/login" className="group px-4 py-3 rounded-xl text-base font-bold text-white hover:bg-white/10 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/20">
                         <div className="w-8 h-8 rounded-lg bg-white/10 group-hover:bg-white/20 flex items-center justify-center transition-all duration-300">
                           <UserIcon size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
                         <span>Sign In</span>
                       </Link>
-                      <Link to="/signup" className="group block px-4 py-3 rounded-xl text-base font-bold bg-elkawera-accent/20 text-elkawera-accent hover:bg-elkawera-accent hover:text-black transition-all duration-300 flex items-center gap-3 border border-elkawera-accent/30 hover:border-elkawera-accent shadow-lg hover:shadow-elkawera-accent/25">
+                      <Link to="/signup" className="group px-4 py-3 rounded-xl text-base font-bold bg-elkawera-accent/20 text-elkawera-accent hover:bg-elkawera-accent hover:text-black transition-all duration-300 flex items-center gap-3 border border-elkawera-accent/30 hover:border-elkawera-accent shadow-lg hover:shadow-elkawera-accent/25">
                         <div className="w-8 h-8 rounded-lg bg-elkawera-accent/30 group-hover:bg-black/20 flex items-center justify-center transition-all duration-300">
                           <UserPlus size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
@@ -520,13 +520,13 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                       <div className="px-3 text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3">
                         Info
                       </div>
-                      <Link to="/about" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/about" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <Info size={18} className="group-hover:scale-110 transition-transform" />
                         </div>
                         <span>About US</span>
                       </Link>
-                      <Link to="/contact" className="group block px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
+                      <Link to="/contact" className="group px-4 py-3 rounded-xl text-base font-medium text-gray-300 hover:text-[var(--text-primary)] hover:bg-white/5 transition-all duration-300 flex items-center gap-3 border border-transparent hover:border-white/10">
                         <div className="w-8 h-8 rounded-lg bg-white/5 group-hover:bg-elkawera-accent/20 flex items-center justify-center transition-all duration-300">
                           <MessageSquare size={18} className="group-hover:scale-110 transition-transform" />
                         </div>

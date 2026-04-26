@@ -179,7 +179,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <NavItem to="/leaderboard" icon={Trophy} label="Leaderboard" />
                         <NavItem to="/events" icon={Calendar} label="Events" />
                         <NavItem to="/teams" icon={Users} label="Teams" />
-                        <NavItem to="/kits" icon={Shirt} label="Official Kits" />
+                        {/* <NavItem to="/kits" icon={Shirt} label="Official Kits" /> */}
                     </>
                 )}
 
@@ -192,7 +192,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <NavItem to="/leaderboard" icon={Trophy} label="Leaderboard" />
                         <NavItem to="/events" icon={Calendar} label="Events" />
                         <NavItem to="/teams" icon={Users} label="Teams" />
-                        <NavItem to="/kits" icon={Shirt} label="Official Kits" />
+                        {/* <NavItem to="/kits" icon={Shirt} label="Official Kits" /> */}
                     </>
                 )}
 
@@ -203,11 +203,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         <SectionHeader title="Admin" />
                         <Divider />
 
+                        <NavItem to="/admin/performance" icon={TrendingUp} label="Performance Center" />
                         <NavItem to="/admin/matches" icon={Target} label="Matches" />
-                        <NavItem to="/admin/scouts" icon={Shield} label="Scouts" />
+                        {/* <NavItem to="/admin/scouts" icon={Shield} label="Scouts" /> */}
                         <NavItem to="/admin/users" icon={Users} label="Users" />
-                        <NavItem to="/admin/kits" icon={Shirt} label="Kit Management" />
-                        <NavItem to="/admin/kit-requests" icon={Package} label="Kit Requests" count={kitRequestsCount} />
+                        {/* <NavItem to="/admin/kits" icon={Shirt} label="Kit Management" /> */}
+                        {/* <NavItem to="/admin/kit-requests" icon={Package} label="Kit Requests" count={kitRequestsCount} /> */}
                         <NavItem to="/compare" icon={BarChart2} label="Compare" />
                         <NavItem to="/create" icon={Plus} label="New Card" />
                     </>

@@ -29,6 +29,7 @@ interface PerformanceMetrics {
  * GENERAL RULES (All Players):
  * - 2 penalty miss = -1 ovr
  * - 2 own goals = -1 ovr
+ * - 4 goals conceded = -1 ovr
  * 
  * FORWARD (CF) RULES:
  * - 4 goals = +1 ovr
@@ -44,8 +45,8 @@ interface PerformanceMetrics {
  * - 1 penalty save = +1 ovr
  * - 1 goal = +1 ovr
  * - 2 assists = +1 ovr
- * - 4 goals conceded = -1 ovr
  * - 6 saves = +1 ovr
+ * - 1 clean sheet = +1 ovr
  */
 export const computeOverallWithPerformance = (
   baseScore: number,
@@ -72,6 +73,14 @@ export const computeOverallWithPerformance = (
   // 2 own goals = -1 ovr
   bonus -= Math.floor(ownGoals / 2);
 
+  // 4 goals conceded = -1 ovr (All Positions)
+  bonus -= Math.floor(goalsConceded / 4);
+
+  // 1 clean sheet = +1 ovr (CB and GK only)
+  if (position === 'CB' || position === 'GK') {
+    bonus += cleanSheets;
+  }
+
   // ==================== POSITION SPECIFIC RULES ====================
   switch (position) {
     case 'CF':
@@ -79,11 +88,11 @@ export const computeOverallWithPerformance = (
       break;
 
     case 'CB':
-      bonus += calculateDefenderBonus(defContrib, cleanSheets, goals, assists);
+      bonus += calculateDefenderBonus(defContrib, goals, assists);
       break;
 
     case 'GK':
-      bonus += calculateGoalkeeperBonus(goals, assists, saves, penaltySaves, goalsConceded);
+      bonus += calculateGoalkeeperBonus(goals, assists, saves, penaltySaves);
       break;
   }
 
@@ -121,7 +130,6 @@ const calculateForwardBonus = (
  */
 const calculateDefenderBonus = (
   defContrib: number,
-  cleanSheets: number,
   goals: number,
   assists: number
 ): number => {
@@ -129,9 +137,6 @@ const calculateDefenderBonus = (
   
   // 8 def con = +1 ovr
   bonus += Math.floor(defContrib / 8);
-  
-  // 1 clean sheet = +1 ovr
-  bonus += cleanSheets;
   
   // 3 assists or goals = +1 ovr (combined total)
   const attackingContributions = goals + assists;
@@ -147,8 +152,7 @@ const calculateGoalkeeperBonus = (
   goals: number,
   assists: number,
   saves: number,
-  penaltySaves: number,
-  goalsConceded: number
+  penaltySaves: number
 ): number => {
   let bonus = 0;
   
@@ -160,9 +164,6 @@ const calculateGoalkeeperBonus = (
   
   // 2 assists = +1 ovr
   bonus += Math.floor(assists / 2);
-  
-  // 4 goals conceded = -1 ovr
-  bonus -= Math.floor(goalsConceded / 4);
   
   // 6 saves = +1 ovr (normal saves, not penalty saves)
   bonus += Math.floor(saves / 6);

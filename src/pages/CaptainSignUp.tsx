@@ -34,7 +34,7 @@ export const CaptainSignUp: React.FC = () => {
         setError('');
 
         try {
-            // First, create captain account (this happens after OTP verification)
+            // First, create captain account
             const newUser = await signUp(
                 formData.name,
                 formData.email,
@@ -49,7 +49,6 @@ export const CaptainSignUp: React.FC = () => {
             );
 
             // Only after successful account creation, create team and send data to admin
-            // This ensures admin only gets data after OTP verification is complete
             const team: Team = {
                 id: uuidv4(),
                 name: formData.teamName,

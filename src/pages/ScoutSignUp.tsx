@@ -30,7 +30,7 @@ export const ScoutSignUp: React.FC = () => {
         setError('');
 
         try {
-            // First, create scout account (this happens after OTP verification)
+            // First, create scout account
             await registerScout(
                 formData.name,
                 formData.email,
@@ -41,7 +41,6 @@ export const ScoutSignUp: React.FC = () => {
             );
 
             // Only after successful account creation, auto login
-            // This ensures admin only gets data after OTP verification is complete
             await signIn(formData.email, formData.password);
             navigate('/scout/dashboard');
         } catch (err) {
@@ -57,7 +56,7 @@ export const ScoutSignUp: React.FC = () => {
 
     const additionalFields = (
         <div className="border-t border-white/10 pt-4 mt-4">
-            <label className="block text-xs uppercase text-gray-400 mb-2 font-bold tracking-wider flex items-center gap-2">
+            <label className="text-xs uppercase text-gray-400 mb-2 font-bold tracking-wider flex items-center gap-2">
                 <Briefcase size={14} /> Scout Type
             </label>
             <select
@@ -70,7 +69,7 @@ export const ScoutSignUp: React.FC = () => {
             </select>
 
             <div className="mt-4">
-                <label className="block text-xs uppercase text-gray-400 mb-2 font-bold tracking-wider flex items-center gap-2">
+                <label className="text-xs uppercase text-gray-400 mb-2 font-bold tracking-wider flex items-center gap-2">
                     {scoutType === 'Club' ? <Building2 size={14} /> : <MapPin size={14} />}
                     {scoutType === 'Club' ? 'Club / Academy Name' : 'City / Region'} (Optional)
                 </label>

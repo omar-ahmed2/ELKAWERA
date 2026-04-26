@@ -68,20 +68,4 @@ export const formatPhoneNumber = (phone: string): string => {
   return `${cleanPhone.slice(0, 3)}-${cleanPhone.slice(3, 7)}-${cleanPhone.slice(7, 11)}`;
 };
 
-export const generateOTP = (): string => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
-};
 
-export const validateOTP = (otp: string): ValidationResult => {
-  if (!otp || otp.trim() === '') {
-    return { isValid: false, error: 'OTP is required' };
-  }
-
-  const cleanOTP = otp.replace(/\D/g, '');
-
-  if (cleanOTP.length !== 6) {
-    return { isValid: false, error: 'OTP must be 6 digits' };
-  }
-
-  return { isValid: true };
-};

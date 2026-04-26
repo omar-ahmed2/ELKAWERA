@@ -28,7 +28,7 @@ export const SignUp: React.FC = () => {
         setError('');
 
         try {
-            // First, create the user account (this happens after OTP verification)
+            // First, create the user account
             const newUser = await signUp(
                 formData.name,
                 formData.email,
@@ -43,7 +43,6 @@ export const SignUp: React.FC = () => {
             );
 
             // Only after successful account creation, send registration request to admin
-            // This ensures admin only gets data after OTP verification is complete
             const registrationRequest = {
                 id: uuidv4(),
                 userId: newUser.id,

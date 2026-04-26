@@ -321,7 +321,7 @@ export const AdminPerformanceCenter: React.FC = () => {
                                                 <StatStepper label="Own Goals" value={editData.ownGoals || 0} onChange={(v: any) => handleUpdateStat('ownGoals', v)} />
                                                 <StatStepper label="Pen. Missed" value={editData.penaltyMissed || 0} onChange={(v: any) => handleUpdateStat('penaltyMissed', v)} />
                                             </div>
-                                            {editData.position === 'GK' && (
+                                            {(editData.position === 'GK' || editData.position === 'CB') && (
                                                 <StatStepper label="Goals Conceded" value={editData.goalsConceded || 0} onChange={(v: any) => handleUpdateStat('goalsConceded', v)} />
                                             )}
                                         </div>

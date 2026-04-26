@@ -435,7 +435,7 @@ export const Kits: React.FC = () => {
 
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
-                                            <label className="block text-sm font-bold text-gray-300 mb-2 flex items-center gap-2">
+                                            <label className="text-sm font-bold text-gray-300 mb-2 flex items-center gap-2">
                                                 <Mail size={14} className="text-elkawera-accent" /> Contact Gmail
                                             </label>
                                             <input
@@ -447,7 +447,7 @@ export const Kits: React.FC = () => {
                                             />
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-bold text-gray-300 mb-2 flex items-center gap-2">
+                                            <label className="text-sm font-bold text-gray-300 mb-2 flex items-center gap-2">
                                                 <Phone size={14} className="text-elkawera-accent" /> Phone Number
                                             </label>
                                             <input

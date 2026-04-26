@@ -6,6 +6,7 @@ export const ADMIN_ACCOUNTS: Array<{ email: string; password: string; name: stri
   { email: 'youssef@gmail.com', password: 'youssef@elkawera', name: 'Youssef' },
   { email: 'falaky@gmail.com', password: 'falaky@elkawera', name: 'Falaky' },
   { email: 'omar@gmail.com', password: 'omar@elkawera', name: 'Omar' },
+  { email: 'mohamed@gmail.com', password: 'mohamed@elkawera', name: 'Mohamed' },
 ];
 
 export const isAdminAccount = (email: string, password: string): boolean => {

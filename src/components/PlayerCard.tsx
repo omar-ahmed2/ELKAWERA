@@ -118,7 +118,7 @@ export const PlayerCard: React.FC<PlayerCardProps> = ({
                                 <rect width="100%" height="100%" filter={`url(#${noiseId})`} />
                             </svg>
                             {/* Flowing Energy Patterns */}
-                            <div className="absolute inset-0 opacity-40 bg-[length:400%_400%] animate-energy-flow bg-gradient-to-br from-transparent via-cyan-500/10 via-transparent to-transparent"></div>
+                            <div className="absolute inset-0 opacity-40 bg-[length:400%_400%] animate-energy-flow bg-gradient-to-br from-transparent via-cyan-500/10 to-transparent"></div>
                             {/* Neon Circuitry */}
                             <svg width="100%" height="100%" className="opacity-30 mix-blend-screen">
                                 <defs>

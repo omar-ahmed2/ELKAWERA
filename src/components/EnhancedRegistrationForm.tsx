@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { UserPlus, Eye, EyeOff, Check, X, AlertCircle } from 'lucide-react';
 import { validateGmailEmail, validatePhoneNumber, formatPhoneNumber } from '@/utils/validation';
-import { OTPVerification } from './OTPVerification';
 import { UserRole } from '@/types';
 
 interface RegistrationData {
@@ -56,8 +55,7 @@ export const EnhancedRegistrationForm: React.FC<EnhancedRegistrationFormProps> =
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showOTP, setShowOTP] = useState(false);
-  const [isValidating, setIsValidating] = useState(false);
+
 
   const navigate = useNavigate();
 
@@ -127,11 +125,15 @@ export const EnhancedRegistrationForm: React.FC<EnhancedRegistrationFormProps> =
         const formData = new FormData(form);
         const data: any = {};
 
-        // Convert FormData to plain object
+        // Convert FormData to plain object with numeric conversion for specific fields
         for (let [key, value] of formData.entries()) {
-          data[key] = value;
+          if (key === 'age' || key === 'height' || key === 'weight') {
+            data[key] = Number(value);
+          } else {
+            data[key] = value;
+          }
         }
-
+        
         // Update form state with all current values
         setFormData(prev => ({ ...prev, ...data }));
       }
@@ -214,16 +216,6 @@ export const EnhancedRegistrationForm: React.FC<EnhancedRegistrationFormProps> =
       return;
     }
 
-    setIsValidating(true);
-
-    // Simulate validation delay
-    setTimeout(() => {
-      setIsValidating(false);
-      setShowOTP(true);
-    }, 1000);
-  };
-
-  const handleOTPVerification = async () => {
     setIsSubmitting(true);
     try {
       await onSubmit(formData);
@@ -235,41 +227,11 @@ export const EnhancedRegistrationForm: React.FC<EnhancedRegistrationFormProps> =
     }
   };
 
-  const handleRestart = () => {
-    setShowOTP(false);
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      password: '',
-      age: 18,
-      height: 175,
-      weight: 70,
-      strongFoot: 'Right',
-      position: 'CF',
-      teamName: '',
-      teamAbbreviation: '',
-      teamColor: '#00ff9d',
-      teamLogo: null
-    });
-    setErrors({});
-    setTouched({});
-  };
 
-  const handleBackToForm = () => {
-    setShowOTP(false);
-  };
 
-  if (showOTP) {
-    return (
-      <OTPVerification
-        phoneNumber={formData.phone}
-        onVerificationSuccess={handleOTPVerification}
-        onBack={handleBackToForm}
-        onRestart={handleRestart}
-      />
-    );
-  }
+
+
+
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] px-4">
@@ -454,13 +416,13 @@ export const EnhancedRegistrationForm: React.FC<EnhancedRegistrationFormProps> =
 
           <button
             type="submit"
-            disabled={isValidating || isSubmitting}
+            disabled={isSubmitting}
             className="w-full py-4 bg-elkawera-accent text-black font-bold uppercase rounded-xl hover:bg-white transition-all transform hover:scale-[1.02] shadow-[0_0_20px_rgba(0,255,157,0.3)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            {isValidating ? (
+            {isSubmitting ? (
               <>
                 <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin" />
-                Validating Information...
+                Creating Account...
               </>
             ) : (
               <>
@@ -486,11 +448,11 @@ export const EnhancedRegistrationForm: React.FC<EnhancedRegistrationFormProps> =
           </div>
         )}
 
-        {role !== 'scout' && (
+        {/* {role !== 'scout' && (
           <div className="mt-2 text-center text-sm text-gray-400">
             Are you a scout? <Link to="/signup/scout" className="text-elkawera-accent hover:underline font-bold">Scout Sign-Up</Link>
           </div>
-        )}
+        )} */}
 
         <div className="mt-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 text-center">
           <strong>Note:</strong> Only Gmail addresses (@gmail.com) and 11-digit phone numbers starting with 01 are accepted.

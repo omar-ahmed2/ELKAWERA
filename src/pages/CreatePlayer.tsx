@@ -124,9 +124,9 @@ export const CreatePlayer: React.FC = () => {
             ...prev,
             id: newId,
             name: request.name,
-            age: request.age,
-            height: request.height,
-            weight: request.weight,
+            age: Number(request.age),
+            height: Number(request.height),
+            weight: Number(request.weight),
             position: request.position,
             country: 'EG', // Default to Egypt
             createdAt: Date.now(),
@@ -198,15 +198,16 @@ export const CreatePlayer: React.FC = () => {
       const playerToSave: Player = {
         id: playerId,
         name: formData.name.trim(),
-        age: formData.age || 18,
-        height: formData.height || 175,
-        weight: formData.weight || 70,
+        age: Number(formData.age) || 18,
+        height: Number(formData.height) || 175,
+        weight: Number(formData.weight) || 70,
         position: formData.position || 'CF',
         country: formData.country || 'EG',
         teamId: formData.teamId || undefined,
         cardType: formData.cardType || 'Silver',
         imageUrl: formData.imageUrl || null,
         overallScore: score,
+        baseScore: baseManualScore,
         goals: formData.goals || 0,
 
         assists: formData.assists || 0,
@@ -460,55 +461,7 @@ export const CreatePlayer: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-elkawera-accent/10 to-transparent border border-elkawera-accent/30 rounded-xl p-4 mb-4">
-              <label className="block text-xs uppercase text-elkawera-accent mb-3 font-bold">Card Tier (Automatic)</label>
-              <div className="grid grid-cols-2 xs:grid-cols-4 gap-3">
-                <div
-                  className={`p-3 sm:p-4 rounded-lg border-2 transition-all opacity-50 ${formData.cardType === 'Silver'
-                    ? 'border-gray-400 bg-gray-900/50 shadow-lg scale-105 opacity-100'
-                    : 'border-white/5 bg-black/10'
-                    }`}
-                >
-                  <div className="text-center">
-                    <div className="text-xl sm:text-2xl mb-1">🥈</div>
-                    <div className={`text-[10px] sm:text-sm font-bold ${formData.cardType === 'Silver' ? 'text-white' : 'text-gray-500'}`}>Silver</div>
-                  </div>
-                </div>
-                <div
-                  className={`p-3 sm:p-4 rounded-lg border-2 transition-all opacity-50 ${formData.cardType === 'Gold'
-                    ? 'border-yellow-400 bg-yellow-900/50 shadow-lg scale-105 opacity-100'
-                    : 'border-white/5 bg-black/10'
-                    }`}
-                >
-                  <div className="text-center">
-                    <div className="text-xl sm:text-2xl mb-1">🥇</div>
-                    <div className={`text-[10px] sm:text-sm font-bold ${formData.cardType === 'Gold' ? 'text-yellow-300' : 'text-gray-500'}`}>Gold</div>
-                  </div>
-                </div>
-                <div
-                  className={`p-3 sm:p-4 rounded-lg border-2 transition-all opacity-50 ${formData.cardType === 'Elite'
-                    ? 'border-red-500 bg-red-900/50 shadow-lg scale-105 opacity-100'
-                    : 'border-white/5 bg-black/10'
-                    }`}
-                >
-                  <div className="text-center">
-                    <div className="text-xl sm:text-2xl mb-1">🔴</div>
-                    <div className={`text-[10px] sm:text-sm font-bold ${formData.cardType === 'Elite' ? 'text-red-400' : 'text-gray-500'}`}>Elite</div>
-                  </div>
-                </div>
-                <div
-                  className={`p-3 sm:p-4 rounded-lg border-2 transition-all opacity-50 ${formData.cardType === 'Platinum'
-                    ? 'border-cyan-400 bg-cyan-900/50 shadow-lg scale-105 opacity-100'
-                    : 'border-white/5 bg-black/10'
-                    }`}
-                >
-                  <div className="text-center">
-                    <div className="text-xl sm:text-2xl mb-1">💎</div>
-                    <div className={`text-[10px] sm:text-sm font-bold ${formData.cardType === 'Platinum' ? 'text-cyan-300' : 'text-gray-500'}`}>Platinum</div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            
 
             <div>
               <label className="block text-xs uppercase text-gray-400 mb-1">Assign Team</label>
@@ -566,133 +519,7 @@ export const CreatePlayer: React.FC = () => {
             </div>
           )}
 
-          {/* Season Stats Section - Show for Card Builder and Edit modes */}
-          {/* Season Stats Section - Show for Card Builder and Edit modes */}
-          {requestId && (
-            <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-white/10 pb-2">
-                <h3 className="text-xl font-bold text-elkawera-accent">Performance Records</h3>
-                <span className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Manual Calculating OVR</span>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Goals</label>
-                  <input
-                    type="number"
-                    value={formData.goals || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, goals: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono focus:border-[#00ff9d] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Assists</label>
-                  <input
-                    type="number"
-                    value={formData.assists || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, assists: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono focus:border-[#00ff9d] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Def. Contrib</label>
-                  <input
-                    type="number"
-                    value={formData.defensiveContributions || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, defensiveContributions: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono focus:border-[#00ff9d] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Matches</label>
-                  <input
-                    type="number"
-                    value={formData.matchesPlayed || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, matchesPlayed: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono focus:border-[#00ff9d] outline-none"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Clean Sheets</label>
-                  <input
-                    type="number"
-                    value={formData.cleanSheets || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, cleanSheets: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Saves</label>
-                  <input
-                    type="number"
-                    value={formData.saves || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, saves: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase text-gray-400 mb-1 font-bold">Penalty Saves</label>
-                  <input
-                    type="number"
-                    value={formData.penaltySaves || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, penaltySaves: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-white/10 rounded p-2 text-white font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase text-red-400/70 mb-1 font-bold">Own Goals</label>
-                  <input
-                    type="number"
-                    value={formData.ownGoals || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, ownGoals: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-red-500/10 rounded p-2 text-white font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase text-red-400/70 mb-1 font-bold">Goals Conceded</label>
-                  <input
-                    type="number"
-                    value={formData.goalsConceded || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, goalsConceded: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-red-500/10 rounded p-2 text-white font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[10px] uppercase text-red-400/70 mb-1 font-bold">Penalty Missed</label>
-                  <input
-                    type="number"
-                    value={formData.penaltyMissed || 0}
-                    onChange={(e) => setFormData(prev => ({ ...prev, penaltyMissed: parseInt(e.target.value) || 0 }))}
-                    className="w-full bg-black/50 border border-red-500/10 rounded p-2 text-white font-mono"
-                  />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-[#00ff9d]/10 to-transparent p-6 rounded-xl border border-[#00ff9d]/30">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <label className="text-xs font-bold text-[#00ff9d] uppercase tracking-tighter">Final Card Rating</label>
-                    <p className="text-[10px] text-gray-500">performance bonuses</p>
-                  </div>
-                  <div className="text-right">
-                    <span className="text-4xl font-display font-black text-white">{formData.overallScore}</span>
-                    <div className="text-[10px] text-[#00ff9d] font-bold uppercase tracking-widest">{formData.cardType}</div>
-                  </div>
-                </div>
-                <input
-                  type="range"
-                  min="30"
-                  max="95"
-                  value={baseManualScore}
-                  onChange={(e) => setBaseManualScore(parseInt(e.target.value))}
-                  className="w-full h-2 bg-black/50 rounded-lg appearance-none cursor-pointer accent-[#00ff9d]"
-                />
-              </div>
-            </div>
-          )}
+          
 
           <button
             onClick={handleSave}
