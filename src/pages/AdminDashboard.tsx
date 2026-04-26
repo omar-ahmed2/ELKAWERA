@@ -230,20 +230,20 @@ export const AdminDashboard: React.FC = () => {
             to="/admin/matches"
             delay={0.7}
           />
-          <ActionButton
+          {/* <ActionButton
             icon={FileText}
             label="Scout Reports"
             desc="View scout activities, rankings, and recruitment analysis."
             to="/admin/scouts"
             delay={0.8}
-          />
-          <ActionButton
+          /> */}
+          {/* <ActionButton
             icon={CreditCard}
             label="Kit Requests"
             desc="Manage team kit orders and custom design submissions."
             to="/admin/kit-requests"
             delay={0.9}
-          />
+          /> */}
           <ActionButton
             icon={Plus}
             label="Create Player Card"
