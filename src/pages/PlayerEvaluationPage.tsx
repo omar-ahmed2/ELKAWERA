@@ -180,6 +180,10 @@ export const PlayerEvaluationPage: React.FC = () => {
                     });
                 }
 
+                // Determine goals conceded based on team (home players concede away score, away players concede home score)
+                const isHomePlayer = match.homePlayerIds.includes(player.id);
+                const goalsConcededThisMatch = isHomePlayer ? match.awayScore : match.homeScore;
+
                 // Update player stats
                 const updatedPlayer: Player = {
                     ...player,
@@ -189,6 +193,7 @@ export const PlayerEvaluationPage: React.FC = () => {
                     cleanSheets: player.cleanSheets + (evaluation.cleanSheets ? 1 : 0),
                     penaltySaves: player.penaltySaves + evaluation.penaltySaves,
                     saves: (player.saves || 0) + evaluation.saves,
+                    goalsConceded: player.goalsConceded + goalsConcededThisMatch,
                     matchesPlayed: player.matchesPlayed + 1,
                     updatedAt: Date.now(),
                 };

@@ -33,6 +33,11 @@ export function calculatePlayerOverallRating(
     if (evaluation.penaltySaves > 0) adjustment += evaluation.penaltySaves * 0.8;
     if (evaluation.saves > 0) adjustment += evaluation.saves * 0.1;
 
+    // Note: player.goalsConceded already includes this match's goals conceded
+    if (player.goalsConceded > 0) {
+        adjustment -= Math.floor(player.goalsConceded / 4);
+    }
+
     // Cap the adjustment to prevent massive jumps
     adjustment = Math.min(adjustment, 3);
 
