@@ -427,12 +427,12 @@ export const Landing: React.FC = React.memo(() => {
               desc={t('landing.feat.admin.desc')}
               color="red"
             />
-            <FeatureCard
+            {/* <FeatureCard
               icon={<Search size={28} />}
               title={t('landing.feat.scout.title')}
               desc={t('landing.feat.scout.desc')}
               color="cyan"
-            />
+            /> */}
             <FeatureCard
               icon={<Calendar size={28} />}
               title={t('landing.feat.scheduling.title')}
@@ -610,7 +610,7 @@ export const Landing: React.FC = React.memo(() => {
           </div>
         </section>
 
-        {/* Global Community Section */}
+        {/* Global Community Section
         <motion.section
           initial="hidden"
           whileInView="visible"
@@ -654,7 +654,7 @@ export const Landing: React.FC = React.memo(() => {
               </Link>
             </div>
           </div>
-        </motion.section>
+        </motion.section> */}
 
         {/* Final CTA Section */}
         <section className="container mx-auto px-4 md:px-6 py-16 md:py-20">
@@ -683,7 +683,7 @@ export const Landing: React.FC = React.memo(() => {
               </div>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-8 pt-4 md:pt-8 text-black/40 font-bold uppercase tracking-tighter text-xs md:text-sm">
                 <span className="flex items-center gap-2"><Trophy size={16} /> Monthly Tournaments</span>
-                <span className="flex items-center gap-2"><Award size={16} /> Professional Scouting</span>
+                {/* <span className="flex items-center gap-2"><Award size={16} /> Professional Scouting</span> */}
                 <span className="flex items-center gap-2"><MousePointer2 size={16} /> Instant Stats</span>
               </div>
             </motion.div>

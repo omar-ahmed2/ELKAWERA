@@ -189,7 +189,7 @@ export const Settings: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div>
+                                {/* <div>
                                     <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
                                         <div className="w-5 h-5 flex items-center justify-center bg-cyan-400/20 rounded text-cyan-400">
                                             <Snowfall snowflakeCount={10} style={{ position: 'relative', width: 20, height: 20 }} />
@@ -208,7 +208,7 @@ export const Settings: React.FC = () => {
                                             <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${snowEffect ? (dir === 'rtl' ? '-translate-x-6' : 'translate-x-6') : 'translate-x-0'}`}></div>
                                         </button>
                                     </div>
-                                </div>
+                                </div> */}
 
                                 <div className="mt-8 flex justify-end">
                                     <button

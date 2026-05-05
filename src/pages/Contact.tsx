@@ -55,7 +55,7 @@ export const Contact: React.FC = () => {
             </div>
           </div>
 
-          <div className="space-y-6">
+          {/* <div className="space-y-6">
             <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest">Connect with us</h3>
             <div className="flex gap-4">
               {[Instagram, Facebook, Twitter].map((Icon, i) => (
@@ -64,7 +64,7 @@ export const Contact: React.FC = () => {
                 </a>
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Contact Form */}
@@ -137,6 +137,7 @@ export const Contact: React.FC = () => {
                 <button
                   type="submit"
                   className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-bold py-5 rounded-2xl shadow-xl hover:shadow-blue-500/20 hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group"
+        
                 >
                   Send Message
                   <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />

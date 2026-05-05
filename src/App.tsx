@@ -56,7 +56,7 @@ const AppInner: React.FC = () => {
   
   return (
     <HashRouter>
-      {snowEffect && (
+      {/* {snowEffect && (
         <Snowfall
           color="#65ec6eff"
           snowflakeCount={200}
@@ -72,7 +72,7 @@ const AppInner: React.FC = () => {
             opacity: 0.6
           }}
         />
-      )}
+      )} */}
       <Layout>
         <Routes>
           <Route path="/" element={<Landing />} />

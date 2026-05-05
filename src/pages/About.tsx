@@ -32,17 +32,17 @@ export const About: React.FC = () => {
         { title: "Tactical Lineups", desc: "Before matches, you use the team management interface to drag and drop players into specific slots. This 'Lineup' is what the system uses to assign 'Clean Sheet' points to defenders and 'Goal' points to strikers once the match is finished." }
       ]
     },
-    scout: {
-      title: "As a Scout",
-      icon: <Search className="w-8 h-8 text-elkawera-accent" />,
-      description: "You are a data analyst. You use the platform to filter noise and identify elite potential through cold hard facts.",
-      features: [
-        { title: "The Advanced Search Engine", desc: "You use a specialized 'Search' page with multi-tier filters. You can search for 'Players over 180cm, with a 75+ shooting rating, who have played more than 5 matches'. This returns a curated list of talent cards." },
-        { title: "Talent Monitoring", desc: "When you click on a Player's card, your Scout ID is recorded. You use your 'Scout Dashboard' to see a history of everyone you've viewed, allowing you to track if a player's stats have improved since your last check-in." },
-        { title: "Accessing Verified Data", desc: "Unlike regular users, you can see a player's 'Verified Phone' and 'Email' on their public profile. This allows you to bypass the digital platform and initiate real-world recruitment conversations with players or their captains." },
-        { title: "Market Trends", desc: "You analyze the 'Trending' section of your dashboard, which aggregates data on which players are getting the most 'Likes' and 'Views' from other scouts, helping you spot emerging stars early." }
-      ]
-    },
+    // scout: {
+    //   title: "As a Scout",
+    //   icon: <Search className="w-8 h-8 text-elkawera-accent" />,
+    //   description: "You are a data analyst. You use the platform to filter noise and identify elite potential through cold hard facts.",
+    //   features: [
+    //     { title: "The Advanced Search Engine", desc: "You use a specialized 'Search' page with multi-tier filters. You can search for 'Players over 180cm, with a 75+ shooting rating, who have played more than 5 matches'. This returns a curated list of talent cards." },
+    //     { title: "Talent Monitoring", desc: "When you click on a Player's card, your Scout ID is recorded. You use your 'Scout Dashboard' to see a history of everyone you've viewed, allowing you to track if a player's stats have improved since your last check-in." },
+    //     { title: "Accessing Verified Data", desc: "Unlike regular users, you can see a player's 'Verified Phone' and 'Email' on their public profile. This allows you to bypass the digital platform and initiate real-world recruitment conversations with players or their captains." },
+    //     { title: "Market Trends", desc: "You analyze the 'Trending' section of your dashboard, which aggregates data on which players are getting the most 'Likes' and 'Views' from other scouts, helping you spot emerging stars early." }
+    //   ]
+    // },
     admin: {
       title: "As an Admin",
       icon: <Star className="w-8 h-8 text-elkawera-accent" />,
@@ -248,7 +248,7 @@ export const About: React.FC = () => {
           </div>
           {/* Stats Overlay */}
           <div className="absolute -bottom-8 -right-8 p-6 rounded-3xl bg-[var(--bg-primary)] border border-elkawera-accent/30 shadow-2xl -skew-y-3">
-            <div className="text-3xl font-black text-elkawera-accent italic leading-none tracking-tighter">10,000+</div>
+            <div className="text-3xl font-black text-elkawera-accent italic leading-none tracking-tighter">250+</div>
             <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Active Players</div>
           </div>
         </div>

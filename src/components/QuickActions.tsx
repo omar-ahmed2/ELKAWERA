@@ -51,15 +51,15 @@ export const QuickActions: React.FC<QuickActionsProps> = ({ userRole, hasPlayerC
                 color: 'text-purple-400',
                 bgColor: 'bg-purple-500/10'
             },
-            {
-                id: 'kits',
-                title: 'Official Kits',
-                description: 'Browse & order kits',
-                icon: <Shirt size={24} />,
-                link: '/kits',
-                color: 'text-green-400',
-                bgColor: 'bg-green-500/10'
-            }
+            // {
+            //     id: 'kits',
+            //     title: 'Official Kits',
+            //     description: 'Browse & order kits',
+            //     icon: <Shirt size={24} />,
+            //     link: '/kits',
+            //     color: 'text-green-400',
+            //     bgColor: 'bg-green-500/10'
+            // }
         ];
 
         if (userRole === 'player' && hasPlayerCard) {
