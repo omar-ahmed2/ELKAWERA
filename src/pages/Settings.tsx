@@ -28,7 +28,7 @@ import Snowfall from 'react-snowfall';
 export const Settings: React.FC = () => {
     const { user, signOut } = useAuth();
     const { language, theme, setLanguage, setTheme, snowEffect, setSnowEffect, t, dir } = useSettings();
-    const [activeTab, setActiveTab] = useState('general');
+    const [activeTab, setActiveTab] = useState('security');
     const [loading, setLoading] = useState(false);
 
     // Security State
@@ -92,7 +92,6 @@ export const Settings: React.FC = () => {
 
 
     const tabs = [
-        { id: 'general', label: t('settings.general'), icon: Monitor },
         { id: 'security', label: 'Privacy & Security', icon: Shield },
     ];
 
@@ -145,91 +144,7 @@ export const Settings: React.FC = () => {
                         <div className="absolute top-0 right-0 w-64 h-64 bg-elkawera-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
 
                         {/* General Tab */}
-                        {activeTab === 'general' && (
-                            <div className="space-y-8 animate-fade-in">
-                                <div>
-                                    <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                                        <Globe size={20} className="text-blue-400" /> {t('settings.language')}
-                                    </h2>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <button
-                                            onClick={() => setLanguage('en')}
-                                            className={`p-4 rounded-xl border flex items-center justify-between transition-all ${language === 'en' ? 'bg-[var(--bg-secondary)] border-elkawera-accent' : 'bg-black/20 border-white/10 hover:border-white/30'}`}
-                                        >
-                                            <span className="font-bold text-[var(--text-primary)]">English (UK)</span>
-                                            {language === 'en' && <Check size={18} className="text-elkawera-accent" />}
-                                        </button>
-                                        <button
-                                            onClick={() => setLanguage('ar')}
-                                            className={`p-4 rounded-xl border flex items-center justify-between transition-all ${language === 'ar' ? 'bg-[var(--bg-secondary)] border-elkawera-accent' : 'bg-black/20 border-white/10 hover:border-white/30'}`}
-                                        >
-                                            <span className="font-bold font-sans text-[var(--text-primary)]">العربية</span>
-                                            {language === 'ar' && <Check size={18} className="text-elkawera-accent" />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                                        <Moon size={20} className="text-purple-400" /> {t('settings.theme')}
-                                    </h2>
-                                    <div className="grid grid-cols-2 gap-2 bg-black/20 rounded-xl p-1">
-                                        <button
-                                            onClick={() => setTheme('dark')}
-                                            className={`flex items-center justify-center gap-2 py-3 rounded-lg transition-all font-bold text-sm ${theme === 'dark' ? 'bg-[var(--bg-secondary)] text-white shadow' : 'text-gray-500 hover:text-white'}`}
-                                        >
-                                            <Moon size={16} /> {t('settings.dark')}
-                                        </button>
-                                        <button
-                                            onClick={() => setTheme('light')}
-                                            className={`flex items-center justify-center gap-2 py-3 rounded-lg transition-all font-bold text-sm ${theme === 'light' ? 'bg-white text-black shadow' : 'text-gray-500 hover:text-white'}`}
-                                        >
-                                            <Sun size={16} /> {t('settings.light')}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                {/* <div>
-                                    <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4 flex items-center gap-2">
-                                        <div className="w-5 h-5 flex items-center justify-center bg-cyan-400/20 rounded text-cyan-400">
-                                            <Snowfall snowflakeCount={10} style={{ position: 'relative', width: 20, height: 20 }} />
-                                        </div>
-                                        {t('settings.snow')}
-                                    </h2>
-                                    <div className="flex items-center justify-between p-4 bg-black/20 rounded-xl border border-white/5">
-                                        <div>
-                                            <div className="font-bold text-[var(--text-primary)]">{t('settings.snow')}</div>
-                                            <div className="text-xs text-[var(--text-secondary)]">{t('settings.snow.desc')}</div>
-                                        </div>
-                                        <button
-                                            onClick={() => setSnowEffect(!snowEffect)}
-                                            className={`w-12 h-6 rounded-full p-1 transition-colors duration-300 ${snowEffect ? 'bg-elkawera-accent' : 'bg-gray-700'}`}
-                                        >
-                                            <div className={`w-4 h-4 rounded-full bg-white transition-transform duration-300 ${snowEffect ? (dir === 'rtl' ? '-translate-x-6' : 'translate-x-6') : 'translate-x-0'}`}></div>
-                                        </button>
-                                    </div>
-                                </div> */}
-
-                                <div className="mt-8 flex justify-end">
-                                    <button
-                                        onClick={handleSave}
-                                        disabled={loading}
-                                        className="px-6 py-3 bg-white text-black font-bold uppercase rounded-full hover:bg-elkawera-accent transition-colors shadow-lg flex items-center gap-2"
-                                    >
-                                        {loading ? (
-                                            <>
-                                                <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
-                                                Saving...
-                                            </>
-                                        ) : (
-                                            <>
-                                                <Save size={18} /> {t('settings.save')}
-                                            </>
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                        )}
+                        
 
                         {/* Privacy & Security Tab */}
                         {activeTab === 'security' && (
