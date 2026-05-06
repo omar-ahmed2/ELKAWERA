@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type Language = 'en' | 'ar';
-type Theme = 'dark' | 'light';
+type Language = 'en';
+type Theme = 'dark';
 
 interface SettingsContextType {
     language: Language;
@@ -11,7 +11,7 @@ interface SettingsContextType {
     setTheme: (theme: Theme) => void;
     setSnowEffect: (enabled: boolean) => void;
     t: (key: string) => string;
-    dir: 'ltr' | 'rtl';
+    dir: 'ltr';
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -27,7 +27,6 @@ const translations: Record<Language, Record<string, string>> = {
         'settings.language': 'Language & Region',
         'settings.theme': 'Theme Preference',
         'settings.dark': 'Dark Mode',
-        'settings.light': 'Light Mode',
         'settings.sound': 'Sound',
         'settings.sound.desc': 'Play sounds when clicking buttons or receiving notifications.',
         'settings.snow': 'Winter Snowfall',
@@ -240,261 +239,30 @@ const translations: Record<Language, Record<string, string>> = {
         'teams.table.action': 'Action',
         'teams.card.details': 'DETAILS',
     },
-    ar: {
-        'settings.title': 'الإعدادات',
-        'settings.subtitle': 'إدارة تفضيلاتك وأمان حسابك',
-        'settings.general': 'عام',
-        'settings.notifications': 'إشعارات',
-        'settings.privacy': 'الخصوصية والأمان',
-        'settings.signout': 'تسجيل الخروج',
-        'settings.language': 'الغة والمنطقة',
-        'settings.theme': 'تفضيلات المظهر',
-        'settings.dark': 'الوضع الليلي',
-        'settings.light': 'الوضع النهاري',
-        'settings.sound': 'الصوت',
-        'settings.sound.desc': 'تشغيل الأصوات عند النقر على الأزرار أو تلقي الإشعارات.',
-        'settings.snow': 'تساقط الثلوج الشموي',
-        'settings.snow.desc': 'تفعيل أو تعطيل تأثير تساقط الثلوج الرائع عبر المنصة.',
-        'settings.save': 'حفظ التغييرات',
-        // Navigation
-        'nav.dashboard': 'لوحة التحكم',
-        'nav.matches': 'المباريات',
-        'nav.teams': 'الفرق',
-        'nav.leaderboard': 'لوحة المتصدرين',
-        'nav.profile': 'الملف الشخصي',
-        'nav.settings': 'الإعدادات',
-        'nav.about': 'عن المنصة',
-        'nav.contact': 'اتصل بنا',
-        // Common
-        'common.loading': 'جاري التحميل...',
-        'common.search': 'بحث...',
-        'common.no_data': 'لا توجد بيانات.',
-        'common.view_details': 'عرض التفاصيل',
-        'common.cancel': 'إلغاء',
-        'common.confirm': 'تأكيد',
-        'common.edit': 'تعديل',
-        'common.delete': 'حذف',
-        'common.save': 'حفظ',
-        // Landing
-        'landing.hero.title_manage': 'ابدأ بناء',
-        'landing.hero.title_dynasty': 'مسيرتك الأسطورية',
-        'landing.hero.subtitle': 'المنصة الاحترافية لمتابعة تطور اللاعبين. أنشئ الفرق، حدد المراكز، وتابع تدرج الإحصائيات بعد كل مباراة.',
-        'landing.cta.create': 'إنشاء لاعب',
-        'landing.cta.teams': 'إدارة الفرق',
-        'landing.cta.database': 'عرض قاعدة البيانات',
-        'landing.feat.stats.title': 'إحصائيات ديناميكية',
-        'landing.feat.stats.desc': 'قم بتحديث الخصائص بعد كل مباراة لإعادة حساب التقييم العام.',
-        'landing.feat.teams.title': 'إدارة الفرق',
-        'landing.feat.teams.desc': 'أنشئ التشكيلات، عيّن اللاعبين، وأدر فرقاً متعددة بسهولة.',
-        'landing.feat.tier.title': 'نظام المستويات',
-        'landing.feat.tier.desc': 'طوّر البطاقات من الفضية إلى الذهبية ثم البلاتينية بناءً على الأداء.',
-        'landing.feat.analytics.title': 'التحليلات',
-        'landing.feat.analytics.desc': 'تصور النمو بمرور الوقت وتتبع تقدم فريقك بدقة.',
-        // Vision
-        'landing.vision.title': 'رؤيتنا',
-        'landing.vision.subtitle': 'ثورة في إدارة كرة القدم للهواة',
-        'landing.vision.desc1': 'الكورة هي أكثر من مجرد متتبع للإحصائيات. إنها نظام بيئي رقمي مصمم لرفع كرة القدم في الشوارع إلى المعايير الاحترافية.',
-        'landing.vision.desc2': 'مهمتنا هي تزويد كل لاعب وقائد وكشاف بالأدوات التي يحتاجونها لإظهار الموهبة وإدارة المنافسة بسلاسة.',
-        'landing.vision.philosophy': 'حيث يلتقي الشغف بالاحترافية',
-        // How It Works
-        'landing.how.title': 'كيف يعمل؟',
-        'landing.how.step1.title': 'أنشئ ملفك الشخصي',
-        'landing.how.step1.desc': 'سجل كلاعب، قائد، أو كشاف لتبدأ رحلتك.',
-        'landing.how.step2.title': 'كون فريقك',
-        'landing.how.step2.desc': 'يمكن للقادة بناء الفرق وتوظيف اللاعبين من قاعدة البيانات.',
-        'landing.how.step3.title': 'العب وتطور',
-        'landing.how.step3.desc': 'سجل نتائج المباريات وشاهد إحصائياتك ومستوى بطاقتك يتطور.',
-        'landing.how.step4.title': 'كن تحت الأنظار',
-        'landing.how.step4.desc': 'أهم المواهب تجذب الكشافين الذين يبحثون عن الأساطير القادمة.',
-        // Extended Features
-        'landing.feat.admin.title': 'تحكم الإدارة',
-        'landing.feat.admin.desc': 'اعتماد المباريات، إدارة المستخدمين، وضمان نزاهة المنصة.',
-        'landing.feat.scout.title': 'اكتشاف المواهب',
-        'landing.feat.scout.desc': 'فلاتر متقدمة للعثور على اللاعبين حسب الأداء، العمر، والمركز.',
-        'landing.feat.scheduling.title': 'جدولة المباريات',
-        'landing.feat.scheduling.desc': 'تنظيم المباريات والبطولات بأدوات جدولة تلقائية.',
-        'landing.feat.leaderboards.title': 'التصنيفات العالمية',
-        'landing.feat.leaderboards.desc': 'نافس على الصدارة في التصنيفات الإقليمية والعالمية.',
-        // Card Evolution
-        'landing.evolution.title': 'تطور بطاقة اللاعب',
-        'landing.evolution.subtitle': 'أداؤك، تقدمك',
-        'landing.evolution.desc': 'كل مباراة لها قيمتها. مع تحسن مهاراتك، يتطور مستوى بطاقتك.',
-        'landing.evolution.silver': 'الفضية: البداية',
-        'landing.evolution.gold': 'الذهبية: النجم الصاعد',
-        'landing.evolution.elite': 'النخبة: درجة المحترفين',
-        'landing.evolution.platinum': 'البلاتينية: حالة الأسطورة',
-        // Team Management
-        'landing.team_mgmt.title': 'إدارة فرق احترافية',
-        'landing.team_mgmt.desc': 'كل ما يحتاجه القائد لقيادة مسيرة ناجحة. أدر التشكيلات، تتبع مستوى الفريق، وجدول التحديات.',
-        // Analytics
-        'landing.analytics.title': 'تحليلات متعمقة',
-        'landing.analytics.desc': 'تمثيلات مرئية جميلة لأدائك بمرور الوقت. خرائط حرارية، رسوم بيانية للتقدم، ونسب الأداء.',
-        // Typewriter phrases
-        'landing.hero.typewriter.1': 'إرثك الكروي',
-        'landing.hero.typewriter.2': 'المستقبل',
-        'landing.hero.typewriter.3': 'أسطورتك',
-        'landing.hero.typewriter.4': 'مصيرك',
-        // Community
-        'landing.community.title': 'المجتمع والمنافسة',
-        'landing.community.desc': 'انضم إلى أكبر مجتمع لكرة القدم في الشوارع، شارك في الفعاليات، وابنِ سمعتك.',
-        // CTAs
-        'landing.cta.player': 'انضم كلاعب',
-        'landing.cta.captain': 'ابدأ كقائد',
-        'landing.cta.scout': 'سجل ككشاف',
-        'landing.cta.view_rankings': 'عرض التصنيفات العالمية',
-        // Dashboard
-        'dashboard.title': 'لوحة تحكم الفريق',
-        'dashboard.subtitle': 'إدارة بطاقات اللاعبين وتتبع الأداء.',
-        'dashboard.my_card': 'بطاقتي',
-        'dashboard.welcome': 'مرحباً',
-        'dashboard.notification': 'إشعار',
-        'dashboard.created_by_admin': 'تم إنشاء بطاقتك بواسطة المشرف.',
-        'dashboard.admin_update_only': 'يمكن للمشرفين فقط تحديث إحصائياتك.',
-        'dashboard.pending_card': 'بطاقتك قيد المراجعة',
-        'dashboard.pending_desc': 'سيقوم المشرف بإنشاء بطاقتك قريباً.',
-        'dashboard.rejected_card': 'تم رفض الطلب',
-        'dashboard.rejected_desc': 'تم رفض طلبك السابق. يرجى مراجعة التفاصيل والمحاولة مرة أخرى.',
-        'dashboard.no_card': 'لا توجد بطاقة',
-        'dashboard.no_card_desc': 'ليس لديك بطاقة لاعب حتى الآن. اطلب واحدة الآن!',
-        'dashboard.create_card': 'طلب بطاقة لاعب',
-        'dashboard.retry_card': 'إنشاء بطاقة جديدة',
-        'dashboard.delete_confirm_title': 'حذف البطاقة؟',
-        'dashboard.delete_confirm_msg': 'لا يمكن التراجع عن هذا الإجراء. سيتم حذف اللاعب وإحصائياته نهائياً.',
-        'dashboard.club_top_rated': 'الأعلى تقييماً',
-        'dashboard.metrics.overall': 'الإجمالي',
-        'dashboard.metrics.goals': 'الأهداف',
-        'dashboard.metrics.matches': 'مباريات',
-        'dashboard.update_performance': 'تحديث الأداء',
-        'dashboard.backup_data': 'نسخ احتياطي',
-
-        'dashboard.add_new_card': 'إضافة بطاقة جديدة',
-        'dashboard.admin_team_cards': 'بطاقات الفريق الإداري',
-        'dashboard.match_requests': 'طلبات المباريات للتحكيم',
-        'dashboard.ready_to_start': 'جاهزة للبدء',
-        'dashboard.lineups_submitted': 'تم تقديم التشكيلات من قبل كلا القائدين',
-        'dashboard.start_match': 'بدء المباراة',
-        'dashboard.squad_composition': 'تكوين الفريق',
-        'dashboard.total_cards': 'إجمالي البطاقات',
-        'dashboard.search_db': 'بحث في قاعدة البيانات',
-        'dashboard.filter_pos': 'تصفية حسب المركز',
-        'dashboard.player_cards': 'بطاقات اللاعبين',
-        'dashboard.no_match': 'لا يوجد لاعبين مطابقين للبحث.',
-        'dashboard.clear_filters': 'مسح التصفية',
-        'dashboard.edit_card': 'تعديل البطاقة',
-        'dashboard.delete_card': 'حذف',
-        'dashboard.flip_instruction': 'انقر على البطاقة للقلب',
-        'dashboard.user_db': 'قاعدة بيانات المستخدمين',
-        'dashboard.user_table.user': 'المستخدم',
-        'dashboard.user_table.email': 'البريد الإلكتروني',
-        'dashboard.user_table.role': 'الدور',
-        'dashboard.user_table.joined': 'تاريخ الانضمام',
-        'dashboard.user_table.actions': 'إجراءات',
-        'dashboard.user_table.delete_user': 'حذف المستخدم',
-        'dashboard.user_table.delete_confirm': 'حذف؟',
-        'dashboard.user_table.yes': 'نعم',
-        'dashboard.user_table.no': 'لا',
-        // Leaderboard & Stats
-        'leaderboard.title': 'لوحة المتصدرين',
-        'leaderboard.subtitle': 'أفضل اللاعبين والفرق الأسطورية',
-        'leaderboard.players_ranking': 'ترتيب اللاعبين',
-        'leaderboard.clubs_ranking': 'ترتيب الفرق',
-        'leaderboard.no_matches': 'لا توجد مباريات',
-        'stats.matches': 'مباريات',
-        'stats.wins': 'فوز',
-        'stats.losses': 'خسارة',
-        'stats.draws': 'تعادل',
-        'stats.goals': 'أهداف',
-        'stats.assists': 'تمريرات حاسمة',
-        'stats.defense': 'دفاع',
-        'stats.saves': 'تصديات',
-        'stats.clean_sheets': 'شباك نظيفة',
-        'stats.rating': 'التقييم',
-        'stats.overall': 'الإجمالي',
-        // Positions
-        'pos.all': 'كل المراكز',
-        'pos.cf': 'مهاجم',
-        'pos.cb': 'مدافع',
-        'pos.gk': 'حارس مرمى',
-        'pos.mid': 'خط وسط',
-        // Teams
-        'teams.title': 'إدارة الفرق',
-        'teams.subtitle': 'أنشئ وأدر فرقك بشعارات مخصصة.',
-        'teams.create_btn': 'إنشاء فريق',
-        'teams.your_teams': 'فرقك',
-        'teams.other_teams': 'فرق أخرى',
-        'teams.no_teams': 'لا توجد فرق',
-        'teams.create_first_team': 'أنشئ أول فريق لك لتبدأ مسيرتك.',
-        'teams.player_create_msg': 'أنشئ فريقك لتبدأ اللعب.',
-        'teams.link_create': 'أنشئ فريق الآن',
-        'teams.player_max_team_warning': 'يمكن للاعبين إنشاء فريق واحد فقط',
-        'teams.edit_title': 'تعديل تفاصيل الفريق',
-        'teams.create_title': 'إنشاء فريق جديد',
-        'teams.form.name': 'اسم الفريق',
-        'teams.form.short_name': 'الاختصار (3 حروف)',
-        'teams.form.color': 'اللون الأساسي',
-        'teams.form.logo': 'شعار الفريق',
-        'teams.form.upload_text': 'رفع PNG/JPG',
-        'teams.form.change': 'تغيير',
-        'teams.form.cancel': 'إلغاء',
-        'teams.form.save': 'حفظ الفريق',
-        'teams.form.update': 'تحديث الفريق',
-        'teams.details.back': 'العودة للفرق',
-        'teams.details.invite': 'دعوة لاعب',
-        'teams.details.edit': 'تعديل',
-        'teams.details.delete': 'حذف',
-        'teams.details.squad_size': 'حجم التشكيلة',
-        'teams.details.avg_rating': 'متوسط التقييم',
-        'teams.details.captain': 'القائد',
-        'teams.details.squad_list': 'قائمة الفريق',
-        'teams.details.no_players': 'لا يوجد لاعبين في هذا الفريق بعد.',
-        'teams.details.invite_link': 'دعوة لاعبين للانضمام',
-        'teams.delete_confirm_title': 'حذف الفريق؟',
-        'teams.delete_confirm_msg': 'هل أنت متأكد من حذف هذا الفريق؟ لا يمكن التراجع عن هذا الإجراء.',
-        'teams.remove_player_confirm': 'إزالة لاعب من الفريق؟',
-        'teams.remove_player_msg': 'سيتم إزالة هذا اللاعب وسيصبح حراً.',
-        'teams.min_players': 'الحد الأدنى للاعبين',
-        'teams.max_players': 'تجاوز الحد الأقصى',
-        'teams.min_players_msg': 'تحتاج إلى 5 لاعبين على الأقل لجدولة المباريات.',
-        'teams.max_players_msg': 'الحد الأقصى هو 7 لاعبين لكل فريق.',
-        'teams.table.player': 'اللاعب',
-        'teams.table.pos': 'المركز',
-        'teams.table.tier': 'المستوى',
-        'teams.table.age': 'العمر',
-        'teams.table.action': 'إجراء',
-        'teams.card.details': 'تفاصيل',
-    }
 };
 
 export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [language, setLanguage] = useState<Language>('en');
-    const [theme, setTheme] = useState<Theme>('dark');
+    const [theme] = useState<Theme>('dark');
     const [snowEffect, setSnowEffect] = useState<boolean>(true);
 
     useEffect(() => {
-        const storedLang = localStorage.getItem('elkawera_lang') as Language;
-        const storedTheme = localStorage.getItem('elkawera_theme') as Theme;
         const storedSnow = localStorage.getItem('elkawera_snow');
-        if (storedLang) setLanguage(storedLang);
-        if (storedTheme) setTheme(storedTheme);
         if (storedSnow !== null) setSnowEffect(storedSnow === 'true');
     }, []);
 
-    const updateLanguage = (lang: Language) => {
-        setLanguage(lang);
-        localStorage.setItem('elkawera_lang', lang);
-        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-        document.documentElement.lang = lang;
-    };
+    // Language is locked to English only - RTL removed
+    useEffect(() => {
+        document.documentElement.dir = 'ltr';
+        document.documentElement.lang = 'en';
+        localStorage.setItem('elkawera_lang', 'en');
+    }, []);
 
-    const updateTheme = (newTheme: Theme) => {
-        setTheme(newTheme);
-        localStorage.setItem('elkawera_theme', newTheme);
-        if (newTheme === 'light') {
-            document.documentElement.classList.add('light-mode');
-        } else {
-            document.documentElement.classList.remove('light-mode');
-        }
-    };
+    // Theme is locked to dark mode only
+    useEffect(() => {
+        document.documentElement.classList.remove('light-mode');
+        localStorage.setItem('elkawera_theme', 'dark');
+    }, []);
 
     const updateSnowEffect = (enabled: boolean) => {
         setSnowEffect(enabled);
@@ -510,11 +278,11 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             language,
             theme,
             snowEffect,
-            setLanguage: updateLanguage,
-            setTheme: updateTheme,
+            setLanguage: () => {}, // Locked to English
+            setTheme: () => {}, // Locked to dark mode
             setSnowEffect: updateSnowEffect,
             t,
-            dir: language === 'ar' ? 'rtl' : 'ltr'
+            dir: 'ltr' // Locked to LTR
         }}>
             {children}
         </SettingsContext.Provider>
