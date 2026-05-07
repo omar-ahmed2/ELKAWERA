@@ -135,9 +135,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <div className="relative w-12 h-12 rounded-full shadow-lg flex items-center justify-center flex-shrink-0 bg-white/5 border border-white/10 overflow-hidden">
                         <img src="/elkawera.png" alt="Logo" className="w-full h-full object-cover" />
                     </div>
-                    <span className="text-xl font-display font-bold italic tracking-tighter text-[var(--text-primary)] truncate">
-                        ELKAWERA<span className="text-elkawera-accent">.</span>
-                    </span>
+                    <div className="flex flex-col leading-none">
+                        <span className="text-lg sm:text-2xl font-display font-bold italic tracking-tighter text-[var(--text-primary)] group-hover:scale-105 transition-transform duration-300">
+                            ELKAWERA
+                        </span>
+                        <span className="text-[10px] sm:text-xs font-display font-bold italic tracking-[0.2em] text-elkawera-accent group-hover:scale-105 transition-transform duration-300">
+                            COMMUNITY<span className="text-elkawera-accent">.</span>
+                        </span>
+                    </div>
                 </div>
 
                 {/* Toggle Button */}
@@ -247,9 +252,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
 // Backward compatibility exports
 export const AppSidebar = Sidebar;
-export const AdminSidebar: React.FC<{ pendingRequestsCount: number; unreadNotifications: number; kitRequestsCount: number }> = 
+export const AdminSidebar: React.FC<{ pendingRequestsCount: number; unreadNotifications: number; kitRequestsCount: number }> =
     ({ pendingRequestsCount, unreadNotifications, kitRequestsCount }) => (
-        <Sidebar 
+        <Sidebar
             pendingRequestsCount={pendingRequestsCount}
             unreadNotifications={unreadNotifications}
             kitRequestsCount={kitRequestsCount}

@@ -230,12 +230,7 @@ export const Leaderboard: React.FC = () => {
                                             >
                                                 <Edit size={16} /> Quick Edit
                                             </button>
-                                            <button
-                                                onClick={(e) => { e.stopPropagation(); navigate(`/admin/performance-records/${player.id}`); }}
-                                                className="flex-1 min-w-[150px] py-3 bg-[#00ff9d] text-black font-bold uppercase rounded-xl hover:bg-white transition-colors flex items-center justify-center gap-2 text-sm shadow-lg shadow-[#00ff9d]/20"
-                                            >
-                                                <Activity size={16} /> Enhance Performance
-                                            </button>
+                                            
                                         </>
                                     )}
                                     <button
