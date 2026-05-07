@@ -101,9 +101,14 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
                 </div>
-                <span className="text-lg sm:text-2xl font-display font-bold italic tracking-tighter text-[var(--text-primary)] group-hover:scale-105 transition-transform duration-300">
-                  ELKAWERA<span className="text-elkawera-accent">.</span>
-                </span>
+                <div className="flex flex-row items-baseline gap-1 sm:gap-2 leading-none">
+                  <span className="text-lg sm:text-2xl font-display font-bold italic tracking-tighter text-[var(--text-primary)] group-hover:scale-105 transition-transform duration-300">
+                    ELKAWERA
+                  </span>
+                  <span className="text-[10px] sm:text-xs font-display font-bold italic tracking-[0.1em] text-elkawera-accent group-hover:scale-105 transition-transform duration-300">
+                    COMMUNITY<span className="text-elkawera-accent">.</span>
+                  </span>
+                </div>
               </div>
 
               {/* Desktop Menu - Hide for Admins as they use Sidebar */}
